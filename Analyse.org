@@ -1,0 +1,180 @@
+#+TITLE: Analyse structurée des articles (Partie B)
+#+AUTHOR: Synthèse pour le mémoire
+#+LANGUAGE: fr
+
+* 1) Meyer & Schnell (2020)
+** Référence
+- Meyer, M., & Schnell, S. (2020). /What counts as a "good" argument in school?—How teachers grade students’ mathematical arguments/. Educational Studies in Mathematics.
+- DOI: 10.1007/s10649-020-09974-z
+
+** Problématique
+- Les programmes demandent aux élèves d’argumenter, mais les critères effectivement utilisés par les enseignants pour noter ces arguments restent peu documentés.
+
+** Objectif de l’étude
+- Identifier les critères mobilisés par des enseignants du secondaire pour évaluer des arguments mathématiques d’élèves.
+- Mettre ces critères en relation avec des dimensions théoriques de l’argument.
+
+** Méthodologie
+- Approche qualitative par entretiens semi-directifs.
+- 16 enseignants allemands du secondaire (classes 5 à 13 ; 1 à 25 ans d’expérience).
+- Tâche de probabilité + 12 productions d’élèves (réelles/fictives) à noter (échelle allemande 1 à 6), commenter et éventuellement réviser.
+- Analyse interprétative des éléments regardés et des critères utilisés ; comparaison avec trois dimensions théoriques (structure, contenu, orientation destinataire).
+
+** Résultats principaux
+- Les enseignants mobilisent un ensemble *hétérogène* de critères, à la fois logiques et pédagogiques.
+- Un même argument peut recevoir des évaluations différentes selon le correcteur et le contexte.
+- Les critères empiriques observés s’alignent globalement sur les trois dimensions théoriques (structure, contenu, orientation destinataire).
+- L’explicitation des règles générales est souvent moins valorisée à l’école que dans l’enseignement supérieur, ce qui éclaire le décalage école/université.
+
+** Apports pour ton sujet (rigueur perçue)
+- La rigueur n’est pas un critère unique ; elle est une combinaison de validité, intelligibilité, présentation et adéquation au contexte de classe.
+- L’évaluation de la preuve est une pratique située, fortement dépendante de normes locales et de préférences enseignantes.
+
+** Limites
+- Dispositif de type « laboratoire » (copies hors contexte de classe habituel).
+- Focus sur l’évaluation *sommative* (pas l’évaluation formative en situation ordinaire).
+
+** Implications didactiques
+- Rendre explicites les critères de correction auprès des élèves.
+- Aligner tâches, attentes d’écriture, et feedback.
+
+* 2) Moore (2016)
+** Référence
+- Moore, R. C. (2016). /Mathematics Professors’ Evaluation of Students’ Proofs: A Complex Teaching Practice/. International Journal of Research in Undergraduate Mathematics Education, 2, 246–278.
+- DOI: 10.1007/s40753-016-0029-y
+
+** Problématique
+- On sait peu comment les enseignants-chercheurs évaluent concrètement les preuves rédigées par les étudiants, et quels critères ils pondèrent réellement.
+
+** Objectif de l’étude
+- Étudier l’accord/désaccord entre correcteurs.
+- Identifier les caractéristiques d’une « bonne preuve » en contexte universitaire.
+- Documenter la manière dont ces critères sont communiqués aux étudiants.
+
+** Méthodologie
+- Étude exploratoire qualitative, 4 enseignants-chercheurs en mathématiques (deux entretiens chacun).
+- Entretien 1 : correction de 6 preuves d’étudiants (annotation + note /10 + verbalisation).
+- Entretien 2 : re-correction de 3 preuves après consultation des annotations des autres + correction d’une 7e preuve.
+
+** Résultats principaux
+- Variabilité notable des notes : pour 5 preuves sur 7, l’écart initial est d’au moins 3 points.
+- Critères centraux convergents :
+  - correction logique,
+  - clarté,
+  - fluidité/forme,
+  - preuve de compréhension de l’étudiant.
+- Les aspects de forme sont commentés, mais pèsent généralement moins dans la note finale.
+- La note dépend fortement de jugements sur la *gravité* des erreurs et sur la cognition supposée de l’étudiant (intention/compréhension), pas seulement de la validité formelle.
+
+** Apports pour ton sujet (rigueur perçue)
+- Confirme que l’évaluation de la rigueur est interprétative : elle combine produit écrit et lecture du « niveau de compréhension » de l’élève.
+- Montre la distinction utile entre *évaluer* une preuve et *noter* une preuve.
+
+** Limites
+- Petit échantillon (4 professeurs).
+- Nombre limité de preuves, en contexte d’entretien et non en correction ordinaire de cours.
+- Copies hors contexte de classe des évaluateurs.
+
+** Implications didactiques
+- Besoin de critères explicites et partagés pour réduire l’arbitraire inter-correcteurs.
+- Importance de former à la cohérence entre feedback qualitatif et note chiffrée.
+
+* 3) Knuth, Kim, Zaslavsky, Vinsonhaler, Gaddis & Fernandez (2020)
+** Référence
+- Knuth, E., Kim, H., Zaslavsky, O., Vinsonhaler, R., Gaddis, D., & Fernandez, L. (2020). /Teachers’ Views about the Role of Examples in Proving-related Activities/. Journal of Educational Research in Mathematics, numéro spécial, 115–134.
+- DOI: 10.29275/jerm.2020.08.sp.1.115
+
+** Problématique
+- Les exemples jouent un rôle clé dans l’activité de preuve, mais l’enseignement explicite de leur usage stratégique reste limité.
+
+** Objectif de l’étude
+- Examiner les croyances d’enseignants sur le rôle des exemples dans les activités de preuve.
+- Étudier les pratiques déclarées d’enseignement de cet usage.
+
+** Méthodologie
+- Enquête en ligne (questions fermées + ouvertes).
+- 54 enseignants de collège (middle school) aux États-Unis (région Mid-South).
+- Analyse mixte : catégorisation a priori (cadre d’analyse de l’usage des exemples) + catégories émergentes.
+
+** Résultats principaux
+- Les enseignants jugent majoritairement les exemples utiles pour apprendre à prouver.
+- Mais les réponses ouvertes montrent souvent une conception limitée et peu stratégique de l’usage des exemples en preuve.
+- Les enseignants décrivent fréquemment un usage des exemples centré sur :
+  - conviction empirique,
+  - reproduction de procédures,
+  - choix d’exemples « faciles » ou « premiers venus ».
+- Faible mise en avant de fonctions plus avancées : recherche d’invariants, sélection de cas frontières, transition vers preuve générale.
+- Les justifications par exemple générique sont souvent perçues comme peu accessibles/peu convaincantes pour les élèves.
+
+** Apports pour ton sujet (rigueur perçue)
+- Montre un écart entre l’importance reconnue des exemples et les pratiques/attentes didactiques effectivement mobilisées.
+- Éclaire une dimension de la rigueur : passer de « ça marche sur des cas » à « pourquoi c’est vrai en général ».
+
+** Limites
+- Données auto-déclarées (écart possible avec les pratiques réelles).
+- Étude circonscrite au niveau collège et à un contexte régional.
+
+** Implications didactiques
+- Besoin de formation ciblée sur l’usage stratégique des exemples en preuve.
+- Nécessité de ressources curriculaires explicites pour orchestrer la transition exemple -> argument général -> preuve.
+
+* 4) Lesseig (2016)
+** Référence
+- Lesseig, K. (2016). /Investigating mathematical knowledge for teaching proof in professional development/. International Journal of Research in Education and Science.
+
+** Problématique
+- Les recherches signalent une compréhension fragile de la preuve chez de nombreux enseignants, mais décrivent encore peu précisément les connaissances à développer en formation.
+
+** Objectif de l’étude
+- Proposer et tester un cadre de /Mathematical Knowledge for Teaching Proof/ (MKT for Proof).
+- Étudier comment différentes formes de formation continue activent des composantes distinctes de cette connaissance.
+
+** Cadre théorique
+- Adaptation du cadre MKT (Ball et al.) à la preuve, avec 4 domaines :
+  - CCK (connaissances communes),
+  - SCK (connaissances spécialisées pour enseigner),
+  - KCS (connaissance du contenu et des élèves),
+  - KCT (connaissance du contenu et de l’enseignement).
+
+** Méthodologie
+- Données issues du projet /Leader Project/ (formation de leaders en PD).
+- 35 leaders (primaire/collège/lycée) de 3 districts.
+- Analyse vidéo d’un même problème de preuve (« Halving and Doubling ») dans 4 contextes de formation (séminaire + séances PD animées par des leaders de cas).
+- Codage qualitatif/quantitatif des unités d’échange selon les composantes du cadre.
+
+** Résultats principaux
+- Les discussions de séminaire « doing mathematics » mobilisent les 4 domaines du cadre.
+- Les discussions sur vidéocases se concentrent davantage sur le SCK.
+- Les séances PD animées sur le terrain montrent des profils différents selon le niveau :
+  - primaire : davantage CCK/SCK autour de la généralité des arguments,
+  - collège/lycée : davantage KCS/KCT (attentes sur les élèves, choix pédagogiques, orchestrations).
+- Le cadre MKT for Proof est opératoire pour concevoir, analyser et évaluer des dispositifs de formation sur la preuve.
+
+** Apports pour ton sujet (rigueur perçue)
+- Permet de relier la perception de la rigueur à des composantes professionnelles distinctes (mathématiques et didactiques).
+- Offre une base solide pour transformer des constats sur l’évaluation en objectifs de formation enseignants.
+
+** Limites
+- Inférences faites en contexte de formation (et non en observation directe systématique de classes).
+- Frontières parfois poreuses entre catégories de connaissance.
+- Le cadre n’est pas un curriculum clé en main, mais un outil d’analyse/conception.
+
+** Implications didactiques
+- Concevoir des formations qui articulent explicitement CCK, SCK, KCS et KCT autour de tâches de preuve.
+- Outiller les formateurs pour diagnostiquer quelles composantes de connaissance sont réellement travaillées.
+
+* Synthèse transversale (pour le mémoire)
+** Convergences fortes
+- La « rigueur » est évaluée de manière plurielle (validité logique, clarté, explicitation, lisibilité, adéquation au destinataire).
+- Les critères de qualité d’un écrit de preuve sont rarement totalement stabilisés ou explicités.
+- L’évaluation dépend du contexte institutionnel (école/université), du correcteur et de ses finalités (former, certifier, accompagner).
+
+** Points d’attention pour ta problématique
+- Passer d’une rigueur implicite à des critères explicites et partagés est central.
+- L’usage des exemples constitue un levier-clé mais sous-exploité pour faire évoluer les écrits d’élèves vers la généralité.
+- Une perspective « formation des enseignants » est nécessaire pour rendre soutenable l’évolution des pratiques d’évaluation et d’enseignement de la preuve.
+
+** Traduction possible en prescriptions didactiques
+- Construire une grille de critères explicites de l’écrit de preuve (logique, structure, justifications, adressage).
+- Enseigner explicitement la transition *exemple -> conjecture -> argument général -> preuve*.
+- Aligner tâches, attentes, correction et feedback sur les mêmes critères de rigueur.
