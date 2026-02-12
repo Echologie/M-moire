@@ -1,8 +1,11 @@
 port module Main exposing (main)
 
+import Animator
+import Animator.Inline
 import Browser
 import Browser.Dom as Dom
 import Browser.Events
+import Dict exposing (Dict)
 import Html exposing (Html, div, h1, h2, h3, input, p, small, span, text, textarea)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, onInput, preventDefaultOn)
@@ -10,6 +13,7 @@ import Html.Keyed as Keyed
 import Json.Decode as Decode
 import Process
 import Task
+import Time
 
 
 port renderMath : String -> Cmd msg
@@ -55,6 +59,7 @@ type alias Model =
     , activePropositionId : Maybe Int
     , dragging : Maybe DragState
     , lastDraggedPropositionId : Maybe Int
+    , miniatureLayout : Animator.Timeline (Dict Int Position)
     , boardRect : Maybe BoardRect
     , email : String
     , viewport : Viewport
@@ -73,6 +78,7 @@ type Msg
     | GotBoardRect (Result Dom.Error Dom.Element)
     | WindowResized Int Int
     | RenderMathNow
+    | AnimatorTick Time.Posix
 
 
 main : Program () Model Msg
@@ -95,6 +101,7 @@ init _ =
       , activePropositionId = initial |> List.head |> Maybe.map .id
       , dragging = Nothing
       , lastDraggedPropositionId = Nothing
+      , miniatureLayout = Animator.init Dict.empty
       , boardRect = Nothing
       , email = ""
       , viewport = { width = 1200, height = 800 }
@@ -164,8 +171,20 @@ proposition id badge title preview steps =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Browser.Events.onResize WindowResized
+subscriptions model =
+    Sub.batch
+        [ Browser.Events.onResize WindowResized
+        , Animator.toSubscription AnimatorTick model animator
+        ]
+
+
+animator : Animator.Animator Model
+animator =
+    Animator.animator
+        |> Animator.watching .miniatureLayout
+            (\newLayout currentModel ->
+                { currentModel | miniatureLayout = newLayout }
+            )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -202,11 +221,16 @@ update msg model =
 
                             else
                                 firstUnplacedId updated |> Maybe.withDefault propositionId |> Just
+
+                        nextLayout =
+                            layoutFromPropositions updated
                     in
                     ( { model
                         | propositions = updated
                         , dragging = Nothing
                         , lastDraggedPropositionId = Just propositionId
+                        , miniatureLayout =
+                            Animator.go (Animator.millis 220) nextLayout model.miniatureLayout
                         , activePropositionId = nextActive
                       }
                     , scheduleMathRender
@@ -260,6 +284,9 @@ update msg model =
 
         RenderMathNow ->
             ( model, renderMath "refresh" )
+
+        AnimatorTick newTime ->
+            ( Animator.update newTime animator model, Cmd.none )
 
 
 currentDraggedId : Model -> Maybe Int
@@ -324,6 +351,16 @@ updatePropositionComment propositionId newComment propositions =
                 item
         )
         propositions
+
+
+layoutFromPropositions : List Proposition -> Dict Int Position
+layoutFromPropositions propositions =
+    propositions
+        |> List.filterMap
+            (\item ->
+                item.pos |> Maybe.map (\position -> ( item.id, position ))
+            )
+        |> Dict.fromList
 
 
 positionFromClient : BoardRect -> Float -> Float -> Position
@@ -685,7 +722,7 @@ boardPanel model placedPropositions compact =
                 , style "border-radius" "8px"
                 , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
                 ]
-                ([ axisLines ] ++ List.map (viewPlacedMiniature model.activePropositionId model.dragging compact) placedPropositions ++ [ dragOverlay model.dragging ])
+                ([ axisLines ] ++ List.map (viewPlacedMiniature model.activePropositionId model.dragging model.miniatureLayout compact) placedPropositions ++ [ dragOverlay model.dragging ])
             , div [ style "display" "flex", style "justify-content" "space-between", style "font-size" "13px", style "margin-top" "6px", style "color" "#40506a" ]
                 [ span [] [ text "Precision faible" ], span [] [ text "Precision elevee" ] ]
             ]
@@ -735,8 +772,8 @@ dragOverlay dragging =
                 []
 
 
-viewPlacedMiniature : Maybe Int -> Maybe DragState -> Bool -> Proposition -> Html Msg
-viewPlacedMiniature activeId dragging compact item =
+viewPlacedMiniature : Maybe Int -> Maybe DragState -> Animator.Timeline (Dict Int Position) -> Bool -> Proposition -> Html Msg
+viewPlacedMiniature activeId dragging miniatureLayout compact item =
     case item.pos of
         Nothing ->
             text ""
@@ -760,6 +797,9 @@ viewPlacedMiniature activeId dragging compact item =
 
                     else
                         "168px"
+
+                fallbackPosition =
+                    Dict.get item.id (Animator.current miniatureLayout) |> Maybe.withDefault pos
             in
             div
                 [ draggable "true"
@@ -770,8 +810,30 @@ viewPlacedMiniature activeId dragging compact item =
                 , attribute "data-badge" item.badge
                 , attribute "data-title" item.title
                 , style "position" "absolute"
-                , style "left" (String.fromFloat (pos.x * 100) ++ "%")
-                , style "top" (String.fromFloat (pos.y * 100) ++ "%")
+                , Animator.Inline.style miniatureLayout
+                    "left"
+                    (\x -> String.fromFloat x ++ "%")
+                    (\layout ->
+                        layout
+                            |> Dict.get item.id
+                            |> Maybe.withDefault fallbackPosition
+                            |> .x
+                            |> (\value -> value * 100)
+                            |> Animator.at
+                            |> Animator.arriveSmoothly 0.6
+                    )
+                , Animator.Inline.style miniatureLayout
+                    "top"
+                    (\y -> String.fromFloat y ++ "%")
+                    (\layout ->
+                        layout
+                            |> Dict.get item.id
+                            |> Maybe.withDefault fallbackPosition
+                            |> .y
+                            |> (\value -> value * 100)
+                            |> Animator.at
+                            |> Animator.arriveSmoothly 0.6
+                    )
                 , style "transform" "translate(-50%, -50%)"
                 , style "width" widthText
                 , style "min-height" "58px"
