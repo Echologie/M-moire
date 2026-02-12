@@ -24,8 +24,7 @@ type alias Proposition =
     { id : Int
     , badge : String
     , title : String
-    , level : String
-    , summary : String
+    , preview : String
     , steps : List String
     , pos : Maybe Position
     , comment : String
@@ -44,12 +43,25 @@ type alias DragState =
     { propositionId : Int }
 
 
+type alias Viewport =
+    { width : Int
+    , height : Int
+    }
+
+
+type PanelState
+    = PanelExpanded
+    | PanelCollapsed
+
+
 type alias Model =
     { propositions : List Proposition
     , activePropositionId : Maybe Int
     , dragging : Maybe DragState
     , boardRect : Maybe BoardRect
     , email : String
+    , viewport : Viewport
+    , panelState : PanelState
     }
 
 
@@ -61,6 +73,7 @@ type Msg
     | SelectProposition Int
     | UpdateSelectedComment String
     | UpdateEmail String
+    | TogglePanel
     | RefreshBoardRect
     | GotBoardRect (Result Dom.Error Dom.Element)
     | WindowResized Int Int
@@ -88,6 +101,8 @@ init _ =
       , dragging = Nothing
       , boardRect = Nothing
       , email = ""
+      , viewport = { width = 1200, height = 800 }
+      , panelState = PanelExpanded
       }
     , Cmd.batch
         [ Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
@@ -100,21 +115,19 @@ initialPropositions : List Proposition
 initialPropositions =
     [ proposition
         1
-        "A1"
-        "Rédaction 1"
-        "Niveau de rigueur : faible"
-        "Erreur de formule, conclusion numérique approximative."
+        "A"
+        "Copie A"
+        "$\\cos(2x)=1-2\\sin(x)$"
         [ "On cherche les solutions de $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$."
         , "Je remplace par $\\cos(2x)=1-2\\sin(x)$."
         , "Donc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$."
-        , "Alors $\\sin(x)=\\dfrac{1}{3}$, d'ou $x\\approx0{,}34$ ou $x\\approx2{,}80$."
+        , "Alors $\\sin(x)=\\dfrac{1}{3}$, donc $x\\approx0{,}34$ ou $x\\approx2{,}80$."
         ]
     , proposition
         2
-        "B2"
-        "Rédaction 2"
-        "Niveau de rigueur : moyen"
-        "Bonne methode algebrique, justification partielle des angles."
+        "B"
+        "Copie B"
+        "$2\\sin^2(x)+\\sin(x)-1=0$"
         [ "On part de $\\cos(2x)=\\sin(x)$ et de $\\cos(2x)=1-2\\sin^2(x)$."
         , "On obtient $1-2\\sin^2(x)=\\sin(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$."
         , "En posant $y=\\sin(x)$ : $2y^2+y-1=0$, d'ou $y=\\dfrac{1}{2}$ ou $y=-1$."
@@ -122,10 +135,9 @@ initialPropositions =
         ]
     , proposition
         3
-        "C3"
-        "Rédaction 3"
-        "Niveau de rigueur : bon"
-        "Demarche correcte avec etapes explicites et valeurs exactes."
+        "C"
+        "Copie C"
+        "$(2\\sin(x)-1)(\\sin(x)+1)=0$"
         [ "On resout $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$."
         , "Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$."
         , "Factorisation : $(2\\sin(x)-1)(\\sin(x)+1)=0$."
@@ -134,10 +146,9 @@ initialPropositions =
         ]
     , proposition
         4
-        "D4"
-        "Rédaction 4"
-        "Niveau de rigueur : tres bon"
-        "Resolution complete avec ensemble general puis restriction."
+        "D"
+        "Copie D"
+        "$x=\\dfrac{\\pi}{6}+2k\\pi$"
         [ "Equation : $\\cos(2x)=\\sin(x)$."
         , "Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$."
         , "Produit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$."
@@ -148,13 +159,12 @@ initialPropositions =
     ]
 
 
-proposition : Int -> String -> String -> String -> String -> List String -> Proposition
-proposition id badge title level summary steps =
+proposition : Int -> String -> String -> String -> List String -> Proposition
+proposition id badge title preview steps =
     { id = id
     , badge = badge
     , title = title
-    , level = level
-    , summary = summary
+    , preview = preview
     , steps = steps
     , pos = Nothing
     , comment = ""
@@ -170,9 +180,18 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         StartDrag propositionId ->
+            let
+                nextPanel =
+                    if isMobileViewport model.viewport then
+                        PanelCollapsed
+
+                    else
+                        model.panelState
+            in
             ( { model
                 | dragging = Just { propositionId = propositionId }
                 , activePropositionId = Just propositionId
+                , panelState = nextPanel
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
@@ -198,12 +217,7 @@ update msg model =
                                 Just dragState.propositionId
 
                             else
-                                case firstUnplacedId updated of
-                                    Just nextId ->
-                                        Just nextId
-
-                                    Nothing ->
-                                        Just dragState.propositionId
+                                firstUnplacedId updated |> Maybe.withDefault dragState.propositionId |> Just
                     in
                     ( { model
                         | propositions = updated
@@ -220,7 +234,15 @@ update msg model =
             ( { model | dragging = Nothing }, Cmd.none )
 
         SelectProposition propositionId ->
-            ( { model | activePropositionId = Just propositionId }
+            ( { model
+                | activePropositionId = Just propositionId
+                , panelState =
+                    if isMobileViewport model.viewport then
+                        PanelExpanded
+
+                    else
+                        model.panelState
+              }
             , scheduleMathRender
             )
 
@@ -234,6 +256,18 @@ update msg model =
 
         UpdateEmail newEmail ->
             ( { model | email = newEmail }, Cmd.none )
+
+        TogglePanel ->
+            let
+                nextState =
+                    case model.panelState of
+                        PanelExpanded ->
+                            PanelCollapsed
+
+                        PanelCollapsed ->
+                            PanelExpanded
+            in
+            ( { model | panelState = nextState }, scheduleMathRender )
 
         RefreshBoardRect ->
             ( model, Task.attempt GotBoardRect (Dom.getElement "board") )
@@ -256,8 +290,21 @@ update msg model =
                 Err _ ->
                     ( model, Cmd.none )
 
-        WindowResized _ _ ->
-            ( model, Task.perform (\_ -> RefreshBoardRect) (Process.sleep 20) )
+        WindowResized width height ->
+            let
+                updatedViewport =
+                    { width = width, height = height }
+
+                nextPanelState =
+                    if isMobileViewport updatedViewport then
+                        model.panelState
+
+                    else
+                        PanelExpanded
+            in
+            ( { model | viewport = updatedViewport, panelState = nextPanelState }
+            , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 20)
+            )
 
         RenderMathNow ->
             ( model, renderMath "refresh" )
@@ -266,6 +313,16 @@ update msg model =
 scheduleMathRender : Cmd Msg
 scheduleMathRender =
     Task.perform (\_ -> RenderMathNow) (Process.sleep 20)
+
+
+isMobileViewport : Viewport -> Bool
+isMobileViewport viewport =
+    viewport.width < 980
+
+
+isLandscapeViewport : Viewport -> Bool
+isLandscapeViewport viewport =
+    viewport.width > viewport.height
 
 
 isPlaced : Int -> List Proposition -> Bool
@@ -349,81 +406,239 @@ clamp minVal maxVal value =
 view : Model -> Html Msg
 view model =
     let
-        placedCount =
-            List.filter (\item -> item.pos /= Nothing) model.propositions |> List.length
+        placed =
+            List.filter (\item -> item.pos /= Nothing) model.propositions
 
         totalCount =
             List.length model.propositions
 
-        placedPropositions =
-            List.filter (\item -> item.pos /= Nothing) model.propositions
+        placedCount =
+            List.length placed
+
+        remainingCount =
+            totalCount - placedCount
+
+        mobile =
+            isMobileViewport model.viewport
+
+        landscape =
+            isLandscapeViewport model.viewport
     in
     div
         [ style "font-family" "system-ui, sans-serif"
         , style "margin" "0"
-        , style "padding" "20px"
-        , style "background" "#f5f7fb"
+        , style "padding" "16px"
+        , style "background" "#eef3fb"
         , style "min-height" "100vh"
         ]
-        [ h1 [ style "margin-top" "0" ] [ text "Evaluation de redactions - Prototype UX" ]
-        , p [ style "margin" "0 0 12px", style "color" "#33425f" ]
-            [ text "Exercice teste (niveau premiere) : resoudre "
+        [ topHeader placedCount totalCount remainingCount
+        , if mobile then
+            mobileWorkspace model placed remainingCount totalCount landscape
+
+          else
+            desktopWorkspace model placed remainingCount totalCount
+        ]
+
+
+topHeader : Int -> Int -> Int -> Html msg
+topHeader placedCount totalCount remainingCount =
+    div
+        [ style "margin-bottom" "12px"
+        , style "padding" "12px"
+        , style "border" "1px solid #d5deef"
+        , style "border-radius" "12px"
+        , style "background" "white"
+        ]
+        [ h1 [ style "margin" "0 0 8px", style "font-size" "24px" ] [ text "Evaluation de productions d'eleves" ]
+        , p [ style "margin" "0", style "color" "#33425f" ]
+            [ text "Exercice : resoudre "
             , span [ style "font-weight" "700" ] [ text "$\\cos(2x)=\\sin(x)$" ]
             , text " sur "
             , span [ style "font-weight" "700" ] [ text "$[0;2\\pi[$" ]
             , text "."
             ]
-        , p [ style "margin" "0 0 18px", style "color" "#5a6986" ]
-            [ text ("Progression : " ++ String.fromInt placedCount ++ " / " ++ String.fromInt totalCount ++ " proposition(s) placee(s)") ]
-        , div
-            [ style "display" "flex"
-            , style "flex-wrap" "wrap"
-            , style "gap" "16px"
-            , style "align-items" "flex-start"
-            ]
-            [ leftPanel model
-            , boardPanel model placedPropositions
+        , p [ style "margin" "8px 0 0", style "color" "#516182", style "font-size" "14px" ]
+            [ text
+                ("Placees : "
+                    ++ String.fromInt placedCount
+                    ++ " / "
+                    ++ String.fromInt totalCount
+                    ++ "  |  Restantes : "
+                    ++ String.fromInt remainingCount
+                )
             ]
         ]
 
 
-leftPanel : Model -> Html Msg
-leftPanel model =
+desktopWorkspace : Model -> List Proposition -> Int -> Int -> Html Msg
+desktopWorkspace model placed remainingCount totalCount =
+    div
+        [ style "display" "flex"
+        , style "gap" "16px"
+        , style "align-items" "flex-start"
+        ]
+        [ desktopPanel model remainingCount totalCount
+        , boardPanel model placed False False
+        ]
+
+
+mobileWorkspace : Model -> List Proposition -> Int -> Int -> Bool -> Html Msg
+mobileWorkspace model placed remainingCount totalCount landscape =
+    div
+        [ style "position" "relative"
+        , style "width" "100%"
+        ]
+        [ boardPanel model placed True landscape
+        , mobileOverlay model remainingCount totalCount landscape
+        ]
+
+
+desktopPanel : Model -> Int -> Int -> Html Msg
+desktopPanel model remainingCount totalCount =
+    div
+        [ style "background" "white"
+        , style "border" "1px solid #d9e0ee"
+        , style "border-radius" "12px"
+        , style "padding" "14px"
+        , style "flex" "1 1 420px"
+        , style "max-width" "520px"
+        ]
+        [ panelHeader model remainingCount totalCount False
+        , panelBody model False
+        ]
+
+
+mobileOverlay : Model -> Int -> Int -> Bool -> Html Msg
+mobileOverlay model remainingCount totalCount landscape =
+    case model.panelState of
+        PanelCollapsed ->
+            button
+                [ onClick TogglePanel
+                , style "position" "absolute"
+                , style "top" "10px"
+                , style "left" "10px"
+                , style "z-index" "80"
+                , style "padding" "8px 12px"
+                , style "border" "1px solid #99add6"
+                , style "border-radius" "999px"
+                , style "background" "white"
+                , style "cursor" "pointer"
+                , style "box-shadow" "0 2px 8px rgba(0,0,0,0.12)"
+                ]
+                [ text
+                    ("Afficher les copies ("
+                        ++ String.fromInt (totalCount - remainingCount)
+                        ++ "/"
+                        ++ String.fromInt totalCount
+                        ++ ")"
+                    )
+                ]
+
+        PanelExpanded ->
+            let
+                common =
+                    [ style "position" "absolute"
+                    , style "z-index" "80"
+                    , style "background" "rgba(255,255,255,0.97)"
+                    , style "border" "1px solid #c4d2ee"
+                    , style "border-radius" "12px"
+                    , style "padding" "10px"
+                    , style "box-shadow" "0 10px 28px rgba(0,0,0,0.16)"
+                    , style "overflow" "auto"
+                    ]
+
+                placement =
+                    if landscape then
+                        [ style "left" "10px"
+                        , style "top" "10px"
+                        , style "bottom" "10px"
+                        , style "width" "44%"
+                        ]
+
+                    else
+                        [ style "left" "10px"
+                        , style "right" "10px"
+                        , style "bottom" "10px"
+                        , style "max-height" "50%"
+                        ]
+            in
+            div (common ++ placement)
+                [ panelHeader model remainingCount totalCount True
+                , panelBody model True
+                ]
+
+
+panelHeader : Model -> Int -> Int -> Bool -> Html Msg
+panelHeader model remainingCount totalCount isMobile =
+    div
+        [ style "display" "flex"
+        , style "align-items" "center"
+        , style "justify-content" "space-between"
+        , style "margin-bottom" "10px"
+        ]
+        [ div []
+            [ h2 [ style "margin" "0", style "font-size" "18px" ] [ text "Copies" ]
+            , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#566483" ]
+                [ text
+                    ("A placer : "
+                        ++ String.fromInt remainingCount
+                        ++ " / "
+                        ++ String.fromInt totalCount
+                    )
+                ]
+            ]
+        , if isMobile then
+            button
+                [ onClick TogglePanel
+                , style "padding" "6px 10px"
+                , style "border" "1px solid #9ab0da"
+                , style "border-radius" "8px"
+                , style "background" "white"
+                , style "cursor" "pointer"
+                ]
+                [ text "Masquer" ]
+
+          else
+            text ""
+        ]
+
+
+panelBody : Model -> Bool -> Html Msg
+panelBody model compact =
     let
         active =
             activeProposition model
     in
-    div
-        [ style "background" "white"
-        , style "border" "1px solid #d9e0ee"
-        , style "border-radius" "10px"
-        , style "padding" "14px"
-        , style "flex" "1 1 360px"
-        , style "max-width" "520px"
-        ]
-        [ h2 [ style "margin" "4px 0 12px" ] [ text "Proposition a evaluer" ]
+    div []
+        [ propositionSelector model
         , case active of
             Nothing ->
-                p [ style "color" "#5a6986" ] [ text "Toutes les propositions sont placees. Tu peux cliquer une miniature sur le plan pour la rouvrir en grand." ]
+                p [ style "color" "#5a6986", style "font-size" "14px" ] [ text "Toutes les copies sont placees. Clique une miniature pour la rouvrir." ]
 
             Just item ->
                 div []
-                    [ viewLargePropositionCard model.dragging item
-                    , h3 [ style "margin" "14px 0 8px" ] [ text "Commentaire" ]
+                    [ viewLargePropositionCard model.dragging item compact
+                    , h3 [ style "margin" "12px 0 8px" ] [ text "Commentaire" ]
                     , textarea
-                        [ rows 5
+                        [ rows
+                            (if compact then
+                                4
+
+                             else
+                                5
+                            )
                         , style "width" "100%"
                         , style "resize" "vertical"
                         , style "padding" "8px"
                         , style "border" "1px solid #c7d3ea"
                         , style "border-radius" "8px"
-                        , placeholder "Observations sur cette redaction..."
+                        , placeholder "Observations sur cette copie..."
                         , value item.comment
                         , onInput UpdateSelectedComment
                         ]
                         []
                     ]
-        , h3 [ style "margin" "16px 0 8px" ] [ text "Email (optionnel)" ]
+        , h3 [ style "margin" "14px 0 8px" ] [ text "Email (optionnel)" ]
         , input
             [ type_ "email"
             , placeholder "nom@exemple.fr"
@@ -437,38 +652,79 @@ leftPanel model =
             []
         , p [ style "font-size" "12px", style "color" "#6b7892", style "margin" "8px 0 0" ]
             [ text "L'email reste facultatif et separe des evaluations." ]
-        , button
-            [ style "margin-top" "14px"
-            , style "padding" "10px 14px"
-            , style "background" "#0f62fe"
-            , style "color" "white"
-            , style "border" "none"
-            , style "border-radius" "8px"
-            , style "cursor" "pointer"
-            ]
-            [ text "Valider (MVP sans backend)" ]
         ]
 
 
-viewLargePropositionCard : Maybe DragState -> Proposition -> Html Msg
-viewLargePropositionCard dragging item =
+propositionSelector : Model -> Html Msg
+propositionSelector model =
+    div [ style "display" "flex", style "flex-wrap" "wrap", style "gap" "8px", style "margin-bottom" "12px" ]
+        (List.map (selectorItem model.activePropositionId model.propositions) model.propositions)
+
+
+selectorItem : Maybe Int -> List Proposition -> Proposition -> Html Msg
+selectorItem activeId allPropositions item =
+    let
+        isActive =
+            activeId == Just item.id
+
+        isAlreadyPlaced =
+            isPlaced item.id allPropositions
+    in
+    button
+        [ onClick (SelectProposition item.id)
+        , style "display" "flex"
+        , style "align-items" "center"
+        , style "gap" "6px"
+        , style "padding" "6px 10px"
+        , style "border-radius" "999px"
+        , style "border"
+            (if isActive then
+                "2px solid #0f62fe"
+
+             else
+                "1px solid #b7c7e6"
+            )
+        , style "background" "white"
+        , style "cursor" "pointer"
+        ]
+        [ miniBadge item.badge
+        , span [ style "font-size" "13px", style "font-weight" "600", style "color" "#2d3f63" ] [ text item.title ]
+        , span
+            [ style "display" "inline-block"
+            , style "width" "8px"
+            , style "height" "8px"
+            , style "border-radius" "999px"
+            , style "background"
+                (if isAlreadyPlaced then
+                    "#16a34a"
+
+                 else
+                    "#94a3b8"
+                )
+            ]
+            []
+        ]
+
+
+viewLargePropositionCard : Maybe DragState -> Proposition -> Bool -> Html Msg
+viewLargePropositionCard dragging item compact =
     div
         [ style "position" "relative"
         , style "border" "1px solid #c8d6ef"
         , style "border-radius" "12px"
         , style "background" "#fbfdff"
-        , style "padding" "14px"
+        , style "padding" "12px"
         ]
         [ badgeView item.badge "18px"
-        , div [ style "margin-left" "62px" ]
+        , div [ style "margin-left" "58px" ]
             [ h3 [ style "margin" "0 0 4px" ] [ text item.title ]
-            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text item.level ]
+            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
             ]
-        , p [ style "margin" "10px 0 8px", style "color" "#22314f", style "font-weight" "600" ] [ text "Version complete" ]
+        , p [ style "margin" "10px 0 8px", style "color" "#22314f", style "font-weight" "600" ] [ text "Texte de la copie" ]
         , div [] (List.map viewStep item.steps)
         , p [ style "margin" "12px 0 6px", style "color" "#5a6986", style "font-size" "13px" ]
-            [ text "Glisse la miniature pour positionner cette redaction sur le plan." ]
-        , viewDragMiniature dragging item
+            [ text "Miniature a glisser vers le plan :" ]
+        , viewDragMiniature dragging item compact
         ]
 
 
@@ -477,8 +733,8 @@ viewStep stepText =
     p [ style "margin" "6px 0", style "line-height" "1.4", style "color" "#1f2a44" ] [ text stepText ]
 
 
-viewDragMiniature : Maybe DragState -> Proposition -> Html Msg
-viewDragMiniature dragging item =
+viewDragMiniature : Maybe DragState -> Proposition -> Bool -> Html Msg
+viewDragMiniature dragging item compact =
     let
         isDragging =
             case dragging of
@@ -494,7 +750,13 @@ viewDragMiniature dragging item =
         , onDragEndCard
         , onClick (SelectProposition item.id)
         , style "position" "relative"
-        , style "width" "170px"
+        , style "width"
+            (if compact then
+                "150px"
+
+             else
+                "170px"
+            )
         , style "min-height" "64px"
         , style "border-radius" "12px"
         , style "border" "1px solid #9cb4e6"
@@ -512,11 +774,28 @@ viewDragMiniature dragging item =
             )
         ]
         [ badgeView item.badge "14px"
-        , div [ style "padding-left" "54px", style "font-size" "12px", style "color" "#253556" ]
+        , div [ style "padding-left" "52px", style "font-size" "12px", style "color" "#253556" ]
             [ div [ style "font-weight" "700", style "margin-bottom" "2px" ] [ text item.title ]
-            , div [ style "font-size" "11px", style "color" "#5f6f8e" ] [ text item.summary ]
+            , div [ style "font-size" "11px", style "color" "#5f6f8e" ] [ text item.preview ]
             ]
         ]
+
+
+miniBadge : String -> Html msg
+miniBadge badge =
+    span
+        [ style "display" "inline-flex"
+        , style "align-items" "center"
+        , style "justify-content" "center"
+        , style "min-width" "20px"
+        , style "height" "20px"
+        , style "border-radius" "999px"
+        , style "background" "#2563eb"
+        , style "color" "white"
+        , style "font-size" "12px"
+        , style "font-weight" "700"
+        ]
+        [ text badge ]
 
 
 badgeView : String -> String -> Html msg
@@ -536,17 +815,28 @@ badgeView label sizeText =
         , style "font-weight" "800"
         , style "color" "white"
         , style "background" "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)"
-        , style "letter-spacing" "0.5px"
         ]
         [ text label ]
 
 
-boardPanel : Model -> List Proposition -> Html Msg
-boardPanel model placedPropositions =
+boardPanel : Model -> List Proposition -> Bool -> Bool -> Html Msg
+boardPanel model placedPropositions isMobile isLandscape =
+    let
+        boardHeight =
+            if isMobile then
+                if isLandscape then
+                    "78vh"
+
+                else
+                    "64vh"
+
+            else
+                "560px"
+    in
     div
         [ style "background" "white"
         , style "border" "1px solid #d9e0ee"
-        , style "border-radius" "10px"
+        , style "border-radius" "12px"
         , style "padding" "14px"
         , style "flex" "2 1 520px"
         , style "min-width" "280px"
@@ -558,17 +848,18 @@ boardPanel model placedPropositions =
             , div
                 [ id "board"
                 , style "position" "relative"
-                , style "height" "560px"
+                , style "height" boardHeight
+                , style "min-height" "320px"
                 , style "border" "1px solid #b9c9e6"
                 , style "border-radius" "8px"
                 , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
                 ]
-                ([ axisLines ] ++ List.map (viewPlacedMiniature model.activePropositionId model.dragging) placedPropositions ++ [ dragOverlay model.dragging ])
+                ([ axisLines ] ++ List.map (viewPlacedMiniature model.activePropositionId model.dragging isMobile) placedPropositions ++ [ dragOverlay model.dragging ])
             , div [ style "display" "flex", style "justify-content" "space-between", style "font-size" "13px", style "margin-top" "6px", style "color" "#40506a" ]
                 [ span [] [ text "Precision faible" ], span [] [ text "Precision elevee" ] ]
             ]
         , small [ style "display" "block", style "margin-top" "10px", style "color" "#6b7892" ]
-            [ text "Cliquer une miniature la rouvre en grand dans le panneau de gauche." ]
+            [ text "Cliquer une miniature la reouvre en grand. Drag tactile : appui long + glisser." ]
         ]
 
 
@@ -613,8 +904,8 @@ dragOverlay dragging =
                 []
 
 
-viewPlacedMiniature : Maybe Int -> Maybe DragState -> Proposition -> Html Msg
-viewPlacedMiniature activeId dragging item =
+viewPlacedMiniature : Maybe Int -> Maybe DragState -> Bool -> Proposition -> Html Msg
+viewPlacedMiniature activeId dragging compact item =
     case item.pos of
         Nothing ->
             text ""
@@ -631,6 +922,13 @@ viewPlacedMiniature activeId dragging item =
 
                         Nothing ->
                             False
+
+                widthText =
+                    if compact then
+                        "138px"
+
+                    else
+                        "170px"
             in
             div
                 [ draggable "true"
@@ -641,8 +939,8 @@ viewPlacedMiniature activeId dragging item =
                 , style "left" (String.fromFloat (pos.x * 100) ++ "%")
                 , style "top" (String.fromFloat (pos.y * 100) ++ "%")
                 , style "transform" "translate(-50%, -50%)"
-                , style "width" "170px"
-                , style "min-height" "64px"
+                , style "width" widthText
+                , style "min-height" "62px"
                 , style "border"
                     (if isActive then
                         "2px solid #0f62fe"
@@ -656,7 +954,6 @@ viewPlacedMiniature activeId dragging item =
                 , style "padding" "10px 10px 10px 12px"
                 , style "cursor" "grab"
                 , style "user-select" "none"
-                , style "font-size" "14px"
                 , style "opacity"
                     (if isDragging then
                         "0"
@@ -666,9 +963,9 @@ viewPlacedMiniature activeId dragging item =
                     )
                 ]
                 [ badgeView item.badge "14px"
-                , div [ style "padding-left" "54px", style "font-size" "12px", style "color" "#253556" ]
+                , div [ style "padding-left" "52px", style "font-size" "12px", style "color" "#253556" ]
                     [ div [ style "font-weight" "700", style "margin-bottom" "2px" ] [ text item.title ]
-                    , div [ style "font-size" "11px", style "color" "#5f6f8e" ] [ text item.summary ]
+                    , div [ style "font-size" "11px", style "color" "#5f6f8e" ] [ text item.preview ]
                     ]
                 ]
 

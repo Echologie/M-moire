@@ -4,31 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prototype UX - Evaluation de productions</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
-    />
+    <link rel="stylesheet" href="vendor/katex/katex.min.css" />
   </head>
   <body>
     <div id="elm-main"></div>
 
-    <script type="module">
-      import { enableDragDropTouch } from "https://unpkg.com/@dragdroptouch/drag-drop-touch@2.0.3/dist/drag-drop-touch.esm.min.js";
-      enableDragDropTouch(document, document, {
-        forceListen: true,
-        allowDragScroll: false,
-      });
-    </script>
-
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
-    ></script>
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-    ></script>
-
+    <script type="module" src="vendor/drag-drop-touch/drag-drop-touch.esm.min.js?autoload"></script>
+    <script src="vendor/katex/katex.min.js"></script>
+    <script src="vendor/katex/auto-render.min.js"></script>
     <script src="main.js"></script>
     <script>
       var app = Elm.Main.init({ node: document.getElementById("elm-main") });
@@ -53,6 +36,7 @@
         });
       }
 
+      window.addEventListener("load", scheduleRenderMath);
       scheduleRenderMath();
 
       if (app.ports && app.ports.renderMath) {

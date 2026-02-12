@@ -5159,6 +5159,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$PanelExpanded = {$: 'PanelExpanded'};
 var $author$project$Main$RefreshBoardRect = {$: 'RefreshBoardRect'};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$List$head = function (list) {
@@ -5170,46 +5171,42 @@ var $elm$core$List$head = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Main$proposition = F6(
-	function (id, badge, title, level, summary, steps) {
-		return {badge: badge, comment: '', id: id, level: level, pos: $elm$core$Maybe$Nothing, steps: steps, summary: summary, title: title};
+var $author$project$Main$proposition = F5(
+	function (id, badge, title, preview, steps) {
+		return {badge: badge, comment: '', id: id, pos: $elm$core$Maybe$Nothing, preview: preview, steps: steps, title: title};
 	});
 var $author$project$Main$initialPropositions = _List_fromArray(
 	[
-		A6(
+		A5(
 		$author$project$Main$proposition,
 		1,
-		'A1',
-		'Rédaction 1',
-		'Niveau de rigueur : faible',
-		'Erreur de formule, conclusion numérique approximative.',
+		'A',
+		'Copie A',
+		'$\\cos(2x)=1-2\\sin(x)$',
 		_List_fromArray(
-			['On cherche les solutions de $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$.', 'Je remplace par $\\cos(2x)=1-2\\sin(x)$.', 'Donc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$.', 'Alors $\\sin(x)=\\dfrac{1}{3}$, d\'ou $x\\approx0{,}34$ ou $x\\approx2{,}80$.'])),
-		A6(
+			['On cherche les solutions de $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$.', 'Je remplace par $\\cos(2x)=1-2\\sin(x)$.', 'Donc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$.', 'Alors $\\sin(x)=\\dfrac{1}{3}$, donc $x\\approx0{,}34$ ou $x\\approx2{,}80$.'])),
+		A5(
 		$author$project$Main$proposition,
 		2,
-		'B2',
-		'Rédaction 2',
-		'Niveau de rigueur : moyen',
-		'Bonne methode algebrique, justification partielle des angles.',
+		'B',
+		'Copie B',
+		'$2\\sin^2(x)+\\sin(x)-1=0$',
 		_List_fromArray(
 			['On part de $\\cos(2x)=\\sin(x)$ et de $\\cos(2x)=1-2\\sin^2(x)$.', 'On obtient $1-2\\sin^2(x)=\\sin(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'En posant $y=\\sin(x)$ : $2y^2+y-1=0$, d\'ou $y=\\dfrac{1}{2}$ ou $y=-1$.', 'Donc $x=\\dfrac{\\pi}{6}$, $\\dfrac{5\\pi}{6}$ ou $\\dfrac{3\\pi}{2}$ sur l\'intervalle.'])),
-		A6(
+		A5(
 		$author$project$Main$proposition,
 		3,
-		'C3',
-		'Rédaction 3',
-		'Niveau de rigueur : bon',
-		'Demarche correcte avec etapes explicites et valeurs exactes.',
+		'C',
+		'Copie C',
+		'$(2\\sin(x)-1)(\\sin(x)+1)=0$',
 		_List_fromArray(
 			['On resout $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$.', 'Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$.', 'Factorisation : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Alors $\\sin(x)=\\dfrac{1}{2}$ ou $\\sin(x)=-1$.', 'Dans $[0;2\\pi[$ : $x\\in\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.'])),
-		A6(
+		A5(
 		$author$project$Main$proposition,
 		4,
-		'D4',
-		'Rédaction 4',
-		'Niveau de rigueur : tres bon',
-		'Resolution complete avec ensemble general puis restriction.',
+		'D',
+		'Copie D',
+		'$x=\\dfrac{\\pi}{6}+2k\\pi$',
 		_List_fromArray(
 			['Equation : $\\cos(2x)=\\sin(x)$.', 'Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'Produit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Cas 1 : $\\sin(x)=\\dfrac{1}{2}\\iff x=\\dfrac{\\pi}{6}+2k\\pi$ ou $x=\\dfrac{5\\pi}{6}+2k\\pi$.', 'Cas 2 : $\\sin(x)=-1\\iff x=\\dfrac{3\\pi}{2}+2k\\pi$.', 'Intersection avec $[0;2\\pi[$ : $S=\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.']))
 	]);
@@ -5244,7 +5241,9 @@ var $author$project$Main$init = function (_v0) {
 			boardRect: $elm$core$Maybe$Nothing,
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
-			propositions: initial
+			panelState: $author$project$Main$PanelExpanded,
+			propositions: initial,
+			viewport: {height: 800, width: 1200}
 		},
 		$elm$core$Platform$Cmd$batch(
 			_List_fromArray(
@@ -5684,6 +5683,7 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $author$project$Main$GotBoardRect = function (a) {
 	return {$: 'GotBoardRect', a: a};
 };
+var $author$project$Main$PanelCollapsed = {$: 'PanelCollapsed'};
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
 		return g(
@@ -5734,6 +5734,9 @@ var $author$project$Main$firstUnplacedId = function (propositions) {
 				propositions)));
 };
 var $elm$browser$Browser$Dom$getElement = _Browser_getElement;
+var $author$project$Main$isMobileViewport = function (viewport) {
+	return viewport.width < 980;
+};
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -5820,13 +5823,15 @@ var $author$project$Main$update = F2(
 		switch (msg.$) {
 			case 'StartDrag':
 				var propositionId = msg.a;
+				var nextPanel = $author$project$Main$isMobileViewport(model.viewport) ? $author$project$Main$PanelCollapsed : model.panelState;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							activePropositionId: $elm$core$Maybe$Just(propositionId),
 							dragging: $elm$core$Maybe$Just(
-								{propositionId: propositionId})
+								{propositionId: propositionId}),
+							panelState: nextPanel
 						}),
 					A2(
 						$elm$core$Task$attempt,
@@ -5844,19 +5849,11 @@ var $author$project$Main$update = F2(
 					var pos = A3($author$project$Main$positionFromClient, rect, clientX, clientY);
 					var updated = A3($author$project$Main$updatePropositionPosition, dragState.propositionId, pos, model.propositions);
 					var alreadyPlaced = A2($author$project$Main$isPlaced, dragState.propositionId, model.propositions);
-					var nextActive = function () {
-						if (alreadyPlaced) {
-							return $elm$core$Maybe$Just(dragState.propositionId);
-						} else {
-							var _v2 = $author$project$Main$firstUnplacedId(updated);
-							if (_v2.$ === 'Just') {
-								var nextId = _v2.a;
-								return $elm$core$Maybe$Just(nextId);
-							} else {
-								return $elm$core$Maybe$Just(dragState.propositionId);
-							}
-						}
-					}();
+					var nextActive = alreadyPlaced ? $elm$core$Maybe$Just(dragState.propositionId) : $elm$core$Maybe$Just(
+						A2(
+							$elm$core$Maybe$withDefault,
+							dragState.propositionId,
+							$author$project$Main$firstUnplacedId(updated)));
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -5881,16 +5878,17 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							activePropositionId: $elm$core$Maybe$Just(propositionId)
+							activePropositionId: $elm$core$Maybe$Just(propositionId),
+							panelState: $author$project$Main$isMobileViewport(model.viewport) ? $author$project$Main$PanelExpanded : model.panelState
 						}),
 					$author$project$Main$scheduleMathRender);
 			case 'UpdateSelectedComment':
 				var newComment = msg.a;
-				var _v3 = model.activePropositionId;
-				if (_v3.$ === 'Nothing') {
+				var _v2 = model.activePropositionId;
+				if (_v2.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var propositionId = _v3.a;
+					var propositionId = _v2.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -5906,6 +5904,20 @@ var $author$project$Main$update = F2(
 						model,
 						{email: newEmail}),
 					$elm$core$Platform$Cmd$none);
+			case 'TogglePanel':
+				var nextState = function () {
+					var _v3 = model.panelState;
+					if (_v3.$ === 'PanelExpanded') {
+						return $author$project$Main$PanelCollapsed;
+					} else {
+						return $author$project$Main$PanelExpanded;
+					}
+				}();
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{panelState: nextState}),
+					$author$project$Main$scheduleMathRender);
 			case 'RefreshBoardRect':
 				return _Utils_Tuple2(
 					model,
@@ -5929,8 +5941,14 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
 			case 'WindowResized':
+				var width = msg.a;
+				var height = msg.b;
+				var updatedViewport = {height: height, width: width};
+				var nextPanelState = $author$project$Main$isMobileViewport(updatedViewport) ? model.panelState : $author$project$Main$PanelExpanded;
 				return _Utils_Tuple2(
-					model,
+					_Utils_update(
+						model,
+						{panelState: nextPanelState, viewport: updatedViewport}),
 					A2(
 						$elm$core$Task$perform,
 						function (_v5) {
@@ -6138,8 +6156,7 @@ var $author$project$Main$badgeView = F2(
 					A2($elm$html$Html$Attributes$style, 'font-size', sizeText),
 					A2($elm$html$Html$Attributes$style, 'font-weight', '800'),
 					A2($elm$html$Html$Attributes$style, 'color', 'white'),
-					A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)'),
-					A2($elm$html$Html$Attributes$style, 'letter-spacing', '0.5px')
+					A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)')
 				]),
 			_List_fromArray(
 				[
@@ -6179,13 +6196,14 @@ var $author$project$Main$onDragStartCard = function (propositionId) {
 		$elm$json$Json$Decode$succeed(
 			$author$project$Main$StartDrag(propositionId)));
 };
-var $author$project$Main$viewPlacedMiniature = F3(
-	function (activeId, dragging, item) {
+var $author$project$Main$viewPlacedMiniature = F4(
+	function (activeId, dragging, compact, item) {
 		var _v0 = item.pos;
 		if (_v0.$ === 'Nothing') {
 			return $elm$html$Html$text('');
 		} else {
 			var pos = _v0.a;
+			var widthText = compact ? '138px' : '170px';
 			var isDragging = function () {
 				if (dragging.$ === 'Just') {
 					var dragState = dragging.a;
@@ -6216,8 +6234,8 @@ var $author$project$Main$viewPlacedMiniature = F3(
 						'top',
 						$elm$core$String$fromFloat(pos.y * 100) + '%'),
 						A2($elm$html$Html$Attributes$style, 'transform', 'translate(-50%, -50%)'),
-						A2($elm$html$Html$Attributes$style, 'width', '170px'),
-						A2($elm$html$Html$Attributes$style, 'min-height', '64px'),
+						A2($elm$html$Html$Attributes$style, 'width', widthText),
+						A2($elm$html$Html$Attributes$style, 'min-height', '62px'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'border',
@@ -6228,7 +6246,6 @@ var $author$project$Main$viewPlacedMiniature = F3(
 						A2($elm$html$Html$Attributes$style, 'padding', '10px 10px 10px 12px'),
 						A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
 						A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
-						A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'opacity',
@@ -6241,7 +6258,7 @@ var $author$project$Main$viewPlacedMiniature = F3(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								A2($elm$html$Html$Attributes$style, 'padding-left', '54px'),
+								A2($elm$html$Html$Attributes$style, 'padding-left', '52px'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
 								A2($elm$html$Html$Attributes$style, 'color', '#253556')
 							]),
@@ -6267,21 +6284,22 @@ var $author$project$Main$viewPlacedMiniature = F3(
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text(item.summary)
+										$elm$html$Html$text(item.preview)
 									]))
 							]))
 					]));
 		}
 	});
-var $author$project$Main$boardPanel = F2(
-	function (model, placedPropositions) {
+var $author$project$Main$boardPanel = F4(
+	function (model, placedPropositions, isMobile, isLandscape) {
+		var boardHeight = isMobile ? (isLandscape ? '78vh' : '64vh') : '560px';
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
 					A2($elm$html$Html$Attributes$style, 'background', 'white'),
 					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
 					A2($elm$html$Html$Attributes$style, 'padding', '14px'),
 					A2($elm$html$Html$Attributes$style, 'flex', '2 1 520px'),
 					A2($elm$html$Html$Attributes$style, 'min-width', '280px')
@@ -6339,7 +6357,8 @@ var $author$project$Main$boardPanel = F2(
 								[
 									$elm$html$Html$Attributes$id('board'),
 									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-									A2($elm$html$Html$Attributes$style, 'height', '560px'),
+									A2($elm$html$Html$Attributes$style, 'height', boardHeight),
+									A2($elm$html$Html$Attributes$style, 'min-height', '320px'),
 									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b9c9e6'),
 									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
 									A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)')
@@ -6350,7 +6369,7 @@ var $author$project$Main$boardPanel = F2(
 								_Utils_ap(
 									A2(
 										$elm$core$List$map,
-										A2($author$project$Main$viewPlacedMiniature, model.activePropositionId, model.dragging),
+										A3($author$project$Main$viewPlacedMiniature, model.activePropositionId, model.dragging, isMobile),
 										placedPropositions),
 									_List_fromArray(
 										[
@@ -6394,11 +6413,10 @@ var $author$project$Main$boardPanel = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Cliquer une miniature la rouvre en grand dans le panneau de gauche.')
+							$elm$html$Html$text('Cliquer une miniature la reouvre en grand. Drag tactile : appui long + glisser.')
 						]))
 				]));
 	});
-var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $author$project$Main$UpdateEmail = function (a) {
 	return {$: 'UpdateEmail', a: a};
 };
@@ -6420,7 +6438,6 @@ var $author$project$Main$activeProposition = function (model) {
 				model.propositions));
 	}
 };
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$Events$alwaysStop = function (x) {
@@ -6453,6 +6470,98 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 };
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $author$project$Main$miniBadge = function (badge) {
+	return A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'display', 'inline-flex'),
+				A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+				A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+				A2($elm$html$Html$Attributes$style, 'min-width', '20px'),
+				A2($elm$html$Html$Attributes$style, 'height', '20px'),
+				A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
+				A2($elm$html$Html$Attributes$style, 'background', '#2563eb'),
+				A2($elm$html$Html$Attributes$style, 'color', 'white'),
+				A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+				A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(badge)
+			]));
+};
+var $author$project$Main$selectorItem = F3(
+	function (activeId, allPropositions, item) {
+		var isAlreadyPlaced = A2($author$project$Main$isPlaced, item.id, allPropositions);
+		var isActive = _Utils_eq(
+			activeId,
+			$elm$core$Maybe$Just(item.id));
+		return A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Events$onClick(
+					$author$project$Main$SelectProposition(item.id)),
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+					A2($elm$html$Html$Attributes$style, 'gap', '6px'),
+					A2($elm$html$Html$Attributes$style, 'padding', '6px 10px'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'border',
+					isActive ? '2px solid #0f62fe' : '1px solid #b7c7e6'),
+					A2($elm$html$Html$Attributes$style, 'background', 'white'),
+					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+				]),
+			_List_fromArray(
+				[
+					$author$project$Main$miniBadge(item.badge),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
+							A2($elm$html$Html$Attributes$style, 'font-weight', '600'),
+							A2($elm$html$Html$Attributes$style, 'color', '#2d3f63')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(item.title)
+						])),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'display', 'inline-block'),
+							A2($elm$html$Html$Attributes$style, 'width', '8px'),
+							A2($elm$html$Html$Attributes$style, 'height', '8px'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
+							A2(
+							$elm$html$Html$Attributes$style,
+							'background',
+							isAlreadyPlaced ? '#16a34a' : '#94a3b8')
+						]),
+					_List_Nil)
+				]));
+	});
+var $author$project$Main$propositionSelector = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+				A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
+				A2($elm$html$Html$Attributes$style, 'gap', '8px'),
+				A2($elm$html$Html$Attributes$style, 'margin-bottom', '12px')
+			]),
+		A2(
+			$elm$core$List$map,
+			A2($author$project$Main$selectorItem, model.activePropositionId, model.propositions),
+			model.propositions));
+};
 var $elm$html$Html$Attributes$rows = function (n) {
 	return A2(
 		_VirtualDom_attribute,
@@ -6462,8 +6571,8 @@ var $elm$html$Html$Attributes$rows = function (n) {
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$viewDragMiniature = F2(
-	function (dragging, item) {
+var $author$project$Main$viewDragMiniature = F3(
+	function (dragging, item, compact) {
 		var isDragging = function () {
 			if (dragging.$ === 'Just') {
 				var dragState = dragging.a;
@@ -6482,7 +6591,10 @@ var $author$project$Main$viewDragMiniature = F2(
 					$elm$html$Html$Events$onClick(
 					$author$project$Main$SelectProposition(item.id)),
 					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-					A2($elm$html$Html$Attributes$style, 'width', '170px'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'width',
+					compact ? '150px' : '170px'),
 					A2($elm$html$Html$Attributes$style, 'min-height', '64px'),
 					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
 					A2($elm$html$Html$Attributes$style, 'border', '1px solid #9cb4e6'),
@@ -6503,7 +6615,7 @@ var $author$project$Main$viewDragMiniature = F2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'padding-left', '54px'),
+							A2($elm$html$Html$Attributes$style, 'padding-left', '52px'),
 							A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
 							A2($elm$html$Html$Attributes$style, 'color', '#253556')
 						]),
@@ -6529,7 +6641,7 @@ var $author$project$Main$viewDragMiniature = F2(
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text(item.summary)
+									$elm$html$Html$text(item.preview)
 								]))
 						]))
 				]));
@@ -6548,8 +6660,8 @@ var $author$project$Main$viewStep = function (stepText) {
 				$elm$html$Html$text(stepText)
 			]));
 };
-var $author$project$Main$viewLargePropositionCard = F2(
-	function (dragging, item) {
+var $author$project$Main$viewLargePropositionCard = F3(
+	function (dragging, item, compact) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6558,7 +6670,7 @@ var $author$project$Main$viewLargePropositionCard = F2(
 					A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
 					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
 					A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
-					A2($elm$html$Html$Attributes$style, 'padding', '14px')
+					A2($elm$html$Html$Attributes$style, 'padding', '12px')
 				]),
 			_List_fromArray(
 				[
@@ -6567,7 +6679,7 @@ var $author$project$Main$viewLargePropositionCard = F2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'margin-left', '62px')
+							A2($elm$html$Html$Attributes$style, 'margin-left', '58px')
 						]),
 					_List_fromArray(
 						[
@@ -6591,7 +6703,7 @@ var $author$project$Main$viewLargePropositionCard = F2(
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text(item.level)
+									$elm$html$Html$text('Version eleve')
 								]))
 						])),
 					A2(
@@ -6604,7 +6716,7 @@ var $author$project$Main$viewLargePropositionCard = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Version complete')
+							$elm$html$Html$text('Texte de la copie')
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -6620,235 +6732,383 @@ var $author$project$Main$viewLargePropositionCard = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Glisse la miniature pour positionner cette redaction sur le plan.')
+							$elm$html$Html$text('Miniature a glisser vers le plan :')
 						])),
-					A2($author$project$Main$viewDragMiniature, dragging, item)
+					A3($author$project$Main$viewDragMiniature, dragging, item, compact)
 				]));
 	});
-var $author$project$Main$leftPanel = function (model) {
-	var active = $author$project$Main$activeProposition(model);
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'background', 'white'),
-				A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
-				A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
-				A2($elm$html$Html$Attributes$style, 'padding', '14px'),
-				A2($elm$html$Html$Attributes$style, 'flex', '1 1 360px'),
-				A2($elm$html$Html$Attributes$style, 'max-width', '520px')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$h2,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin', '4px 0 12px')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Proposition a evaluer')
-					])),
-				function () {
-				if (active.$ === 'Nothing') {
-					return A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'color', '#5a6986')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Toutes les propositions sont placees. Tu peux cliquer une miniature sur le plan pour la rouvrir en grand.')
-							]));
-				} else {
-					var item = active.a;
-					return A2(
-						$elm$html$Html$div,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2($author$project$Main$viewLargePropositionCard, model.dragging, item),
-								A2(
-								$elm$html$Html$h3,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Commentaire')
-									])),
-								A2(
-								$elm$html$Html$textarea,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$rows(5),
-										A2($elm$html$Html$Attributes$style, 'width', '100%'),
-										A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
-										A2($elm$html$Html$Attributes$style, 'padding', '8px'),
-										A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-										A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-										$elm$html$Html$Attributes$placeholder('Observations sur cette redaction...'),
-										$elm$html$Html$Attributes$value(item.comment),
-										$elm$html$Html$Events$onInput($author$project$Main$UpdateSelectedComment)
-									]),
-								_List_Nil)
-							]));
-				}
-			}(),
-				A2(
-				$elm$html$Html$h3,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin', '16px 0 8px')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Email (optionnel)')
-					])),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$type_('email'),
-						$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
-						$elm$html$Html$Attributes$value(model.email),
-						$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
-						A2($elm$html$Html$Attributes$style, 'width', '100%'),
-						A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-						A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-						A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
-						A2($elm$html$Html$Attributes$style, 'color', '#6b7892'),
-						A2($elm$html$Html$Attributes$style, 'margin', '8px 0 0')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('L\'email reste facultatif et separe des evaluations.')
-					])),
-				A2(
+var $author$project$Main$panelBody = F2(
+	function (model, compact) {
+		var active = $author$project$Main$activeProposition(model);
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$author$project$Main$propositionSelector(model),
+					function () {
+					if (active.$ === 'Nothing') {
+						return A2(
+							$elm$html$Html$p,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'color', '#5a6986'),
+									A2($elm$html$Html$Attributes$style, 'font-size', '14px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Toutes les copies sont placees. Clique une miniature pour la rouvrir.')
+								]));
+					} else {
+						var item = active.a;
+						return A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A3($author$project$Main$viewLargePropositionCard, model.dragging, item, compact),
+									A2(
+									$elm$html$Html$h3,
+									_List_fromArray(
+										[
+											A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Commentaire')
+										])),
+									A2(
+									$elm$html$Html$textarea,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$rows(
+											compact ? 4 : 5),
+											A2($elm$html$Html$Attributes$style, 'width', '100%'),
+											A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
+											A2($elm$html$Html$Attributes$style, 'padding', '8px'),
+											A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+											A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+											$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
+											$elm$html$Html$Attributes$value(item.comment),
+											$elm$html$Html$Events$onInput($author$project$Main$UpdateSelectedComment)
+										]),
+									_List_Nil)
+								]));
+					}
+				}(),
+					A2(
+					$elm$html$Html$h3,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Email (optionnel)')
+						])),
+					A2(
+					$elm$html$Html$input,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('email'),
+							$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
+							$elm$html$Html$Attributes$value(model.email),
+							$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
+							A2($elm$html$Html$Attributes$style, 'width', '100%'),
+							A2($elm$html$Html$Attributes$style, 'padding', '10px'),
+							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+							A2($elm$html$Html$Attributes$style, 'color', '#6b7892'),
+							A2($elm$html$Html$Attributes$style, 'margin', '8px 0 0')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('L\'email reste facultatif et separe des evaluations.')
+						]))
+				]));
+	});
+var $author$project$Main$TogglePanel = {$: 'TogglePanel'};
+var $author$project$Main$panelHeader = F4(
+	function (model, remainingCount, totalCount, isMobile) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+					A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between'),
+					A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h2,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '0'),
+									A2($elm$html$Html$Attributes$style, 'font-size', '18px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Copies')
+								])),
+							A2(
+							$elm$html$Html$p,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '4px 0 0'),
+									A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
+									A2($elm$html$Html$Attributes$style, 'color', '#566483')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									'A placer : ' + ($elm$core$String$fromInt(remainingCount) + (' / ' + $elm$core$String$fromInt(totalCount))))
+								]))
+						])),
+					isMobile ? A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Events$onClick($author$project$Main$TogglePanel),
+							A2($elm$html$Html$Attributes$style, 'padding', '6px 10px'),
+							A2($elm$html$Html$Attributes$style, 'border', '1px solid #9ab0da'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+							A2($elm$html$Html$Attributes$style, 'background', 'white'),
+							A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Masquer')
+						])) : $elm$html$Html$text('')
+				]));
+	});
+var $author$project$Main$desktopPanel = F3(
+	function (model, remainingCount, totalCount) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'background', 'white'),
+					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+					A2($elm$html$Html$Attributes$style, 'padding', '14px'),
+					A2($elm$html$Html$Attributes$style, 'flex', '1 1 420px'),
+					A2($elm$html$Html$Attributes$style, 'max-width', '520px')
+				]),
+			_List_fromArray(
+				[
+					A4($author$project$Main$panelHeader, model, remainingCount, totalCount, false),
+					A2($author$project$Main$panelBody, model, false)
+				]));
+	});
+var $author$project$Main$desktopWorkspace = F4(
+	function (model, placed, remainingCount, totalCount) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'gap', '16px'),
+					A2($elm$html$Html$Attributes$style, 'align-items', 'flex-start')
+				]),
+			_List_fromArray(
+				[
+					A3($author$project$Main$desktopPanel, model, remainingCount, totalCount),
+					A4($author$project$Main$boardPanel, model, placed, false, false)
+				]));
+	});
+var $author$project$Main$isLandscapeViewport = function (viewport) {
+	return _Utils_cmp(viewport.width, viewport.height) > 0;
+};
+var $author$project$Main$mobileOverlay = F4(
+	function (model, remainingCount, totalCount, landscape) {
+		var _v0 = model.panelState;
+		if (_v0.$ === 'PanelCollapsed') {
+			return A2(
 				$elm$html$Html$button,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'margin-top', '14px'),
-						A2($elm$html$Html$Attributes$style, 'padding', '10px 14px'),
-						A2($elm$html$Html$Attributes$style, 'background', '#0f62fe'),
-						A2($elm$html$Html$Attributes$style, 'color', 'white'),
-						A2($elm$html$Html$Attributes$style, 'border', 'none'),
-						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-						A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+						$elm$html$Html$Events$onClick($author$project$Main$TogglePanel),
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+						A2($elm$html$Html$Attributes$style, 'top', '10px'),
+						A2($elm$html$Html$Attributes$style, 'left', '10px'),
+						A2($elm$html$Html$Attributes$style, 'z-index', '80'),
+						A2($elm$html$Html$Attributes$style, 'padding', '8px 12px'),
+						A2($elm$html$Html$Attributes$style, 'border', '1px solid #99add6'),
+						A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
+						A2($elm$html$Html$Attributes$style, 'background', 'white'),
+						A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.12)')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Valider (MVP sans backend)')
-					]))
-			]));
-};
+						$elm$html$Html$text(
+						'Afficher les copies (' + ($elm$core$String$fromInt(totalCount - remainingCount) + ('/' + ($elm$core$String$fromInt(totalCount) + ')'))))
+					]));
+		} else {
+			var placement = landscape ? _List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'left', '10px'),
+					A2($elm$html$Html$Attributes$style, 'top', '10px'),
+					A2($elm$html$Html$Attributes$style, 'bottom', '10px'),
+					A2($elm$html$Html$Attributes$style, 'width', '44%')
+				]) : _List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'left', '10px'),
+					A2($elm$html$Html$Attributes$style, 'right', '10px'),
+					A2($elm$html$Html$Attributes$style, 'bottom', '10px'),
+					A2($elm$html$Html$Attributes$style, 'max-height', '50%')
+				]);
+			var common = _List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+					A2($elm$html$Html$Attributes$style, 'z-index', '80'),
+					A2($elm$html$Html$Attributes$style, 'background', 'rgba(255,255,255,0.97)'),
+					A2($elm$html$Html$Attributes$style, 'border', '1px solid #c4d2ee'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+					A2($elm$html$Html$Attributes$style, 'padding', '10px'),
+					A2($elm$html$Html$Attributes$style, 'box-shadow', '0 10px 28px rgba(0,0,0,0.16)'),
+					A2($elm$html$Html$Attributes$style, 'overflow', 'auto')
+				]);
+			return A2(
+				$elm$html$Html$div,
+				_Utils_ap(common, placement),
+				_List_fromArray(
+					[
+						A4($author$project$Main$panelHeader, model, remainingCount, totalCount, true),
+						A2($author$project$Main$panelBody, model, true)
+					]));
+		}
+	});
+var $author$project$Main$mobileWorkspace = F5(
+	function (model, placed, remainingCount, totalCount, landscape) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+					A2($elm$html$Html$Attributes$style, 'width', '100%')
+				]),
+			_List_fromArray(
+				[
+					A4($author$project$Main$boardPanel, model, placed, true, landscape),
+					A4($author$project$Main$mobileOverlay, model, remainingCount, totalCount, landscape)
+				]));
+	});
 var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $author$project$Main$topHeader = F3(
+	function (placedCount, totalCount, remainingCount) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'margin-bottom', '12px'),
+					A2($elm$html$Html$Attributes$style, 'padding', '12px'),
+					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d5deef'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+					A2($elm$html$Html$Attributes$style, 'background', 'white')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h1,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin', '0 0 8px'),
+							A2($elm$html$Html$Attributes$style, 'font-size', '24px')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Evaluation de productions d\'eleves')
+						])),
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin', '0'),
+							A2($elm$html$Html$Attributes$style, 'color', '#33425f')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Exercice : resoudre '),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('$\\cos(2x)=\\sin(x)$')
+								])),
+							$elm$html$Html$text(' sur '),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('$[0;2\\pi[$')
+								])),
+							$elm$html$Html$text('.')
+						])),
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin', '8px 0 0'),
+							A2($elm$html$Html$Attributes$style, 'color', '#516182'),
+							A2($elm$html$Html$Attributes$style, 'font-size', '14px')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							'Placees : ' + ($elm$core$String$fromInt(placedCount) + (' / ' + ($elm$core$String$fromInt(totalCount) + ('  |  Restantes : ' + $elm$core$String$fromInt(remainingCount))))))
+						]))
+				]));
+	});
 var $author$project$Main$view = function (model) {
 	var totalCount = $elm$core$List$length(model.propositions);
-	var placedPropositions = A2(
+	var placed = A2(
 		$elm$core$List$filter,
 		function (item) {
 			return !_Utils_eq(item.pos, $elm$core$Maybe$Nothing);
 		},
 		model.propositions);
-	var placedCount = $elm$core$List$length(
-		A2(
-			$elm$core$List$filter,
-			function (item) {
-				return !_Utils_eq(item.pos, $elm$core$Maybe$Nothing);
-			},
-			model.propositions));
+	var placedCount = $elm$core$List$length(placed);
+	var remainingCount = totalCount - placedCount;
+	var mobile = $author$project$Main$isMobileViewport(model.viewport);
+	var landscape = $author$project$Main$isLandscapeViewport(model.viewport);
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
 				A2($elm$html$Html$Attributes$style, 'font-family', 'system-ui, sans-serif'),
 				A2($elm$html$Html$Attributes$style, 'margin', '0'),
-				A2($elm$html$Html$Attributes$style, 'padding', '20px'),
-				A2($elm$html$Html$Attributes$style, 'background', '#f5f7fb'),
+				A2($elm$html$Html$Attributes$style, 'padding', '16px'),
+				A2($elm$html$Html$Attributes$style, 'background', '#eef3fb'),
 				A2($elm$html$Html$Attributes$style, 'min-height', '100vh')
 			]),
 		_List_fromArray(
 			[
-				A2(
-				$elm$html$Html$h1,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin-top', '0')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Evaluation de redactions - Prototype UX')
-					])),
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin', '0 0 12px'),
-						A2($elm$html$Html$Attributes$style, 'color', '#33425f')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Exercice teste (niveau premiere) : resoudre '),
-						A2(
-						$elm$html$Html$span,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('$\\cos(2x)=\\sin(x)$')
-							])),
-						$elm$html$Html$text(' sur '),
-						A2(
-						$elm$html$Html$span,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('$[0;2\\pi[$')
-							])),
-						$elm$html$Html$text('.')
-					])),
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin', '0 0 18px'),
-						A2($elm$html$Html$Attributes$style, 'color', '#5a6986')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Progression : ' + ($elm$core$String$fromInt(placedCount) + (' / ' + ($elm$core$String$fromInt(totalCount) + ' proposition(s) placee(s)'))))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-						A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
-						A2($elm$html$Html$Attributes$style, 'gap', '16px'),
-						A2($elm$html$Html$Attributes$style, 'align-items', 'flex-start')
-					]),
-				_List_fromArray(
-					[
-						$author$project$Main$leftPanel(model),
-						A2($author$project$Main$boardPanel, model, placedPropositions)
-					]))
+				A3($author$project$Main$topHeader, placedCount, totalCount, remainingCount),
+				mobile ? A5($author$project$Main$mobileWorkspace, model, placed, remainingCount, totalCount, landscape) : A4($author$project$Main$desktopWorkspace, model, placed, remainingCount, totalCount)
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
