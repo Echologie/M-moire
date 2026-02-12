@@ -5160,33 +5160,103 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$RefreshBoardRect = {$: 'RefreshBoardRect'};
-var $author$project$Main$newCard = F2(
-	function (id, title) {
-		return {comment: '', id: id, pos: $elm$core$Maybe$Nothing, title: title};
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$proposition = F6(
+	function (id, badge, title, level, summary, steps) {
+		return {badge: badge, comment: '', id: id, level: level, pos: $elm$core$Maybe$Nothing, steps: steps, summary: summary, title: title};
 	});
+var $author$project$Main$initialPropositions = _List_fromArray(
+	[
+		A6(
+		$author$project$Main$proposition,
+		1,
+		'A1',
+		'Rédaction 1',
+		'Niveau de rigueur : faible',
+		'Erreur de formule, conclusion numérique approximative.',
+		_List_fromArray(
+			['On cherche les solutions de $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$.', 'Je remplace par $\\cos(2x)=1-2\\sin(x)$.', 'Donc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$.', 'Alors $\\sin(x)=\\dfrac{1}{3}$, d\'ou $x\\approx0{,}34$ ou $x\\approx2{,}80$.'])),
+		A6(
+		$author$project$Main$proposition,
+		2,
+		'B2',
+		'Rédaction 2',
+		'Niveau de rigueur : moyen',
+		'Bonne methode algebrique, justification partielle des angles.',
+		_List_fromArray(
+			['On part de $\\cos(2x)=\\sin(x)$ et de $\\cos(2x)=1-2\\sin^2(x)$.', 'On obtient $1-2\\sin^2(x)=\\sin(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'En posant $y=\\sin(x)$ : $2y^2+y-1=0$, d\'ou $y=\\dfrac{1}{2}$ ou $y=-1$.', 'Donc $x=\\dfrac{\\pi}{6}$, $\\dfrac{5\\pi}{6}$ ou $\\dfrac{3\\pi}{2}$ sur l\'intervalle.'])),
+		A6(
+		$author$project$Main$proposition,
+		3,
+		'C3',
+		'Rédaction 3',
+		'Niveau de rigueur : bon',
+		'Demarche correcte avec etapes explicites et valeurs exactes.',
+		_List_fromArray(
+			['On resout $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$.', 'Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$.', 'Factorisation : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Alors $\\sin(x)=\\dfrac{1}{2}$ ou $\\sin(x)=-1$.', 'Dans $[0;2\\pi[$ : $x\\in\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.'])),
+		A6(
+		$author$project$Main$proposition,
+		4,
+		'D4',
+		'Rédaction 4',
+		'Niveau de rigueur : tres bon',
+		'Resolution complete avec ensemble general puis restriction.',
+		_List_fromArray(
+			['Equation : $\\cos(2x)=\\sin(x)$.', 'Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'Produit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Cas 1 : $\\sin(x)=\\dfrac{1}{2}\\iff x=\\dfrac{\\pi}{6}+2k\\pi$ ou $x=\\dfrac{5\\pi}{6}+2k\\pi$.', 'Cas 2 : $\\sin(x)=-1\\iff x=\\dfrac{3\\pi}{2}+2k\\pi$.', 'Intersection avec $[0;2\\pi[$ : $S=\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.']))
+	]);
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Main$RenderMathNow = {$: 'RenderMathNow'};
 var $elm$core$Process$sleep = _Process_sleep;
+var $author$project$Main$scheduleMathRender = A2(
+	$elm$core$Task$perform,
+	function (_v0) {
+		return $author$project$Main$RenderMathNow;
+	},
+	$elm$core$Process$sleep(20));
 var $author$project$Main$init = function (_v0) {
+	var initial = $author$project$Main$initialPropositions;
 	return _Utils_Tuple2(
 		{
+			activePropositionId: A2(
+				$elm$core$Maybe$map,
+				function ($) {
+					return $.id;
+				},
+				$elm$core$List$head(initial)),
 			boardRect: $elm$core$Maybe$Nothing,
-			cards: _List_fromArray(
-				[
-					A2($author$project$Main$newCard, 1, 'Proposition A'),
-					A2($author$project$Main$newCard, 2, 'Proposition B'),
-					A2($author$project$Main$newCard, 3, 'Proposition C'),
-					A2($author$project$Main$newCard, 4, 'Proposition D'),
-					A2($author$project$Main$newCard, 5, 'Proposition E')
-				]),
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
-			selectedCardId: $elm$core$Maybe$Nothing
+			propositions: initial
 		},
-		A2(
-			$elm$core$Task$perform,
-			function (_v1) {
-				return $author$project$Main$RefreshBoardRect;
-			},
-			$elm$core$Process$sleep(60)));
+		$elm$core$Platform$Cmd$batch(
+			_List_fromArray(
+				[
+					A2(
+					$elm$core$Task$perform,
+					function (_v1) {
+						return $author$project$Main$RefreshBoardRect;
+					},
+					$elm$core$Process$sleep(60)),
+					$author$project$Main$scheduleMathRender
+				])));
 };
 var $author$project$Main$WindowResized = F2(
 	function (a, b) {
@@ -5638,8 +5708,73 @@ var $elm$core$Task$attempt = F2(
 							$elm$core$Result$Ok),
 						task))));
 	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Main$firstUnplacedId = function (propositions) {
+	return A2(
+		$elm$core$Maybe$map,
+		function ($) {
+			return $.id;
+		},
+		$elm$core$List$head(
+			A2(
+				$elm$core$List$filter,
+				function (item) {
+					return _Utils_eq(item.pos, $elm$core$Maybe$Nothing);
+				},
+				propositions)));
+};
 var $elm$browser$Browser$Dom$getElement = _Browser_getElement;
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$isPlaced = F2(
+	function (propositionId, propositions) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			false,
+			A2(
+				$elm$core$Maybe$map,
+				function (_v0) {
+					return true;
+				},
+				A2(
+					$elm$core$Maybe$andThen,
+					function ($) {
+						return $.pos;
+					},
+					$elm$core$List$head(
+						A2(
+							$elm$core$List$filter,
+							function (item) {
+								return _Utils_eq(item.id, propositionId);
+							},
+							propositions)))));
+	});
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$clamp = F3(
 	function (minVal, maxVal, value) {
@@ -5654,42 +5789,44 @@ var $author$project$Main$positionFromClient = F3(
 			y: A3($author$project$Main$clamp, 0, 1, (clientY - rect.y) / safeHeight)
 		};
 	});
-var $author$project$Main$updateCardComment = F3(
-	function (cardId, newComment, cards) {
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Main$renderMath = _Platform_outgoingPort('renderMath', $elm$json$Json$Encode$string);
+var $author$project$Main$updatePropositionComment = F3(
+	function (propositionId, newComment, propositions) {
 		return A2(
 			$elm$core$List$map,
-			function (card) {
-				return _Utils_eq(card.id, cardId) ? _Utils_update(
-					card,
-					{comment: newComment}) : card;
+			function (item) {
+				return _Utils_eq(item.id, propositionId) ? _Utils_update(
+					item,
+					{comment: newComment}) : item;
 			},
-			cards);
+			propositions);
 	});
-var $author$project$Main$updateCardPosition = F3(
-	function (cardId, pos, cards) {
+var $author$project$Main$updatePropositionPosition = F3(
+	function (propositionId, pos, propositions) {
 		return A2(
 			$elm$core$List$map,
-			function (card) {
-				return _Utils_eq(card.id, cardId) ? _Utils_update(
-					card,
+			function (item) {
+				return _Utils_eq(item.id, propositionId) ? _Utils_update(
+					item,
 					{
 						pos: $elm$core$Maybe$Just(pos)
-					}) : card;
+					}) : item;
 			},
-			cards);
+			propositions);
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'StartDrag':
-				var cardId = msg.a;
+				var propositionId = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
+							activePropositionId: $elm$core$Maybe$Just(propositionId),
 							dragging: $elm$core$Maybe$Just(
-								{cardId: cardId}),
-							selectedCardId: $elm$core$Maybe$Just(cardId)
+								{propositionId: propositionId})
 						}),
 					A2(
 						$elm$core$Task$attempt,
@@ -5705,14 +5842,26 @@ var $author$project$Main$update = F2(
 					var dragState = _v1.a.a;
 					var rect = _v1.b.a;
 					var pos = A3($author$project$Main$positionFromClient, rect, clientX, clientY);
+					var updated = A3($author$project$Main$updatePropositionPosition, dragState.propositionId, pos, model.propositions);
+					var alreadyPlaced = A2($author$project$Main$isPlaced, dragState.propositionId, model.propositions);
+					var nextActive = function () {
+						if (alreadyPlaced) {
+							return $elm$core$Maybe$Just(dragState.propositionId);
+						} else {
+							var _v2 = $author$project$Main$firstUnplacedId(updated);
+							if (_v2.$ === 'Just') {
+								var nextId = _v2.a;
+								return $elm$core$Maybe$Just(nextId);
+							} else {
+								return $elm$core$Maybe$Just(dragState.propositionId);
+							}
+						}
+					}();
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{
-								cards: A3($author$project$Main$updateCardPosition, dragState.cardId, pos, model.cards),
-								dragging: $elm$core$Maybe$Nothing
-							}),
-						$elm$core$Platform$Cmd$none);
+							{activePropositionId: nextActive, dragging: $elm$core$Maybe$Nothing, propositions: updated}),
+						$author$project$Main$scheduleMathRender);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -5726,27 +5875,27 @@ var $author$project$Main$update = F2(
 						model,
 						{dragging: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none);
-			case 'SelectCard':
-				var cardId = msg.a;
+			case 'SelectProposition':
+				var propositionId = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							selectedCardId: $elm$core$Maybe$Just(cardId)
+							activePropositionId: $elm$core$Maybe$Just(propositionId)
 						}),
-					$elm$core$Platform$Cmd$none);
+					$author$project$Main$scheduleMathRender);
 			case 'UpdateSelectedComment':
 				var newComment = msg.a;
-				var _v2 = model.selectedCardId;
-				if (_v2.$ === 'Nothing') {
+				var _v3 = model.activePropositionId;
+				if (_v3.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var cardId = _v2.a;
+					var propositionId = _v3.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								cards: A3($author$project$Main$updateCardComment, cardId, newComment, model.cards)
+								propositions: A3($author$project$Main$updatePropositionComment, propositionId, newComment, model.propositions)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -5779,15 +5928,19 @@ var $author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
-			default:
+			case 'WindowResized':
 				return _Utils_Tuple2(
 					model,
 					A2(
 						$elm$core$Task$perform,
-						function (_v4) {
+						function (_v5) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(20)));
+			default:
+				return _Utils_Tuple2(
+					model,
+					$author$project$Main$renderMath('refresh'));
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
@@ -5953,7 +6106,6 @@ var $author$project$Main$dragOverlay = function (dragging) {
 	}
 };
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5964,9 +6116,36 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$small = _VirtualDom_node('small');
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$SelectCard = function (a) {
-	return {$: 'SelectCard', a: a};
+var $author$project$Main$SelectProposition = function (a) {
+	return {$: 'SelectProposition', a: a};
 };
+var $author$project$Main$badgeView = F2(
+	function (label, sizeText) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+					A2($elm$html$Html$Attributes$style, 'top', '8px'),
+					A2($elm$html$Html$Attributes$style, 'left', '8px'),
+					A2($elm$html$Html$Attributes$style, 'min-width', '38px'),
+					A2($elm$html$Html$Attributes$style, 'height', '30px'),
+					A2($elm$html$Html$Attributes$style, 'padding', '0 8px'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+					A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+					A2($elm$html$Html$Attributes$style, 'font-size', sizeText),
+					A2($elm$html$Html$Attributes$style, 'font-weight', '800'),
+					A2($elm$html$Html$Attributes$style, 'color', 'white'),
+					A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)'),
+					A2($elm$html$Html$Attributes$style, 'letter-spacing', '0.5px')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(label)
+				]));
+	});
 var $elm$html$Html$Attributes$draggable = _VirtualDom_attribute('draggable');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5993,40 +6172,40 @@ var $author$project$Main$onDragEndCard = A2(
 var $author$project$Main$StartDrag = function (a) {
 	return {$: 'StartDrag', a: a};
 };
-var $author$project$Main$onDragStartCard = function (cardId) {
+var $author$project$Main$onDragStartCard = function (propositionId) {
 	return A2(
 		$elm$html$Html$Events$on,
 		'dragstart',
 		$elm$json$Json$Decode$succeed(
-			$author$project$Main$StartDrag(cardId)));
+			$author$project$Main$StartDrag(propositionId)));
 };
-var $author$project$Main$viewCardOnBoard = F3(
-	function (selectedId, dragging, card) {
-		var _v0 = card.pos;
+var $author$project$Main$viewPlacedMiniature = F3(
+	function (activeId, dragging, item) {
+		var _v0 = item.pos;
 		if (_v0.$ === 'Nothing') {
 			return $elm$html$Html$text('');
 		} else {
 			var pos = _v0.a;
-			var isSelected = _Utils_eq(
-				selectedId,
-				$elm$core$Maybe$Just(card.id));
 			var isDragging = function () {
 				if (dragging.$ === 'Just') {
 					var dragState = dragging.a;
-					return _Utils_eq(dragState.cardId, card.id);
+					return _Utils_eq(dragState.propositionId, item.id);
 				} else {
 					return false;
 				}
 			}();
+			var isActive = _Utils_eq(
+				activeId,
+				$elm$core$Maybe$Just(item.id));
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$draggable('true'),
-						$author$project$Main$onDragStartCard(card.id),
+						$author$project$Main$onDragStartCard(item.id),
 						$author$project$Main$onDragEndCard,
 						$elm$html$Html$Events$onClick(
-						$author$project$Main$SelectCard(card.id)),
+						$author$project$Main$SelectProposition(item.id)),
 						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 						A2(
 						$elm$html$Html$Attributes$style,
@@ -6037,14 +6216,16 @@ var $author$project$Main$viewCardOnBoard = F3(
 						'top',
 						$elm$core$String$fromFloat(pos.y * 100) + '%'),
 						A2($elm$html$Html$Attributes$style, 'transform', 'translate(-50%, -50%)'),
-						A2($elm$html$Html$Attributes$style, 'padding', '8px 10px'),
+						A2($elm$html$Html$Attributes$style, 'width', '170px'),
+						A2($elm$html$Html$Attributes$style, 'min-height', '64px'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'border',
-						isSelected ? '2px solid #0f62fe' : '1px solid #7a92c8'),
+						isActive ? '2px solid #0f62fe' : '1px solid #7a92c8'),
 						A2($elm$html$Html$Attributes$style, 'background', 'white'),
-						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 1px 5px rgba(0,0,0,0.08)'),
+						A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.10)'),
+						A2($elm$html$Html$Attributes$style, 'padding', '10px 10px 10px 12px'),
 						A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
 						A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
 						A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
@@ -6055,12 +6236,45 @@ var $author$project$Main$viewCardOnBoard = F3(
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(card.title)
+						A2($author$project$Main$badgeView, item.badge, '14px'),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'padding-left', '54px'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+								A2($elm$html$Html$Attributes$style, 'color', '#253556')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'font-weight', '700'),
+										A2($elm$html$Html$Attributes$style, 'margin-bottom', '2px')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(item.title)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'font-size', '11px'),
+										A2($elm$html$Html$Attributes$style, 'color', '#5f6f8e')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(item.summary)
+									]))
+							]))
 					]));
 		}
 	});
 var $author$project$Main$boardPanel = F2(
-	function (model, placedCards) {
+	function (model, placedPropositions) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6082,7 +6296,7 @@ var $author$project$Main$boardPanel = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Plan de positionnement')
+							$elm$html$Html$text('Plan Precision / Rigueur')
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -6109,7 +6323,7 @@ var $author$project$Main$boardPanel = F2(
 									_List_Nil,
 									_List_fromArray(
 										[
-											$elm$html$Html$text('Rigueur élevée')
+											$elm$html$Html$text('Rigueur elevee')
 										])),
 									A2(
 									$elm$html$Html$span,
@@ -6136,8 +6350,8 @@ var $author$project$Main$boardPanel = F2(
 								_Utils_ap(
 									A2(
 										$elm$core$List$map,
-										A2($author$project$Main$viewCardOnBoard, model.selectedCardId, model.dragging),
-										placedCards),
+										A2($author$project$Main$viewPlacedMiniature, model.activePropositionId, model.dragging),
+										placedPropositions),
 									_List_fromArray(
 										[
 											$author$project$Main$dragOverlay(model.dragging)
@@ -6159,14 +6373,14 @@ var $author$project$Main$boardPanel = F2(
 									_List_Nil,
 									_List_fromArray(
 										[
-											$elm$html$Html$text('Précision faible')
+											$elm$html$Html$text('Precision faible')
 										])),
 									A2(
 									$elm$html$Html$span,
 									_List_Nil,
 									_List_fromArray(
 										[
-											$elm$html$Html$text('Précision élevée')
+											$elm$html$Html$text('Precision elevee')
 										]))
 								]))
 						])),
@@ -6180,20 +6394,9 @@ var $author$project$Main$boardPanel = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Astuce : appuie longuement puis glisse pour déplacer une carte sur mobile.')
+							$elm$html$Html$text('Cliquer une miniature la rouvre en grand dans le panneau de gauche.')
 						]))
 				]));
-	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
 	});
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $author$project$Main$UpdateEmail = function (a) {
@@ -6201,6 +6404,21 @@ var $author$project$Main$UpdateEmail = function (a) {
 };
 var $author$project$Main$UpdateSelectedComment = function (a) {
 	return {$: 'UpdateSelectedComment', a: a};
+};
+var $author$project$Main$activeProposition = function (model) {
+	var _v0 = model.activePropositionId;
+	if (_v0.$ === 'Nothing') {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var activeId = _v0.a;
+		return $elm$core$List$head(
+			A2(
+				$elm$core$List$filter,
+				function (item) {
+					return _Utils_eq(item.id, activeId);
+				},
+				model.propositions));
+	}
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
@@ -6241,42 +6459,15 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Main$selectedCardFromModel = function (model) {
-	var _v0 = model.selectedCardId;
-	if (_v0.$ === 'Nothing') {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		var cardId = _v0.a;
-		return $elm$core$List$head(
-			A2(
-				$elm$core$List$filter,
-				function (card) {
-					return _Utils_eq(card.id, cardId);
-				},
-				model.cards));
-	}
-};
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$viewCardInList = F3(
-	function (selectedId, dragging, card) {
-		var isSelected = _Utils_eq(
-			selectedId,
-			$elm$core$Maybe$Just(card.id));
+var $author$project$Main$viewDragMiniature = F2(
+	function (dragging, item) {
 		var isDragging = function () {
 			if (dragging.$ === 'Just') {
 				var dragState = dragging.a;
-				return _Utils_eq(dragState.cardId, card.id);
+				return _Utils_eq(dragState.propositionId, item.id);
 			} else {
 				return false;
 			}
@@ -6286,17 +6477,18 @@ var $author$project$Main$viewCardInList = F3(
 			_List_fromArray(
 				[
 					$elm$html$Html$Attributes$draggable('true'),
-					$author$project$Main$onDragStartCard(card.id),
+					$author$project$Main$onDragStartCard(item.id),
 					$author$project$Main$onDragEndCard,
 					$elm$html$Html$Events$onClick(
-					$author$project$Main$SelectCard(card.id)),
-					A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-					A2(
-					$elm$html$Html$Attributes$style,
-					'border',
-					isSelected ? '2px solid #0f62fe' : '1px solid #c7d3ea'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-					A2($elm$html$Html$Attributes$style, 'background', '#fbfcff'),
+					$author$project$Main$SelectProposition(item.id)),
+					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+					A2($elm$html$Html$Attributes$style, 'width', '170px'),
+					A2($elm$html$Html$Attributes$style, 'min-height', '64px'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+					A2($elm$html$Html$Attributes$style, 'border', '1px solid #9cb4e6'),
+					A2($elm$html$Html$Attributes$style, 'background', 'white'),
+					A2($elm$html$Html$Attributes$style, 'padding', '10px 10px 10px 12px'),
+					A2($elm$html$Html$Attributes$style, 'box-shadow', '0 4px 12px rgba(20,55,120,0.10)'),
 					A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
 					A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
 					A2(
@@ -6306,198 +6498,276 @@ var $author$project$Main$viewCardInList = F3(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(card.title)
-				]));
-	});
-var $author$project$Main$leftPanel = F2(
-	function (model, unplacedCards) {
-		var selectedCard = $author$project$Main$selectedCardFromModel(model);
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'background', 'white'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '14px'),
-					A2($elm$html$Html$Attributes$style, 'flex', '1 1 300px'),
-					A2($elm$html$Html$Attributes$style, 'max-width', '360px')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$h2,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '4px 0 10px')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Propositions')
-						])),
-					A2(
-					$elm$html$Html$p,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '0 0 10px'),
-							A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
-							A2($elm$html$Html$Attributes$style, 'color', '#4b5a75')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Carte non placée : glisser vers le plan.')
-						])),
+					A2($author$project$Main$badgeView, item.badge, '14px'),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-							A2($elm$html$Html$Attributes$style, 'flex-direction', 'column'),
-							A2($elm$html$Html$Attributes$style, 'gap', '8px')
-						]),
-					A2(
-						$elm$core$List$map,
-						A2($author$project$Main$viewCardInList, model.selectedCardId, model.dragging),
-						unplacedCards)),
-					A2(
-					$elm$html$Html$h3,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '18px 0 8px')
+							A2($elm$html$Html$Attributes$style, 'padding-left', '54px'),
+							A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+							A2($elm$html$Html$Attributes$style, 'color', '#253556')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Commentaire')
-						])),
-					function () {
-					if (selectedCard.$ === 'Nothing') {
-						return A2(
-							$elm$html$Html$p,
+							A2(
+							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
+									A2($elm$html$Html$Attributes$style, 'font-weight', '700'),
+									A2($elm$html$Html$Attributes$style, 'margin-bottom', '2px')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Sélectionne une proposition pour commenter.')
-								]));
-					} else {
-						var card = selectedCard.a;
-						return A2(
+									$elm$html$Html$text(item.title)
+								])),
+							A2(
 							$elm$html$Html$div,
-							_List_Nil,
 							_List_fromArray(
 								[
-									A2(
-									$elm$html$Html$p,
-									_List_fromArray(
-										[
-											A2($elm$html$Html$Attributes$style, 'margin', '0 0 6px'),
-											A2($elm$html$Html$Attributes$style, 'font-weight', '600')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(card.title)
-										])),
-									A2(
-									$elm$html$Html$textarea,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$rows(6),
-											A2($elm$html$Html$Attributes$style, 'width', '100%'),
-											A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
-											A2($elm$html$Html$Attributes$style, 'padding', '8px'),
-											A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-											A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-											$elm$html$Html$Attributes$placeholder('Observations sur la proposition...'),
-											$elm$html$Html$Attributes$value(card.comment),
-											$elm$html$Html$Events$onInput($author$project$Main$UpdateSelectedComment)
-										]),
-									_List_Nil)
-								]));
-					}
-				}(),
+									A2($elm$html$Html$Attributes$style, 'font-size', '11px'),
+									A2($elm$html$Html$Attributes$style, 'color', '#5f6f8e')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(item.summary)
+								]))
+						]))
+				]));
+	});
+var $author$project$Main$viewStep = function (stepText) {
+	return A2(
+		$elm$html$Html$p,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'margin', '6px 0'),
+				A2($elm$html$Html$Attributes$style, 'line-height', '1.4'),
+				A2($elm$html$Html$Attributes$style, 'color', '#1f2a44')
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(stepText)
+			]));
+};
+var $author$project$Main$viewLargePropositionCard = F2(
+	function (dragging, item) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+					A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+					A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
+					A2($elm$html$Html$Attributes$style, 'padding', '14px')
+				]),
+			_List_fromArray(
+				[
+					A2($author$project$Main$badgeView, item.badge, '18px'),
 					A2(
-					$elm$html$Html$h3,
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'margin', '18px 0 8px')
+							A2($elm$html$Html$Attributes$style, 'margin-left', '62px')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Email (optionnel)')
+							A2(
+							$elm$html$Html$h3,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(item.title)
+								])),
+							A2(
+							$elm$html$Html$p,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '0'),
+									A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
+									A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(item.level)
+								]))
 						])),
-					A2(
-					$elm$html$Html$input,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$type_('email'),
-							$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
-							$elm$html$Html$Attributes$value(model.email),
-							$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
-							A2($elm$html$Html$Attributes$style, 'width', '100%'),
-							A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
-						]),
-					_List_Nil),
 					A2(
 					$elm$html$Html$p,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
-							A2($elm$html$Html$Attributes$style, 'color', '#6b7892'),
-							A2($elm$html$Html$Attributes$style, 'margin', '8px 0 0')
+							A2($elm$html$Html$Attributes$style, 'margin', '10px 0 8px'),
+							A2($elm$html$Html$Attributes$style, 'color', '#22314f'),
+							A2($elm$html$Html$Attributes$style, 'font-weight', '600')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('L\'email est séparé des évaluations et reste facultatif.')
+							$elm$html$Html$text('Version complete')
 						])),
 					A2(
-					$elm$html$Html$button,
+					$elm$html$Html$div,
+					_List_Nil,
+					A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
+					A2(
+					$elm$html$Html$p,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'margin-top', '14px'),
-							A2($elm$html$Html$Attributes$style, 'padding', '10px 14px'),
-							A2($elm$html$Html$Attributes$style, 'background', '#0f62fe'),
-							A2($elm$html$Html$Attributes$style, 'color', 'white'),
-							A2($elm$html$Html$Attributes$style, 'border', 'none'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-							A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+							A2($elm$html$Html$Attributes$style, 'margin', '12px 0 6px'),
+							A2($elm$html$Html$Attributes$style, 'color', '#5a6986'),
+							A2($elm$html$Html$Attributes$style, 'font-size', '13px')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Valider (MVP sans backend)')
-						]))
+							$elm$html$Html$text('Glisse la miniature pour positionner cette redaction sur le plan.')
+						])),
+					A2($author$project$Main$viewDragMiniature, dragging, item)
 				]));
 	});
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Main$strongText = function (txt) {
+var $author$project$Main$leftPanel = function (model) {
+	var active = $author$project$Main$activeProposition(model);
 	return A2(
-		$elm$html$Html$span,
+		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+				A2($elm$html$Html$Attributes$style, 'background', 'white'),
+				A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
+				A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
+				A2($elm$html$Html$Attributes$style, 'padding', '14px'),
+				A2($elm$html$Html$Attributes$style, 'flex', '1 1 360px'),
+				A2($elm$html$Html$Attributes$style, 'max-width', '520px')
 			]),
 		_List_fromArray(
 			[
-				$elm$html$Html$text(txt)
+				A2(
+				$elm$html$Html$h2,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '4px 0 12px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Proposition a evaluer')
+					])),
+				function () {
+				if (active.$ === 'Nothing') {
+					return A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'color', '#5a6986')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Toutes les propositions sont placees. Tu peux cliquer une miniature sur le plan pour la rouvrir en grand.')
+							]));
+				} else {
+					var item = active.a;
+					return A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2($author$project$Main$viewLargePropositionCard, model.dragging, item),
+								A2(
+								$elm$html$Html$h3,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Commentaire')
+									])),
+								A2(
+								$elm$html$Html$textarea,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$rows(5),
+										A2($elm$html$Html$Attributes$style, 'width', '100%'),
+										A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
+										A2($elm$html$Html$Attributes$style, 'padding', '8px'),
+										A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+										A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+										$elm$html$Html$Attributes$placeholder('Observations sur cette redaction...'),
+										$elm$html$Html$Attributes$value(item.comment),
+										$elm$html$Html$Events$onInput($author$project$Main$UpdateSelectedComment)
+									]),
+								_List_Nil)
+							]));
+				}
+			}(),
+				A2(
+				$elm$html$Html$h3,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '16px 0 8px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Email (optionnel)')
+					])),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$type_('email'),
+						$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
+						$elm$html$Html$Attributes$value(model.email),
+						$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
+						A2($elm$html$Html$Attributes$style, 'width', '100%'),
+						A2($elm$html$Html$Attributes$style, 'padding', '10px'),
+						A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+						A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+						A2($elm$html$Html$Attributes$style, 'color', '#6b7892'),
+						A2($elm$html$Html$Attributes$style, 'margin', '8px 0 0')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('L\'email reste facultatif et separe des evaluations.')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin-top', '14px'),
+						A2($elm$html$Html$Attributes$style, 'padding', '10px 14px'),
+						A2($elm$html$Html$Attributes$style, 'background', '#0f62fe'),
+						A2($elm$html$Html$Attributes$style, 'color', 'white'),
+						A2($elm$html$Html$Attributes$style, 'border', 'none'),
+						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+						A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Valider (MVP sans backend)')
+					]))
 			]));
 };
+var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$view = function (model) {
-	var unplacedCards = A2(
+	var totalCount = $elm$core$List$length(model.propositions);
+	var placedPropositions = A2(
 		$elm$core$List$filter,
-		function (card) {
-			return _Utils_eq(card.pos, $elm$core$Maybe$Nothing);
+		function (item) {
+			return !_Utils_eq(item.pos, $elm$core$Maybe$Nothing);
 		},
-		model.cards);
-	var placedCards = A2(
-		$elm$core$List$filter,
-		function (card) {
-			return !_Utils_eq(card.pos, $elm$core$Maybe$Nothing);
-		},
-		model.cards);
+		model.propositions);
+	var placedCount = $elm$core$List$length(
+		A2(
+			$elm$core$List$filter,
+			function (item) {
+				return !_Utils_eq(item.pos, $elm$core$Maybe$Nothing);
+			},
+			model.propositions));
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -6518,18 +6788,52 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Prototype UX – Évaluation de productions')
+						$elm$html$Html$text('Evaluation de redactions - Prototype UX')
 					])),
 				A2(
 				$elm$html$Html$p,
-				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Glisse chaque proposition sur le plan selon les axes : '),
-						$author$project$Main$strongText('Précision'),
-						$elm$html$Html$text(' (horizontal) et '),
-						$author$project$Main$strongText('Rigueur'),
-						$elm$html$Html$text(' (vertical).')
+						A2($elm$html$Html$Attributes$style, 'margin', '0 0 12px'),
+						A2($elm$html$Html$Attributes$style, 'color', '#33425f')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Exercice teste (niveau premiere) : resoudre '),
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('$\\cos(2x)=\\sin(x)$')
+							])),
+						$elm$html$Html$text(' sur '),
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('$[0;2\\pi[$')
+							])),
+						$elm$html$Html$text('.')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '0 0 18px'),
+						A2($elm$html$Html$Attributes$style, 'color', '#5a6986')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						'Progression : ' + ($elm$core$String$fromInt(placedCount) + (' / ' + ($elm$core$String$fromInt(totalCount) + ' proposition(s) placee(s)'))))
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -6542,8 +6846,8 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A2($author$project$Main$leftPanel, model, unplacedCards),
-						A2($author$project$Main$boardPanel, model, placedCards)
+						$author$project$Main$leftPanel(model),
+						A2($author$project$Main$boardPanel, model, placedPropositions)
 					]))
 			]));
 };
