@@ -274,7 +274,7 @@ currentDraggedId model =
 
 scheduleMathRender : Cmd Msg
 scheduleMathRender =
-    Task.perform (\_ -> RenderMathNow) (Process.sleep 20)
+    renderMath "refresh"
 
 
 isMobileViewport : Viewport -> Bool
@@ -593,13 +593,7 @@ viewDraggableSheet dragging item heightText =
         , style "padding" "12px"
         , style "cursor" "grab"
         , style "user-select" "none"
-        , style "opacity"
-            (if isDragging then
-                "0"
-
-             else
-                "1"
-            )
+        , style "opacity" "1"
         ]
         [ badgeView item.badge "18px"
         , div [ style "margin-left" "58px" ]
@@ -682,6 +676,8 @@ boardPanel model placedPropositions compact =
                 [ span [] [ text "Rigueur elevee" ], span [] [ text "" ] ]
             , div
                 [ id "board"
+                , onBoardDragOver
+                , onBoardDrop
                 , style "position" "relative"
                 , style "height" boardHeight
                 , style "min-height" "320px"

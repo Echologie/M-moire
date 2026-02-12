@@ -5219,14 +5219,10 @@ var $elm$core$Maybe$map = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $author$project$Main$RenderMathNow = {$: 'RenderMathNow'};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Main$renderMath = _Platform_outgoingPort('renderMath', $elm$json$Json$Encode$string);
+var $author$project$Main$scheduleMathRender = $author$project$Main$renderMath('refresh');
 var $elm$core$Process$sleep = _Process_sleep;
-var $author$project$Main$scheduleMathRender = A2(
-	$elm$core$Task$perform,
-	function (_v0) {
-		return $author$project$Main$RenderMathNow;
-	},
-	$elm$core$Process$sleep(20));
 var $author$project$Main$init = function (_v0) {
 	var initial = $author$project$Main$initialPropositions;
 	return _Utils_Tuple2(
@@ -5796,8 +5792,6 @@ var $author$project$Main$positionFromClient = F3(
 			y: A3($author$project$Main$clamp, 0, 1, (clientY - rect.y) / safeHeight)
 		};
 	});
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$renderMath = _Platform_outgoingPort('renderMath', $elm$json$Json$Encode$string);
 var $author$project$Main$updatePropositionComment = F3(
 	function (propositionId, newComment, propositions) {
 		return A2(
@@ -6361,6 +6355,8 @@ var $author$project$Main$boardPanel = F3(
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$id('board'),
+									$author$project$Main$onBoardDragOver,
+									$author$project$Main$onBoardDrop,
 									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 									A2($elm$html$Html$Attributes$style, 'height', boardHeight),
 									A2($elm$html$Html$Attributes$style, 'min-height', '320px'),
@@ -6620,10 +6616,7 @@ var $author$project$Main$viewDraggableSheet = F3(
 					A2($elm$html$Html$Attributes$style, 'padding', '12px'),
 					A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
 					A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
-					A2(
-					$elm$html$Html$Attributes$style,
-					'opacity',
-					isDragging ? '0' : '1')
+					A2($elm$html$Html$Attributes$style, 'opacity', '1')
 				]),
 			_List_fromArray(
 				[
