@@ -6,10 +6,9 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Dict exposing (Dict)
-import Html exposing (Html, div, h1, h2, h3, input, p, small, span, text, textarea)
+import Html exposing (Html, button, div, h1, h2, h3, input, p, small, span, text, textarea)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, onClick, onInput, preventDefaultOn)
-import Html.Keyed as Keyed
+import Html.Events exposing (on, onClick, onInput, preventDefaultOn, stopPropagationOn)
 import Json.Decode as Decode
 import Process
 import Task
@@ -45,7 +44,11 @@ type alias BoardRect =
 
 
 type alias DragState =
-    { propositionId : Int }
+    { propositionId : Int
+    , startX : Float
+    , startY : Float
+    , moved : Bool
+    }
 
 
 type alias Viewport =
@@ -56,10 +59,8 @@ type alias Viewport =
 
 type alias Model =
     { propositions : List Proposition
-    , activePropositionId : Maybe Int
+    , expandedPropositionId : Maybe Int
     , dragging : Maybe DragState
-    , lastDraggedPropositionId : Maybe Int
-    , miniatureLayout : Animator.Timeline (Dict Int Position)
     , focusTimeline : Animator.Timeline (Maybe Int)
     , boardRect : Maybe BoardRect
     , email : String
@@ -68,18 +69,38 @@ type alias Model =
 
 
 type Msg
-    = StartDrag Int
-    | DragOver
-    | DropOnBoard Float Float
-    | EndDrag
-    | SelectProposition Int
-    | UpdateSelectedComment String
+    = StartDrag Int Float Float
+    | PointerMove Float Float
+    | PointerUp
+    | CloseExpanded
+    | UpdateExpandedComment String
     | UpdateEmail String
     | RefreshBoardRect
     | GotBoardRect (Result Dom.Error Dom.Element)
     | WindowResized Int Int
     | RenderMathNow
     | AnimatorTick Time.Posix
+    | NoOp
+
+
+miniatureWidth : Float
+miniatureWidth =
+    320
+
+
+miniatureHeight : Float
+miniatureHeight =
+    206
+
+
+miniScale : Float
+miniScale =
+    0.34
+
+
+focusedScale : Float
+focusedScale =
+    0.42
 
 
 main : Program () Model Msg
@@ -95,15 +116,13 @@ main =
 init : () -> ( Model, Cmd Msg )
 init _ =
     let
-        initial =
-            initialPropositions
+        seeded =
+            withInitialPositions initialPropositions
     in
-    ( { propositions = initial
-      , activePropositionId = initial |> List.head |> Maybe.map .id
+    ( { propositions = seeded
+      , expandedPropositionId = Nothing
       , dragging = Nothing
-      , lastDraggedPropositionId = Nothing
-      , miniatureLayout = Animator.init Dict.empty
-      , focusTimeline = Animator.init (initial |> List.head |> Maybe.map .id)
+      , focusTimeline = Animator.init Nothing
       , boardRect = Nothing
       , email = ""
       , viewport = { width = 1200, height = 800 }
@@ -160,6 +179,25 @@ initialPropositions =
     ]
 
 
+withInitialPositions : List Proposition -> List Proposition
+withInitialPositions propositions =
+    let
+        layout : Dict Int Position
+        layout =
+            Dict.fromList
+                [ ( 1, { x = 0.16, y = 0.14 } )
+                , ( 2, { x = 0.36, y = 0.14 } )
+                , ( 3, { x = 0.56, y = 0.14 } )
+                , ( 4, { x = 0.76, y = 0.14 } )
+                ]
+    in
+    List.map
+        (\item ->
+            { item | pos = Dict.get item.id layout }
+        )
+        propositions
+
+
 proposition : Int -> String -> String -> String -> List String -> Proposition
 proposition id badge title preview steps =
     { id = id
@@ -183,10 +221,6 @@ subscriptions model =
 animator : Animator.Animator Model
 animator =
     Animator.animator
-        |> Animator.watching .miniatureLayout
-            (\newLayout currentModel ->
-                { currentModel | miniatureLayout = newLayout }
-            )
         |> Animator.watching .focusTimeline
             (\newFocus currentModel ->
                 { currentModel | focusTimeline = newFocus }
@@ -196,70 +230,87 @@ animator =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        StartDrag propositionId ->
-            ( { model
-                | dragging = Just { propositionId = propositionId }
-                , lastDraggedPropositionId = Just propositionId
-                , activePropositionId = Just propositionId
-                , focusTimeline = animateFocusTo (Just propositionId) model.focusTimeline
+        StartDrag propositionId clientX clientY ->
+            let
+                movedToPointer =
+                    case model.boardRect of
+                        Nothing ->
+                            model
+
+                        Just rect ->
+                            { model
+                                | propositions =
+                                    updatePropositionPosition
+                                        propositionId
+                                        (positionFromClientBounded rect clientX clientY)
+                                        model.propositions
+                            }
+            in
+            ( { movedToPointer
+                | dragging =
+                    Just
+                        { propositionId = propositionId
+                        , startX = clientX
+                        , startY = clientY
+                        , moved = False
+                        }
+                , expandedPropositionId = Nothing
+                , focusTimeline = animateFocusTo Nothing movedToPointer.focusTimeline
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
 
-        DragOver ->
-            ( model, Cmd.none )
-
-        DropOnBoard clientX clientY ->
-            case ( currentDraggedId model, model.boardRect ) of
-                ( Just propositionId, Just rect ) ->
+        PointerMove clientX clientY ->
+            case ( model.dragging, model.boardRect ) of
+                ( Just dragState, Just rect ) ->
                     let
-                        alreadyPlaced =
-                            isPlaced propositionId model.propositions
+                        movedDistance =
+                            distance dragState.startX dragState.startY clientX clientY
 
-                        pos =
-                            positionFromClient rect clientX clientY
+                        hasMoved =
+                            dragState.moved || (movedDistance > 4)
 
-                        updated =
-                            updatePropositionPosition propositionId pos model.propositions
-
-                        nextActive =
-                            if alreadyPlaced then
-                                Just propositionId
-
-                            else
-                                firstUnplacedId updated |> Maybe.withDefault propositionId |> Just
-
-                        nextLayout =
-                            layoutFromPropositions updated
+                        nextPos =
+                            positionFromClientBounded rect clientX clientY
                     in
                     ( { model
-                        | propositions = updated
-                        , dragging = Nothing
-                        , lastDraggedPropositionId = Just propositionId
-                        , miniatureLayout =
-                            Animator.go (Animator.millis 220) nextLayout model.miniatureLayout
-                        , focusTimeline = animateFocusTo nextActive model.focusTimeline
-                        , activePropositionId = nextActive
+                        | propositions = updatePropositionPosition dragState.propositionId nextPos model.propositions
+                        , dragging = Just { dragState | moved = hasMoved }
                       }
-                    , scheduleMathRender
+                    , Cmd.none
                     )
 
                 _ ->
-                    ( { model | dragging = Nothing }, Cmd.none )
+                    ( model, Cmd.none )
 
-        EndDrag ->
-            ( { model | dragging = Nothing }, Cmd.none )
+        PointerUp ->
+            case model.dragging of
+                Nothing ->
+                    ( model, Cmd.none )
 
-        SelectProposition propositionId ->
+                Just dragState ->
+                    if dragState.moved then
+                        ( { model | dragging = Nothing }, Cmd.none )
+
+                    else
+                        ( { model
+                            | dragging = Nothing
+                            , expandedPropositionId = Just dragState.propositionId
+                            , focusTimeline = animateFocusTo (Just dragState.propositionId) model.focusTimeline
+                          }
+                        , scheduleMathRender
+                        )
+
+        CloseExpanded ->
             ( { model
-                | activePropositionId = Just propositionId
-                , focusTimeline = animateFocusTo (Just propositionId) model.focusTimeline
+                | expandedPropositionId = Nothing
+                , focusTimeline = animateFocusTo Nothing model.focusTimeline
               }
-            , scheduleMathRender
+            , Cmd.none
             )
 
-        UpdateSelectedComment newComment ->
-            case model.activePropositionId of
+        UpdateExpandedComment newComment ->
+            case model.expandedPropositionId of
                 Nothing ->
                     ( model, Cmd.none )
 
@@ -292,7 +343,7 @@ update msg model =
 
         WindowResized width height ->
             ( { model | viewport = { width = width, height = height } }
-            , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 20)
+            , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 24)
             )
 
         RenderMathNow ->
@@ -301,15 +352,8 @@ update msg model =
         AnimatorTick newTime ->
             ( Animator.update newTime animator model, Cmd.none )
 
-
-currentDraggedId : Model -> Maybe Int
-currentDraggedId model =
-    case model.dragging of
-        Just dragState ->
-            Just dragState.propositionId
-
-        Nothing ->
-            model.lastDraggedPropositionId
+        NoOp ->
+            ( model, Cmd.none )
 
 
 scheduleMathRender : Cmd Msg
@@ -322,35 +366,17 @@ animateFocusTo propositionId timeline =
     Animator.go (Animator.millis 240) propositionId timeline
 
 
-isMobileViewport : Viewport -> Bool
-isMobileViewport viewport =
-    viewport.width < 980
-
-
-isPlaced : Int -> List Proposition -> Bool
-isPlaced propositionId propositions =
-    propositions
-        |> List.filter (\item -> item.id == propositionId)
-        |> List.head
-        |> Maybe.andThen .pos
-        |> Maybe.map (\_ -> True)
-        |> Maybe.withDefault False
-
-
-firstUnplacedId : List Proposition -> Maybe Int
-firstUnplacedId propositions =
-    propositions
-        |> List.filter (\item -> item.pos == Nothing)
-        |> List.head
-        |> Maybe.map .id
+distance : Float -> Float -> Float -> Float -> Float
+distance x1 y1 x2 y2 =
+    sqrt (((x2 - x1) ^ 2) + ((y2 - y1) ^ 2))
 
 
 updatePropositionPosition : Int -> Position -> List Proposition -> List Proposition
-updatePropositionPosition propositionId pos propositions =
+updatePropositionPosition propositionId newPos propositions =
     List.map
         (\item ->
             if item.id == propositionId then
-                { item | pos = Just pos }
+                { item | pos = Just newPos }
 
             else
                 item
@@ -371,18 +397,8 @@ updatePropositionComment propositionId newComment propositions =
         propositions
 
 
-layoutFromPropositions : List Proposition -> Dict Int Position
-layoutFromPropositions propositions =
-    propositions
-        |> List.filterMap
-            (\item ->
-                item.pos |> Maybe.map (\position -> ( item.id, position ))
-            )
-        |> Dict.fromList
-
-
-positionFromClient : BoardRect -> Float -> Float -> Position
-positionFromClient rect clientX clientY =
+positionFromClientBounded : BoardRect -> Float -> Float -> Position
+positionFromClientBounded rect clientX clientY =
     let
         safeWidth =
             if rect.width <= 0 then
@@ -397,9 +413,21 @@ positionFromClient rect clientX clientY =
 
             else
                 rect.height
+
+        rawX =
+            (clientX - rect.x) / safeWidth
+
+        rawY =
+            (clientY - rect.y) / safeHeight
+
+        marginX =
+            ((miniatureWidth * focusedScale) / 2) / safeWidth
+
+        marginY =
+            ((miniatureHeight * focusedScale) / 2) / safeHeight
     in
-    { x = clamp 0 1 ((clientX - rect.x) / safeWidth)
-    , y = clamp 0 1 ((clientY - rect.y) / safeHeight)
+    { x = clamp marginX (1 - marginX) rawX
+    , y = clamp marginY (1 - marginY) rawY
     }
 
 
@@ -417,342 +445,88 @@ clamp minVal maxVal value =
 
 view : Model -> Html Msg
 view model =
-    let
-        placed =
-            List.filter (\item -> item.pos /= Nothing) model.propositions
-
-        totalCount =
-            List.length model.propositions
-
-        placedCount =
-            List.length placed
-
-        remainingCount =
-            totalCount - placedCount
-
-        mobile =
-            isMobileViewport model.viewport
-    in
     div
-        [ style "font-family" "system-ui, sans-serif"
-        , style "margin" "0"
-        , style "padding" "16px"
-        , style "background" "#eef3fb"
+        [ style "margin" "0"
         , style "min-height" "100vh"
-        ]
-        [ topHeader placedCount totalCount remainingCount
-        , if mobile then
-            mobileWorkspace model placed
-
-          else
-            desktopWorkspace model placed
-        ]
-
-
-topHeader : Int -> Int -> Int -> Html msg
-topHeader placedCount totalCount remainingCount =
-    div
-        [ style "margin-bottom" "12px"
+        , style "height" "100vh"
         , style "padding" "12px"
-        , style "border" "1px solid #d5deef"
-        , style "border-radius" "12px"
-        , style "background" "white"
+        , style "display" "flex"
+        , style "flex-direction" "column"
+        , style "background" "#eaf0fb"
+        , style "font-family" "system-ui, sans-serif"
         ]
-        [ h1 [ style "margin" "0 0 8px", style "font-size" "24px" ] [ text "Evaluation de productions d'eleves" ]
-        , p [ style "margin" "0", style "color" "#33425f" ]
+        [ topHeader
+        , boardView model
+        ]
+
+
+topHeader : Html msg
+topHeader =
+    div
+        [ style "padding" "10px 12px"
+        , style "border" "1px solid #d5deef"
+        , style "border-radius" "10px"
+        , style "background" "white"
+        , style "margin-bottom" "10px"
+        ]
+        [ h1 [ style "margin" "0", style "font-size" "24px" ] [ text "Evaluation de productions d'eleves" ]
+        , p [ style "margin" "6px 0 0", style "color" "#33425f" ]
             [ text "Exercice : resoudre "
             , span [ style "font-weight" "700" ] [ text "$\\cos(2x)=\\sin(x)$" ]
             , text " sur "
             , span [ style "font-weight" "700" ] [ text "$[0;2\\pi[$" ]
             , text "."
             ]
-        , p [ style "margin" "8px 0 0", style "color" "#516182", style "font-size" "14px" ]
-            [ text
-                ("Placees : "
-                    ++ String.fromInt placedCount
-                    ++ " / "
-                    ++ String.fromInt totalCount
-                    ++ "  |  Restantes : "
-                    ++ String.fromInt remainingCount
-                )
-            ]
         ]
 
 
-desktopWorkspace : Model -> List Proposition -> Html Msg
-desktopWorkspace model placed =
-    div
-        [ style "display" "flex"
-        , style "gap" "16px"
-        , style "align-items" "flex-start"
-        ]
-        [ panelView model False
-        , boardPanel model placed False
-        ]
-
-
-mobileWorkspace : Model -> List Proposition -> Html Msg
-mobileWorkspace model placed =
-    div
-        [ style "display" "flex"
-        , style "flex-direction" "column"
-        , style "gap" "10px"
-        ]
-        [ panelView model True
-        , boardPanel model placed True
-        ]
-
-
-panelView : Model -> Bool -> Html Msg
-panelView model compact =
+boardView : Model -> Html Msg
+boardView model =
     let
-        active =
-            activeProposition model
-
-        cardHeight =
-            if compact then
-                "160px"
-
-            else
-                "260px"
-    in
-    div
-        [ style "background" "white"
-        , style "border" "1px solid #d9e0ee"
-        , style "border-radius" "12px"
-        , style "padding" "12px"
-        , style "flex" "1 1 420px"
-        ]
-        [ h2 [ style "margin" "0 0 8px", style "font-size" "18px" ] [ text "Copies" ]
-        , tabsView model compact
-        , case active of
-            Nothing ->
-                p [ style "color" "#5a6986", style "font-size" "14px" ] [ text "Toutes les copies sont placees. Clique une miniature pour la rouvrir." ]
-
-            Just item ->
-                div []
-                    [ Keyed.node "div" [] [ ( String.fromInt item.id, viewDraggableSheet model.dragging item cardHeight ) ]
-                    , h3 [ style "margin" "12px 0 8px" ] [ text "Commentaire" ]
-                    , textarea
-                        [ rows
-                            (if compact then
-                                2
-
-                             else
-                                5
-                            )
-                        , style "width" "100%"
-                        , style "resize" "vertical"
-                        , style "padding" "8px"
-                        , style "border" "1px solid #c7d3ea"
-                        , style "border-radius" "8px"
-                        , placeholder "Observations sur cette copie..."
-                        , value item.comment
-                        , onInput UpdateSelectedComment
-                        ]
-                        []
-                    ]
-        , h3 [ style "margin" "12px 0 8px" ] [ text "Email (optionnel)" ]
-        , input
-            [ type_ "email"
-            , placeholder "nom@exemple.fr"
-            , value model.email
-            , onInput UpdateEmail
-            , style "width" "100%"
-            , style "padding" "10px"
-            , style "border" "1px solid #c7d3ea"
-            , style "border-radius" "8px"
-            ]
-            []
-        , p [ style "font-size" "12px", style "color" "#6b7892", style "margin" "8px 0 0" ]
-            [ text "L'email reste facultatif et separe des evaluations." ]
-        ]
-
-
-tabsView : Model -> Bool -> Html Msg
-tabsView model compact =
-    div
-        [ style "display" "flex"
-        , style "flex-wrap" "wrap"
-        , style "gap" "8px"
-        , style "margin-bottom" "10px"
-        ]
-        (List.map (tabItem model.activePropositionId model.propositions compact) model.propositions)
-
-
-tabItem : Maybe Int -> List Proposition -> Bool -> Proposition -> Html Msg
-tabItem activeId allPropositions compact item =
-    let
-        isActive =
-            activeId == Just item.id
-
-        isAlreadyPlaced =
-            isPlaced item.id allPropositions
-
-        borderStyle =
-            if isActive then
-                "2px solid #0f62fe"
-
-            else if isAlreadyPlaced then
-                "1px solid #2f8f4e"
-
-            else
-                "1px solid #b7c7e6"
-    in
-    div
-        [ onClick (SelectProposition item.id)
-        , style "display" "inline-flex"
-        , style "align-items" "center"
-        , style "justify-content" "center"
-        , style "padding" "6px 10px"
-        , style "min-width" "38px"
-        , style "border-radius" "999px"
-        , style "border" borderStyle
-        , style "background" "white"
-        , style "cursor" "pointer"
-        ]
-        [ if compact then
-            miniBadge item.badge
-
-          else
-            div [ style "display" "inline-flex", style "align-items" "center", style "gap" "8px" ]
-                [ miniBadge item.badge
-                , span [ style "font-size" "12px", style "font-weight" "700", style "color" "#304368" ] [ text item.title ]
-                ]
-        ]
-
-
-viewDraggableSheet : Maybe DragState -> Proposition -> String -> Html Msg
-viewDraggableSheet dragging item heightText =
-    let
-        isDragging =
-            case dragging of
-                Just dragState ->
-                    dragState.propositionId == item.id
-
+        overlay =
+            case selectedProposition model of
                 Nothing ->
-                    False
+                    text ""
+
+                Just item ->
+                    viewExpandedOverlay model item
     in
     div
-        [ draggable "true"
-        , onDragStartCard item.id
-        , onDragEndCard
-        , onClick (SelectProposition item.id)
-        , attribute "data-drag-source" "proposition"
-        , attribute "data-badge" item.badge
-        , attribute "data-title" item.title
-        , attribute "data-preview" item.preview
+        [ id "board"
+        , onBoardMouseMove
+        , onBoardMouseUp
+        , onBoardMouseLeave
+        , onBoardTouchMove
+        , onBoardTouchEnd
         , style "position" "relative"
-        , style "border" "1px solid #c8d6ef"
+        , style "flex" "1"
+        , style "width" "100%"
+        , style "border" "1px solid #b9c9e6"
         , style "border-radius" "12px"
-        , style "background" "#fbfdff"
-        , style "padding" "12px"
-        , style "cursor" "grab"
-        , style "user-select" "none"
-        , style "opacity"
-            (if isDragging then
-                "0.94"
-
-             else
-                "1"
-            )
+        , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
+        , style "overflow" "hidden"
+        , style "touch-action" "none"
         ]
-        [ badgeView item.badge "18px"
-        , div [ style "margin-left" "58px" ]
-            [ h3 [ style "margin" "0 0 4px" ] [ text item.title ]
-            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
-            ]
-        , div
-            [ style "margin-top" "10px"
-            , style "max-height" heightText
-            , style "overflow" "auto"
-            , style "padding-right" "4px"
-            ]
-            (List.map viewStep item.steps)
-        ]
+        ([ axisLines ]
+            ++ List.map (viewMiniature model) model.propositions
+            ++ [ boardLegend, overlay ]
+        )
 
 
-viewStep : String -> Html msg
-viewStep stepText =
-    p [ style "margin" "6px 0", style "line-height" "1.35", style "color" "#1f2a44" ] [ text stepText ]
-
-
-miniBadge : String -> Html msg
-miniBadge badge =
-    span
-        [ style "display" "inline-flex"
-        , style "align-items" "center"
-        , style "justify-content" "center"
-        , style "min-width" "20px"
-        , style "height" "20px"
-        , style "border-radius" "999px"
-        , style "background" "#2563eb"
-        , style "color" "white"
-        , style "font-size" "12px"
-        , style "font-weight" "700"
-        ]
-        [ text badge ]
-
-
-badgeView : String -> String -> Html msg
-badgeView label sizeText =
+boardLegend : Html msg
+boardLegend =
     div
         [ style "position" "absolute"
-        , style "top" "8px"
-        , style "left" "8px"
-        , style "min-width" "38px"
-        , style "height" "30px"
-        , style "padding" "0 8px"
-        , style "border-radius" "999px"
+        , style "left" "10px"
+        , style "right" "10px"
+        , style "bottom" "8px"
         , style "display" "flex"
-        , style "align-items" "center"
-        , style "justify-content" "center"
-        , style "font-size" sizeText
-        , style "font-weight" "800"
-        , style "color" "white"
-        , style "background" "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)"
+        , style "justify-content" "space-between"
+        , style "font-size" "12px"
+        , style "color" "#4c5d7f"
         ]
-        [ text label ]
-
-
-boardPanel : Model -> List Proposition -> Bool -> Html Msg
-boardPanel model placedPropositions compact =
-    let
-        boardHeight =
-            if compact then
-                "56vh"
-
-            else
-                "560px"
-    in
-    div
-        [ style "background" "white"
-        , style "border" "1px solid #d9e0ee"
-        , style "border-radius" "12px"
-        , style "padding" "14px"
-        , style "flex" "2 1 520px"
-        ]
-        [ h2 [ style "margin" "4px 0 10px" ] [ text "Plan Precision / Rigueur" ]
-        , div [ style "position" "relative" ]
-            [ div [ style "display" "flex", style "justify-content" "space-between", style "font-size" "13px", style "margin-bottom" "4px", style "color" "#40506a" ]
-                [ span [] [ text "Rigueur elevee" ], span [] [ text "" ] ]
-            , div
-                [ id "board"
-                , onBoardDragOver
-                , onBoardDrop
-                , style "position" "relative"
-                , style "height" boardHeight
-                , style "min-height" "320px"
-                , style "border" "1px solid #b9c9e6"
-                , style "border-radius" "8px"
-                , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
-                ]
-                ([ axisLines ] ++ List.map (viewPlacedMiniature model.activePropositionId model.dragging model.miniatureLayout model.focusTimeline compact) placedPropositions ++ [ dragOverlay model.dragging ])
-            , div [ style "display" "flex", style "justify-content" "space-between", style "font-size" "13px", style "margin-top" "6px", style "color" "#40506a" ]
-                [ span [] [ text "Precision faible" ], span [] [ text "Precision elevee" ] ]
-            ]
-        , small [ style "display" "block", style "margin-top" "10px", style "color" "#6b7892" ]
-            [ text "Cliquer une miniature la reouvre en grand. Drag tactile : appui long + glisser." ]
+        [ span [] [ text "Precision faible" ]
+        , span [] [ text "Rigueur elevee" ]
         ]
 
 
@@ -780,250 +554,269 @@ axisLines =
         ]
 
 
-dragOverlay : Maybe DragState -> Html Msg
-dragOverlay dragging =
-    case dragging of
-        Nothing ->
-            text ""
-
-        Just _ ->
-            div
-                [ onBoardDragOver
-                , onBoardDrop
-                , style "position" "absolute"
-                , style "inset" "0"
-                , style "z-index" "50"
-                ]
-                []
-
-
-viewPlacedMiniature : Maybe Int -> Maybe DragState -> Animator.Timeline (Dict Int Position) -> Animator.Timeline (Maybe Int) -> Bool -> Proposition -> Html Msg
-viewPlacedMiniature activeId dragging miniatureLayout focusTimeline compact item =
+viewMiniature : Model -> Proposition -> Html Msg
+viewMiniature model item =
     case item.pos of
         Nothing ->
             text ""
 
         Just pos ->
             let
-                isActiveTab =
-                    activeId == Just item.id
-
                 isDragging =
-                    case dragging of
+                    case model.dragging of
                         Just dragState ->
                             dragState.propositionId == item.id
 
                         Nothing ->
                             False
 
-                baseWidth =
-                    if compact then
-                        300
+                isFocused =
+                    Animator.current model.focusTimeline == Just item.id
+
+                cursorStyle =
+                    if isDragging then
+                        "grabbing"
 
                     else
-                        360
-
-                baseHeight =
-                    if compact then
-                        206
-
-                    else
-                        236
-
-                smallScale =
-                    if compact then
-                        0.33
-
-                    else
-                        0.36
-
-                focusedScale =
-                    smallScale + 0.08
-
-                fallbackPosition =
-                    Dict.get item.id (Animator.current miniatureLayout) |> Maybe.withDefault pos
-
-                transformFor selected =
-                    if selected == Just item.id then
-                        Animator.at focusedScale |> Animator.arriveSmoothly 0.65
-
-                    else
-                        Animator.at smallScale |> Animator.arriveSmoothly 0.65
-
-                miniatureBorder =
-                    if isActiveTab then
-                        "2px solid #0f62fe"
-
-                    else
-                        "1px solid #7a92c8"
-
-                previewSteps =
-                    if compact then
-                        List.take 3 item.steps
-
-                    else
-                        List.take 4 item.steps
+                        "grab"
             in
             div
-                [ draggable "true"
-                , onDragStartCard item.id
-                , onDragEndCard
-                , onClick (SelectProposition item.id)
-                , attribute "data-drag-source" "miniature"
-                , attribute "data-badge" item.badge
-                , attribute "data-title" item.title
-                , attribute "data-preview" item.preview
-                , style "position" "absolute"
-                , Animator.Inline.style miniatureLayout
-                    "left"
-                    (\x -> String.fromFloat x ++ "%")
-                    (\layout ->
-                        layout
-                            |> Dict.get item.id
-                            |> Maybe.withDefault fallbackPosition
-                            |> .x
-                            |> (\value -> value * 100)
-                            |> Animator.at
-                            |> Animator.arriveSmoothly 0.6
-                    )
-                , Animator.Inline.style miniatureLayout
-                    "top"
-                    (\y -> String.fromFloat y ++ "%")
-                    (\layout ->
-                        layout
-                            |> Dict.get item.id
-                            |> Maybe.withDefault fallbackPosition
-                            |> .y
-                            |> (\value -> value * 100)
-                            |> Animator.at
-                            |> Animator.arriveSmoothly 0.6
-                    )
-                , Animator.Inline.style focusTimeline
-                    "transform"
-                    (\scaleValue ->
-                        "translate(-50%, -50%) scale(" ++ String.fromFloat scaleValue ++ ")"
-                    )
-                    transformFor
-                , style "transform-origin" "top left"
+                [ style "position" "absolute"
+                , style "left" (String.fromFloat (pos.x * 100) ++ "%")
+                , style "top" (String.fromFloat (pos.y * 100) ++ "%")
+                , style "transform" "translate(-50%, -50%)"
                 , style "z-index"
                     (if isDragging then
                         "70"
 
-                     else if isActiveTab then
-                        "35"
+                     else if isFocused then
+                        "45"
 
                      else
-                        "20"
+                        "30"
                     )
-                , style "cursor" "grab"
+                , style "cursor" cursorStyle
                 , style "user-select" "none"
+                , style "touch-action" "none"
+                , onMiniMouseDown item.id
+                , onMiniTouchStart item.id
                 ]
                 [ div
-                    [ style "position" "relative"
-                    , style "width" (String.fromFloat baseWidth ++ "px")
-                    , style "height" (String.fromFloat baseHeight ++ "px")
-                    , style "overflow" "hidden"
-                    , style "border" miniatureBorder
-                    , style "background" "#fbfdff"
+                    [ Animator.Inline.scale model.focusTimeline
+                        (\focusedId ->
+                            if focusedId == Just item.id then
+                                Animator.at focusedScale |> Animator.arriveSmoothly 0.65
+
+                            else
+                                Animator.at miniScale |> Animator.arriveSmoothly 0.65
+                        )
+                    , style "transform-origin" "top left"
+                    , style "position" "relative"
+                    , style "width" (String.fromFloat miniatureWidth ++ "px")
+                    , style "height" (String.fromFloat miniatureHeight ++ "px")
+                    , style "border"
+                        (if isFocused then
+                            "2px solid #0f62fe"
+
+                         else
+                            "1px solid #7a92c8"
+                        )
                     , style "border-radius" "12px"
+                    , style "background" "#fbfdff"
                     , style "box-shadow"
                         (if isDragging then
-                            "0 10px 22px rgba(15,34,80,0.26)"
+                            "0 12px 24px rgba(15,34,80,0.25)"
 
                          else
                             "0 4px 12px rgba(0,0,0,0.14)"
                         )
-                    , style "padding" "10px"
-                    , style "opacity"
-                        (if isDragging then
-                            "0.9"
-
-                         else
-                            "1"
-                        )
+                    , style "padding" "12px"
+                    , style "overflow" "hidden"
                     ]
-                    [ badgeView item.badge "12px"
+                    [ notchBadge item.badge
                     , div [ style "margin-left" "48px" ]
-                        [ h3 [ style "margin" "0 0 3px", style "font-size" "15px" ] [ text item.title ]
-                        , p [ style "margin" "0", style "font-size" "11px", style "color" "#4f6185" ] [ text "Version eleve" ]
+                        [ h3 [ style "margin" "0 0 4px", style "font-size" "16px", style "color" "#1a2947" ] [ text item.title ]
+                        , p [ style "margin" "0", style "font-size" "12px", style "color" "#4f6185" ] [ text "Cliquer pour agrandir, glisser pour placer." ]
                         ]
-                    , div
-                        [ style "margin-top" "8px"
-                        , style "padding-right" "3px"
+                    , div [ style "margin-top" "12px" ]
+                        [ p [ style "margin" "0", style "font-size" "12px", style "color" "#33425f" ] [ text "Version miniaturisee" ]
+                        , p [ style "margin" "8px 0 0", style "font-size" "12px", style "color" "#5a6986" ] [ text "La redaction complete s'affiche au clic." ]
                         ]
-                        (List.map viewMiniStep previewSteps)
                     ]
                 ]
 
 
-viewMiniStep : String -> Html msg
-viewMiniStep stepText =
-    p
-        [ style "margin" "4px 0"
-        , style "line-height" "1.25"
-        , style "font-size" "11px"
-        , style "color" "#1f2a44"
-        , style "white-space" "nowrap"
-        , style "overflow" "hidden"
-        , style "text-overflow" "ellipsis"
+notchBadge : String -> Html msg
+notchBadge badge =
+    div
+        [ style "position" "absolute"
+        , style "top" "8px"
+        , style "left" "8px"
+        , style "min-width" "34px"
+        , style "height" "26px"
+        , style "padding" "0 8px"
+        , style "border-radius" "999px"
+        , style "display" "flex"
+        , style "align-items" "center"
+        , style "justify-content" "center"
+        , style "font-size" "14px"
+        , style "font-weight" "800"
+        , style "color" "white"
+        , style "background" "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)"
+        , style "box-shadow" "0 2px 8px rgba(29,78,216,0.35)"
         ]
-        [ text stepText ]
+        [ text badge ]
 
 
-activeProposition : Model -> Maybe Proposition
-activeProposition model =
-    case model.activePropositionId of
+viewExpandedOverlay : Model -> Proposition -> Html Msg
+viewExpandedOverlay model item =
+    div
+        [ style "position" "absolute"
+        , style "inset" "0"
+        , style "z-index" "90"
+        , style "background" "rgba(16,24,40,0.28)"
+        , style "display" "flex"
+        , style "align-items" "center"
+        , style "justify-content" "center"
+        , onClick CloseExpanded
+        ]
+        [ div
+            [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
+            , style "position" "relative"
+            , style "width" "min(900px, 94vw)"
+            , style "max-height" "88vh"
+            , style "overflow" "auto"
+            , style "background" "white"
+            , style "border" "1px solid #c8d6ef"
+            , style "border-radius" "14px"
+            , style "padding" "16px"
+            , style "box-shadow" "0 20px 48px rgba(0,0,0,0.24)"
+            ]
+            [ button
+                [ onClick CloseExpanded
+                , style "position" "absolute"
+                , style "top" "10px"
+                , style "right" "10px"
+                , style "border" "1px solid #b7c7e6"
+                , style "background" "white"
+                , style "border-radius" "8px"
+                , style "padding" "4px 8px"
+                , style "cursor" "pointer"
+                , style "font-weight" "700"
+                ]
+                [ text "Reduire" ]
+            , div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
+            , div [ style "margin-left" "54px", style "margin-top" "2px" ]
+                [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]
+                , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
+                ]
+            , div [ style "margin-top" "12px" ] (List.map viewStep item.steps)
+            , h3 [ style "margin" "14px 0 8px" ] [ text "Commentaire" ]
+            , textarea
+                [ rows 5
+                , style "width" "100%"
+                , style "resize" "vertical"
+                , style "padding" "8px"
+                , style "border" "1px solid #c7d3ea"
+                , style "border-radius" "8px"
+                , placeholder "Observations sur cette copie..."
+                , value item.comment
+                , onInput UpdateExpandedComment
+                ]
+                []
+            , h3 [ style "margin" "12px 0 8px" ] [ text "Email (optionnel)" ]
+            , input
+                [ type_ "email"
+                , placeholder "nom@exemple.fr"
+                , value model.email
+                , onInput UpdateEmail
+                , style "width" "100%"
+                , style "padding" "10px"
+                , style "border" "1px solid #c7d3ea"
+                , style "border-radius" "8px"
+                ]
+                []
+            , small [ style "display" "block", style "margin-top" "8px", style "color" "#6b7892" ]
+                [ text "Cliquer hors de la fiche pour la reduire." ]
+            ]
+        ]
+
+
+viewStep : String -> Html msg
+viewStep stepText =
+    p [ style "margin" "6px 0", style "line-height" "1.35", style "color" "#1f2a44" ] [ text stepText ]
+
+
+selectedProposition : Model -> Maybe Proposition
+selectedProposition model =
+    case model.expandedPropositionId of
         Nothing ->
             Nothing
 
-        Just activeId ->
+        Just propositionId ->
             model.propositions
-                |> List.filter (\item -> item.id == activeId)
+                |> List.filter (\item -> item.id == propositionId)
                 |> List.head
 
 
-onDragStartCard : Int -> Html.Attribute Msg
-onDragStartCard propositionId =
-    on "dragstart" (Decode.succeed (StartDrag propositionId))
-
-
-onDragEndCard : Html.Attribute Msg
-onDragEndCard =
-    on "dragend" (Decode.succeed EndDrag)
-
-
-onBoardDragOver : Html.Attribute Msg
-onBoardDragOver =
-    preventDefaultOn "dragover" (Decode.succeed ( DragOver, True ))
-
-
-onBoardDrop : Html.Attribute Msg
-onBoardDrop =
-    preventDefaultOn "drop"
-        (Decode.map
-            (\( x, y ) -> ( DropOnBoard x y, True ))
-            dragPointDecoder
+onMiniMouseDown : Int -> Html.Attribute Msg
+onMiniMouseDown propositionId =
+    on "mousedown"
+        (Decode.map2
+            (StartDrag propositionId)
+            (Decode.field "clientX" Decode.float)
+            (Decode.field "clientY" Decode.float)
         )
 
 
-dragPointDecoder : Decode.Decoder ( Float, Float )
-dragPointDecoder =
-    Decode.oneOf
-        [ Decode.map2 Tuple.pair
-            (Decode.field "pageX" Decode.float)
-            (Decode.field "pageY" Decode.float)
-        , Decode.map2 Tuple.pair
+onMiniTouchStart : Int -> Html.Attribute Msg
+onMiniTouchStart propositionId =
+    preventDefaultOn "touchstart"
+        (Decode.map
+            (\( clientX, clientY ) -> ( StartDrag propositionId clientX clientY, True ))
+            touchPointDecoder
+        )
+
+
+onBoardMouseMove : Html.Attribute Msg
+onBoardMouseMove =
+    on "mousemove"
+        (Decode.map2 PointerMove
             (Decode.field "clientX" Decode.float)
             (Decode.field "clientY" Decode.float)
-        , Decode.map2 Tuple.pair
-            (Decode.at [ "touches", "0", "pageX" ] Decode.float)
-            (Decode.at [ "touches", "0", "pageY" ] Decode.float)
-        , Decode.map2 Tuple.pair
+        )
+
+
+onBoardMouseUp : Html.Attribute Msg
+onBoardMouseUp =
+    on "mouseup" (Decode.succeed PointerUp)
+
+
+onBoardMouseLeave : Html.Attribute Msg
+onBoardMouseLeave =
+    on "mouseleave" (Decode.succeed PointerUp)
+
+
+onBoardTouchMove : Html.Attribute Msg
+onBoardTouchMove =
+    preventDefaultOn "touchmove"
+        (Decode.map
+            (\( clientX, clientY ) -> ( PointerMove clientX clientY, True ))
+            touchPointDecoder
+        )
+
+
+onBoardTouchEnd : Html.Attribute Msg
+onBoardTouchEnd =
+    on "touchend" (Decode.succeed PointerUp)
+
+
+touchPointDecoder : Decode.Decoder ( Float, Float )
+touchPointDecoder =
+    Decode.oneOf
+        [ Decode.map2 Tuple.pair
             (Decode.at [ "touches", "0", "clientX" ] Decode.float)
             (Decode.at [ "touches", "0", "clientY" ] Decode.float)
-        , Decode.map2 Tuple.pair
-            (Decode.at [ "changedTouches", "0", "pageX" ] Decode.float)
-            (Decode.at [ "changedTouches", "0", "pageY" ] Decode.float)
         , Decode.map2 Tuple.pair
             (Decode.at [ "changedTouches", "0", "clientX" ] Decode.float)
             (Decode.at [ "changedTouches", "0", "clientY" ] Decode.float)

@@ -5161,17 +5161,6 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$RefreshBoardRect = {$: 'RefreshBoardRect'};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
 	return {$: 'Timeline', a: a};
 };
@@ -5244,43 +5233,202 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		_List_fromArray(
 			['Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'Produit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Cas 1 : $\\sin(x)=\\dfrac{1}{2}\\iff x=\\dfrac{\\pi}{6}+2k\\pi$ ou $x=\\dfrac{5\\pi}{6}+2k\\pi$.', 'Cas 2 : $\\sin(x)=-1\\iff x=\\dfrac{3\\pi}{2}+2k\\pi$.', 'Intersection avec $[0;2\\pi[$ : $S=\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.']))
 	]);
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$renderMath = _Platform_outgoingPort('renderMath', $elm$json$Json$Encode$string);
 var $author$project$Main$scheduleMathRender = $author$project$Main$renderMath('refresh');
 var $elm$core$Process$sleep = _Process_sleep;
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $author$project$Main$withInitialPositions = function (propositions) {
+	var layout = $elm$core$Dict$fromList(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				1,
+				{x: 0.16, y: 0.14}),
+				_Utils_Tuple2(
+				2,
+				{x: 0.36, y: 0.14}),
+				_Utils_Tuple2(
+				3,
+				{x: 0.56, y: 0.14}),
+				_Utils_Tuple2(
+				4,
+				{x: 0.76, y: 0.14})
+			]));
+	return A2(
+		$elm$core$List$map,
+		function (item) {
+			return _Utils_update(
+				item,
+				{
+					pos: A2($elm$core$Dict$get, item.id, layout)
+				});
+		},
+		propositions);
+};
 var $author$project$Main$init = function (_v0) {
-	var initial = $author$project$Main$initialPropositions;
+	var seeded = $author$project$Main$withInitialPositions($author$project$Main$initialPropositions);
 	return _Utils_Tuple2(
 		{
-			activePropositionId: A2(
-				$elm$core$Maybe$map,
-				function ($) {
-					return $.id;
-				},
-				$elm$core$List$head(initial)),
 			boardRect: $elm$core$Maybe$Nothing,
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
-			focusTimeline: $mdgriffith$elm_animator$Animator$init(
-				A2(
-					$elm$core$Maybe$map,
-					function ($) {
-						return $.id;
-					},
-					$elm$core$List$head(initial))),
-			lastDraggedPropositionId: $elm$core$Maybe$Nothing,
-			miniatureLayout: $mdgriffith$elm_animator$Animator$init($elm$core$Dict$empty),
-			propositions: initial,
+			expandedPropositionId: $elm$core$Maybe$Nothing,
+			focusTimeline: $mdgriffith$elm_animator$Animator$init($elm$core$Maybe$Nothing),
+			propositions: seeded,
 			viewport: {height: 800, width: 1200}
 		},
 		$elm$core$Platform$Cmd$batch(
@@ -5890,6 +6038,15 @@ var $mdgriffith$elm_animator$Internal$Timeline$dwellingAt = F2(
 		var eventEndTime = $mdgriffith$elm_animator$Internal$Timeline$endTime(event);
 		return A2($mdgriffith$elm_animator$Internal$Time$thisAfterOrEqualThat, now, eventStartTime) && A2($mdgriffith$elm_animator$Internal$Time$thisBeforeOrEqualThat, now, eventEndTime);
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $mdgriffith$elm_animator$Internal$Timeline$Captured = function (a) {
 	return {$: 'Captured', a: a};
 };
@@ -5925,6 +6082,16 @@ var $mdgriffith$elm_animator$Internal$Timeline$hewLine = F2(
 					}
 				}
 			}
+		}
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
 		}
 	});
 var $mdgriffith$elm_animator$Internal$Timeline$garbageCollectOldEvents = F3(
@@ -6152,18 +6319,7 @@ var $author$project$Main$animator = A3(
 				currentModel,
 				{focusTimeline: newFocus});
 		}),
-	A3(
-		$mdgriffith$elm_animator$Animator$watching,
-		function ($) {
-			return $.miniatureLayout;
-		},
-		F2(
-			function (newLayout, currentModel) {
-				return _Utils_update(
-					currentModel,
-					{miniatureLayout: newLayout});
-			}),
-		$mdgriffith$elm_animator$Animator$animator));
+	$mdgriffith$elm_animator$Animator$animator);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$browser$Browser$Events$Window = {$: 'Window'};
 var $elm$json$Json$Decode$field = _Json_decodeField;
@@ -6193,127 +6349,6 @@ var $elm$browser$Browser$Events$addKey = function (sub) {
 			$elm$browser$Browser$Events$nodeToKey(node),
 			name),
 		sub);
-};
-var $elm$core$Dict$Black = {$: 'Black'};
-var $elm$core$Dict$RBNode_elm_builtin = F5(
-	function (a, b, c, d, e) {
-		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
-	});
-var $elm$core$Dict$Red = {$: 'Red'};
-var $elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
-			var _v1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
-				var _v3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					key,
-					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
-				var _v5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _v6 = left.d;
-				var _v7 = _v6.a;
-				var llK = _v6.b;
-				var llV = _v6.c;
-				var llLeft = _v6.d;
-				var llRight = _v6.e;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					lK,
-					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
-			} else {
-				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var $elm$core$Basics$compare = _Utils_compare;
-var $elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1.$) {
-				case 'LT':
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3($elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 'EQ':
-					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3($elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var $elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
-var $elm$core$Dict$fromList = function (assocs) {
-	return A3(
-		$elm$core$List$foldl,
-		F2(
-			function (_v0, dict) {
-				var key = _v0.a;
-				var value = _v0.b;
-				return A3($elm$core$Dict$insert, key, value, dict);
-			}),
-		$elm$core$Dict$empty,
-		assocs);
 };
 var $elm$core$Process$kill = _Scheduler_kill;
 var $elm$core$Dict$foldl = F3(
@@ -6927,99 +6962,33 @@ var $elm$core$Task$attempt = F2(
 							$elm$core$Result$Ok),
 						task))));
 	});
-var $author$project$Main$currentDraggedId = function (model) {
-	var _v0 = model.dragging;
-	if (_v0.$ === 'Just') {
-		var dragState = _v0.a;
-		return $elm$core$Maybe$Just(dragState.propositionId);
-	} else {
-		return model.lastDraggedPropositionId;
-	}
-};
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
+var $elm$core$Basics$pow = _Basics_pow;
+var $elm$core$Basics$sqrt = _Basics_sqrt;
+var $author$project$Main$distance = F4(
+	function (x1, y1, x2, y2) {
+		return $elm$core$Basics$sqrt(
+			A2($elm$core$Basics$pow, x2 - x1, 2) + A2($elm$core$Basics$pow, y2 - y1, 2));
 	});
-var $author$project$Main$firstUnplacedId = function (propositions) {
-	return A2(
-		$elm$core$Maybe$map,
-		function ($) {
-			return $.id;
-		},
-		$elm$core$List$head(
-			A2(
-				$elm$core$List$filter,
-				function (item) {
-					return _Utils_eq(item.pos, $elm$core$Maybe$Nothing);
-				},
-				propositions)));
-};
 var $elm$browser$Browser$Dom$getElement = _Browser_getElement;
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$Main$isPlaced = F2(
-	function (propositionId, propositions) {
-		return A2(
-			$elm$core$Maybe$withDefault,
-			false,
-			A2(
-				$elm$core$Maybe$map,
-				function (_v0) {
-					return true;
-				},
-				A2(
-					$elm$core$Maybe$andThen,
-					function ($) {
-						return $.pos;
-					},
-					$elm$core$List$head(
-						A2(
-							$elm$core$List$filter,
-							function (item) {
-								return _Utils_eq(item.id, propositionId);
-							},
-							propositions)))));
-	});
-var $author$project$Main$layoutFromPropositions = function (propositions) {
-	return $elm$core$Dict$fromList(
-		A2(
-			$elm$core$List$filterMap,
-			function (item) {
-				return A2(
-					$elm$core$Maybe$map,
-					function (position) {
-						return _Utils_Tuple2(item.id, position);
-					},
-					item.pos);
-			},
-			propositions));
-};
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$clamp = F3(
 	function (minVal, maxVal, value) {
 		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
 	});
-var $author$project$Main$positionFromClient = F3(
+var $author$project$Main$focusedScale = 0.42;
+var $author$project$Main$miniatureHeight = 206;
+var $author$project$Main$miniatureWidth = 320;
+var $author$project$Main$positionFromClientBounded = F3(
 	function (rect, clientX, clientY) {
 		var safeWidth = (rect.width <= 0) ? 1 : rect.width;
 		var safeHeight = (rect.height <= 0) ? 1 : rect.height;
+		var rawY = (clientY - rect.y) / safeHeight;
+		var rawX = (clientX - rect.x) / safeWidth;
+		var marginY = (($author$project$Main$miniatureHeight * $author$project$Main$focusedScale) / 2) / safeHeight;
+		var marginX = (($author$project$Main$miniatureWidth * $author$project$Main$focusedScale) / 2) / safeWidth;
 		return {
-			x: A3($author$project$Main$clamp, 0, 1, (clientX - rect.x) / safeWidth),
-			y: A3($author$project$Main$clamp, 0, 1, (clientY - rect.y) / safeHeight)
+			x: A3($author$project$Main$clamp, marginX, 1 - marginX, rawX),
+			y: A3($author$project$Main$clamp, marginY, 1 - marginY, rawY)
 		};
 	});
 var $mdgriffith$elm_animator$Animator$update = F3(
@@ -7039,14 +7008,14 @@ var $author$project$Main$updatePropositionComment = F3(
 			propositions);
 	});
 var $author$project$Main$updatePropositionPosition = F3(
-	function (propositionId, pos, propositions) {
+	function (propositionId, newPos, propositions) {
 		return A2(
 			$elm$core$List$map,
 			function (item) {
 				return _Utils_eq(item.id, propositionId) ? _Utils_update(
 					item,
 					{
-						pos: $elm$core$Maybe$Just(pos)
+						pos: $elm$core$Maybe$Just(newPos)
 					}) : item;
 			},
 			propositions);
@@ -7056,92 +7025,101 @@ var $author$project$Main$update = F2(
 		switch (msg.$) {
 			case 'StartDrag':
 				var propositionId = msg.a;
+				var clientX = msg.b;
+				var clientY = msg.c;
+				var movedToPointer = function () {
+					var _v1 = model.boardRect;
+					if (_v1.$ === 'Nothing') {
+						return model;
+					} else {
+						var rect = _v1.a;
+						return _Utils_update(
+							model,
+							{
+								propositions: A3(
+									$author$project$Main$updatePropositionPosition,
+									propositionId,
+									A3($author$project$Main$positionFromClientBounded, rect, clientX, clientY),
+									model.propositions)
+							});
+					}
+				}();
 				return _Utils_Tuple2(
 					_Utils_update(
-						model,
+						movedToPointer,
 						{
-							activePropositionId: $elm$core$Maybe$Just(propositionId),
 							dragging: $elm$core$Maybe$Just(
-								{propositionId: propositionId}),
-							focusTimeline: A2(
-								$author$project$Main$animateFocusTo,
-								$elm$core$Maybe$Just(propositionId),
-								model.focusTimeline),
-							lastDraggedPropositionId: $elm$core$Maybe$Just(propositionId)
+								{moved: false, propositionId: propositionId, startX: clientX, startY: clientY}),
+							expandedPropositionId: $elm$core$Maybe$Nothing,
+							focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, movedToPointer.focusTimeline)
 						}),
 					A2(
 						$elm$core$Task$attempt,
 						$author$project$Main$GotBoardRect,
 						$elm$browser$Browser$Dom$getElement('board')));
-			case 'DragOver':
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'DropOnBoard':
+			case 'PointerMove':
 				var clientX = msg.a;
 				var clientY = msg.b;
-				var _v1 = _Utils_Tuple2(
-					$author$project$Main$currentDraggedId(model),
-					model.boardRect);
-				if ((_v1.a.$ === 'Just') && (_v1.b.$ === 'Just')) {
-					var propositionId = _v1.a.a;
-					var rect = _v1.b.a;
-					var pos = A3($author$project$Main$positionFromClient, rect, clientX, clientY);
-					var updated = A3($author$project$Main$updatePropositionPosition, propositionId, pos, model.propositions);
-					var nextLayout = $author$project$Main$layoutFromPropositions(updated);
-					var alreadyPlaced = A2($author$project$Main$isPlaced, propositionId, model.propositions);
-					var nextActive = alreadyPlaced ? $elm$core$Maybe$Just(propositionId) : $elm$core$Maybe$Just(
-						A2(
-							$elm$core$Maybe$withDefault,
-							propositionId,
-							$author$project$Main$firstUnplacedId(updated)));
+				var _v2 = _Utils_Tuple2(model.dragging, model.boardRect);
+				if ((_v2.a.$ === 'Just') && (_v2.b.$ === 'Just')) {
+					var dragState = _v2.a.a;
+					var rect = _v2.b.a;
+					var nextPos = A3($author$project$Main$positionFromClientBounded, rect, clientX, clientY);
+					var movedDistance = A4($author$project$Main$distance, dragState.startX, dragState.startY, clientX, clientY);
+					var hasMoved = dragState.moved || (movedDistance > 4);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								activePropositionId: nextActive,
-								dragging: $elm$core$Maybe$Nothing,
-								focusTimeline: A2($author$project$Main$animateFocusTo, nextActive, model.focusTimeline),
-								lastDraggedPropositionId: $elm$core$Maybe$Just(propositionId),
-								miniatureLayout: A3(
-									$mdgriffith$elm_animator$Animator$go,
-									$mdgriffith$elm_animator$Animator$millis(220),
-									nextLayout,
-									model.miniatureLayout),
-								propositions: updated
+								dragging: $elm$core$Maybe$Just(
+									_Utils_update(
+										dragState,
+										{moved: hasMoved})),
+								propositions: A3($author$project$Main$updatePropositionPosition, dragState.propositionId, nextPos, model.propositions)
 							}),
-						$author$project$Main$scheduleMathRender);
+						$elm$core$Platform$Cmd$none);
 				} else {
-					return _Utils_Tuple2(
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 'PointerUp':
+				var _v3 = model.dragging;
+				if (_v3.$ === 'Nothing') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var dragState = _v3.a;
+					return dragState.moved ? _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{dragging: $elm$core$Maybe$Nothing}),
-						$elm$core$Platform$Cmd$none);
+						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								dragging: $elm$core$Maybe$Nothing,
+								expandedPropositionId: $elm$core$Maybe$Just(dragState.propositionId),
+								focusTimeline: A2(
+									$author$project$Main$animateFocusTo,
+									$elm$core$Maybe$Just(dragState.propositionId),
+									model.focusTimeline)
+							}),
+						$author$project$Main$scheduleMathRender);
 				}
-			case 'EndDrag':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{dragging: $elm$core$Maybe$Nothing}),
-					$elm$core$Platform$Cmd$none);
-			case 'SelectProposition':
-				var propositionId = msg.a;
+			case 'CloseExpanded':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							activePropositionId: $elm$core$Maybe$Just(propositionId),
-							focusTimeline: A2(
-								$author$project$Main$animateFocusTo,
-								$elm$core$Maybe$Just(propositionId),
-								model.focusTimeline)
+							expandedPropositionId: $elm$core$Maybe$Nothing,
+							focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, model.focusTimeline)
 						}),
-					$author$project$Main$scheduleMathRender);
-			case 'UpdateSelectedComment':
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateExpandedComment':
 				var newComment = msg.a;
-				var _v2 = model.activePropositionId;
-				if (_v2.$ === 'Nothing') {
+				var _v4 = model.expandedPropositionId;
+				if (_v4.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var propositionId = _v2.a;
+					var propositionId = _v4.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7190,19 +7168,21 @@ var $author$project$Main$update = F2(
 						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v4) {
+						function (_v6) {
 							return $author$project$Main$RefreshBoardRect;
 						},
-						$elm$core$Process$sleep(20)));
+						$elm$core$Process$sleep(24)));
 			case 'RenderMathNow':
 				return _Utils_Tuple2(
 					model,
 					$author$project$Main$renderMath('refresh'));
-			default:
+			case 'AnimatorTick':
 				var newTime = msg.a;
 				return _Utils_Tuple2(
 					A3($mdgriffith$elm_animator$Animator$update, newTime, $author$project$Main$animator, model),
 					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
@@ -7238,11 +7218,87 @@ var $author$project$Main$axisLines = A2(
 				]),
 			_List_Nil)
 		]));
-var $author$project$Main$DragOver = {$: 'DragOver'};
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$boardLegend = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+			A2($elm$html$Html$Attributes$style, 'left', '10px'),
+			A2($elm$html$Html$Attributes$style, 'right', '10px'),
+			A2($elm$html$Html$Attributes$style, 'bottom', '8px'),
+			A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+			A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between'),
+			A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+			A2($elm$html$Html$Attributes$style, 'color', '#4c5d7f')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$span,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Precision faible')
+				])),
+			A2(
+			$elm$html$Html$span,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Rigueur elevee')
+				]))
+		]));
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $author$project$Main$PointerUp = {$: 'PointerUp'};
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $author$project$Main$onBoardMouseLeave = A2(
+	$elm$html$Html$Events$on,
+	'mouseleave',
+	$elm$json$Json$Decode$succeed($author$project$Main$PointerUp));
+var $author$project$Main$PointerMove = F2(
+	function (a, b) {
+		return {$: 'PointerMove', a: a, b: b};
+	});
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $author$project$Main$onBoardMouseMove = A2(
+	$elm$html$Html$Events$on,
+	'mousemove',
+	A3(
+		$elm$json$Json$Decode$map2,
+		$author$project$Main$PointerMove,
+		A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
+		A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)));
+var $author$project$Main$onBoardMouseUp = A2(
+	$elm$html$Html$Events$on,
+	'mouseup',
+	$elm$json$Json$Decode$succeed($author$project$Main$PointerUp));
+var $author$project$Main$onBoardTouchEnd = A2(
+	$elm$html$Html$Events$on,
+	'touchend',
+	$elm$json$Json$Decode$succeed($author$project$Main$PointerUp));
 var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
 	return {$: 'MayPreventDefault', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$preventDefaultOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -7250,51 +7306,18 @@ var $elm$html$Html$Events$preventDefaultOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
 	});
-var $author$project$Main$onBoardDragOver = A2(
-	$elm$html$Html$Events$preventDefaultOn,
-	'dragover',
-	$elm$json$Json$Decode$succeed(
-		_Utils_Tuple2($author$project$Main$DragOver, true)));
-var $author$project$Main$DropOnBoard = F2(
-	function (a, b) {
-		return {$: 'DropOnBoard', a: a, b: b};
-	});
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
 	});
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $elm$json$Json$Decode$oneOf = _Json_oneOf;
 var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
 	});
-var $author$project$Main$dragPointDecoder = $elm$json$Json$Decode$oneOf(
+var $author$project$Main$touchPointDecoder = $elm$json$Json$Decode$oneOf(
 	_List_fromArray(
 		[
-			A3(
-			$elm$json$Json$Decode$map2,
-			$elm$core$Tuple$pair,
-			A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float),
-			A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float)),
-			A3(
-			$elm$json$Json$Decode$map2,
-			$elm$core$Tuple$pair,
-			A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
-			A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)),
-			A3(
-			$elm$json$Json$Decode$map2,
-			$elm$core$Tuple$pair,
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['touches', '0', 'pageX']),
-				$elm$json$Json$Decode$float),
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['touches', '0', 'pageY']),
-				$elm$json$Json$Decode$float)),
 			A3(
 			$elm$json$Json$Decode$map2,
 			$elm$core$Tuple$pair,
@@ -7314,19 +7337,6 @@ var $author$project$Main$dragPointDecoder = $elm$json$Json$Decode$oneOf(
 			A2(
 				$elm$json$Json$Decode$at,
 				_List_fromArray(
-					['changedTouches', '0', 'pageX']),
-				$elm$json$Json$Decode$float),
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['changedTouches', '0', 'pageY']),
-				$elm$json$Json$Decode$float)),
-			A3(
-			$elm$json$Json$Decode$map2,
-			$elm$core$Tuple$pair,
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
 					['changedTouches', '0', 'clientX']),
 				$elm$json$Json$Decode$float),
 			A2(
@@ -7335,52 +7345,314 @@ var $author$project$Main$dragPointDecoder = $elm$json$Json$Decode$oneOf(
 					['changedTouches', '0', 'clientY']),
 				$elm$json$Json$Decode$float))
 		]));
-var $author$project$Main$onBoardDrop = A2(
+var $author$project$Main$onBoardTouchMove = A2(
 	$elm$html$Html$Events$preventDefaultOn,
-	'drop',
+	'touchmove',
 	A2(
 		$elm$json$Json$Decode$map,
 		function (_v0) {
-			var x = _v0.a;
-			var y = _v0.b;
+			var clientX = _v0.a;
+			var clientY = _v0.b;
 			return _Utils_Tuple2(
-				A2($author$project$Main$DropOnBoard, x, y),
+				A2($author$project$Main$PointerMove, clientX, clientY),
 				true);
 		},
-		$author$project$Main$dragPointDecoder));
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$dragOverlay = function (dragging) {
-	if (dragging.$ === 'Nothing') {
-		return $elm$html$Html$text('');
+		$author$project$Main$touchPointDecoder));
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Main$selectedProposition = function (model) {
+	var _v0 = model.expandedPropositionId;
+	if (_v0.$ === 'Nothing') {
+		return $elm$core$Maybe$Nothing;
 	} else {
+		var propositionId = _v0.a;
+		return $elm$core$List$head(
+			A2(
+				$elm$core$List$filter,
+				function (item) {
+					return _Utils_eq(item.id, propositionId);
+				},
+				model.propositions));
+	}
+};
+var $author$project$Main$CloseExpanded = {$: 'CloseExpanded'};
+var $author$project$Main$NoOp = {$: 'NoOp'};
+var $author$project$Main$UpdateEmail = function (a) {
+	return {$: 'UpdateEmail', a: a};
+};
+var $author$project$Main$UpdateExpandedComment = function (a) {
+	return {$: 'UpdateExpandedComment', a: a};
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $author$project$Main$notchBadge = function (badge) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+				A2($elm$html$Html$Attributes$style, 'top', '8px'),
+				A2($elm$html$Html$Attributes$style, 'left', '8px'),
+				A2($elm$html$Html$Attributes$style, 'min-width', '34px'),
+				A2($elm$html$Html$Attributes$style, 'height', '26px'),
+				A2($elm$html$Html$Attributes$style, 'padding', '0 8px'),
+				A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
+				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+				A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+				A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+				A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
+				A2($elm$html$Html$Attributes$style, 'font-weight', '800'),
+				A2($elm$html$Html$Attributes$style, 'color', 'white'),
+				A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)'),
+				A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(29,78,216,0.35)')
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(badge)
+			]));
+};
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$Attributes$rows = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'rows',
+		$elm$core$String$fromInt(n));
+};
+var $elm$html$Html$small = _VirtualDom_node('small');
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$viewStep = function (stepText) {
+	return A2(
+		$elm$html$Html$p,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'margin', '6px 0'),
+				A2($elm$html$Html$Attributes$style, 'line-height', '1.35'),
+				A2($elm$html$Html$Attributes$style, 'color', '#1f2a44')
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(stepText)
+			]));
+};
+var $author$project$Main$viewExpandedOverlay = F2(
+	function (model, item) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$author$project$Main$onBoardDragOver,
-					$author$project$Main$onBoardDrop,
 					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 					A2($elm$html$Html$Attributes$style, 'inset', '0'),
-					A2($elm$html$Html$Attributes$style, 'z-index', '50')
+					A2($elm$html$Html$Attributes$style, 'z-index', '90'),
+					A2($elm$html$Html$Attributes$style, 'background', 'rgba(16,24,40,0.28)'),
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+					A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+					$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded)
 				]),
-			_List_Nil);
-	}
-};
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$Events$stopPropagationOn,
+							'click',
+							$elm$json$Json$Decode$succeed(
+								_Utils_Tuple2($author$project$Main$NoOp, true))),
+							A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+							A2($elm$html$Html$Attributes$style, 'width', 'min(900px, 94vw)'),
+							A2($elm$html$Html$Attributes$style, 'max-height', '88vh'),
+							A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
+							A2($elm$html$Html$Attributes$style, 'background', 'white'),
+							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '14px'),
+							A2($elm$html$Html$Attributes$style, 'padding', '16px'),
+							A2($elm$html$Html$Attributes$style, 'box-shadow', '0 20px 48px rgba(0,0,0,0.24)')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
+									A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+									A2($elm$html$Html$Attributes$style, 'top', '10px'),
+									A2($elm$html$Html$Attributes$style, 'right', '10px'),
+									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b7c7e6'),
+									A2($elm$html$Html$Attributes$style, 'background', 'white'),
+									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+									A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
+									A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Reduire')
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+									A2($elm$html$Html$Attributes$style, 'padding-top', '2px')
+								]),
+							_List_fromArray(
+								[
+									$author$project$Main$notchBadge(item.badge)
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin-left', '54px'),
+									A2($elm$html$Html$Attributes$style, 'margin-top', '2px')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$h2,
+									_List_fromArray(
+										[
+											A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(item.title)
+										])),
+									A2(
+									$elm$html$Html$p,
+									_List_fromArray(
+										[
+											A2($elm$html$Html$Attributes$style, 'margin', '0'),
+											A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
+											A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Version eleve')
+										]))
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin-top', '12px')
+								]),
+							A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
+							A2(
+							$elm$html$Html$h3,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Commentaire')
+								])),
+							A2(
+							$elm$html$Html$textarea,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$rows(5),
+									A2($elm$html$Html$Attributes$style, 'width', '100%'),
+									A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
+									A2($elm$html$Html$Attributes$style, 'padding', '8px'),
+									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+									$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
+									$elm$html$Html$Attributes$value(item.comment),
+									$elm$html$Html$Events$onInput($author$project$Main$UpdateExpandedComment)
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$h3,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Email (optionnel)')
+								])),
+							A2(
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$type_('email'),
+									$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
+									$elm$html$Html$Attributes$value(model.email),
+									$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
+									A2($elm$html$Html$Attributes$style, 'width', '100%'),
+									A2($elm$html$Html$Attributes$style, 'padding', '10px'),
+									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+									A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$small,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'display', 'block'),
+									A2($elm$html$Html$Attributes$style, 'margin-top', '8px'),
+									A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Cliquer hors de la fiche pour la reduire.')
+								]))
+						]))
+				]));
 	});
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $elm$html$Html$small = _VirtualDom_node('small');
-var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$SelectProposition = function (a) {
-	return {$: 'SelectProposition', a: a};
-};
 var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
 	return {$: 'Specified', a: a};
 };
@@ -7448,40 +7720,6 @@ var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
 	});
 var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
 var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
-var $elm$virtual_dom$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $author$project$Main$badgeView = F2(
-	function (label, sizeText) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-					A2($elm$html$Html$Attributes$style, 'top', '8px'),
-					A2($elm$html$Html$Attributes$style, 'left', '8px'),
-					A2($elm$html$Html$Attributes$style, 'min-width', '38px'),
-					A2($elm$html$Html$Attributes$style, 'height', '30px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '0 8px'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-					A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-					A2($elm$html$Html$Attributes$style, 'font-size', sizeText),
-					A2($elm$html$Html$Attributes$style, 'font-weight', '800'),
-					A2($elm$html$Html$Attributes$style, 'color', 'white'),
-					A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text(label)
-				]));
-	});
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 	function (_v0, _v1) {
 		var y = _v0.a;
@@ -7866,72 +8104,37 @@ var $mdgriffith$elm_animator$Internal$Timeline$current = function (timeline) {
 		timeline);
 };
 var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
-var $elm$html$Html$Attributes$draggable = _VirtualDom_attribute('draggable');
 var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
+var $author$project$Main$miniScale = 0.34;
+var $author$project$Main$StartDrag = F3(
+	function (a, b, c) {
+		return {$: 'StartDrag', a: a, b: b, c: c};
 	});
-var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
+var $author$project$Main$onMiniMouseDown = function (propositionId) {
 	return A2(
 		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
+		'mousedown',
+		A3(
+			$elm$json$Json$Decode$map2,
+			$author$project$Main$StartDrag(propositionId),
+			A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
+			A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)));
 };
-var $author$project$Main$EndDrag = {$: 'EndDrag'};
-var $author$project$Main$onDragEndCard = A2(
-	$elm$html$Html$Events$on,
-	'dragend',
-	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
-var $author$project$Main$StartDrag = function (a) {
-	return {$: 'StartDrag', a: a};
-};
-var $author$project$Main$onDragStartCard = function (propositionId) {
+var $author$project$Main$onMiniTouchStart = function (propositionId) {
 	return A2(
-		$elm$html$Html$Events$on,
-		'dragstart',
-		$elm$json$Json$Decode$succeed(
-			$author$project$Main$StartDrag(propositionId)));
+		$elm$html$Html$Events$preventDefaultOn,
+		'touchstart',
+		A2(
+			$elm$json$Json$Decode$map,
+			function (_v0) {
+				var clientX = _v0.a;
+				var clientY = _v0.b;
+				return _Utils_Tuple2(
+					A3($author$project$Main$StartDrag, propositionId, clientX, clientY),
+					true);
+			},
+			$author$project$Main$touchPointDecoder));
 };
-var $elm$html$Html$p = _VirtualDom_node('p');
 var $mdgriffith$elm_animator$Internal$Interpolate$dwellPeriod = function (movement) {
 	if (movement.$ === 'Pos') {
 		return $elm$core$Maybe$Nothing;
@@ -8262,7 +8465,6 @@ var $mdgriffith$elm_animator$Internal$Interpolate$interpolateBetween = F7(
 			velocity: $ianmackenzie$elm_units$Pixels$pixelsPerSecond(1000 * (firstDerivative.y / firstDerivative.x))
 		};
 	});
-var $elm$core$Basics$sqrt = _Basics_sqrt;
 var $mdgriffith$elm_animator$Internal$Spring$criticalDamping = F2(
 	function (k, m) {
 		return 2 * $elm$core$Basics$sqrt(k * m);
@@ -8649,261 +8851,60 @@ var $mdgriffith$elm_animator$Animator$Inline$style = F4(
 			toString(
 				A2($mdgriffith$elm_animator$Animator$move, timeline, lookup)));
 	});
-var $elm$core$List$takeReverse = F3(
-	function (n, list, kept) {
-		takeReverse:
-		while (true) {
-			if (n <= 0) {
-				return kept;
-			} else {
-				if (!list.b) {
-					return kept;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs,
-						$temp$kept = A2($elm$core$List$cons, x, kept);
-					n = $temp$n;
-					list = $temp$list;
-					kept = $temp$kept;
-					continue takeReverse;
-				}
-			}
-		}
+var $mdgriffith$elm_animator$Animator$Inline$scale = F2(
+	function (timeline, lookup) {
+		return A4(
+			$mdgriffith$elm_animator$Animator$Inline$style,
+			timeline,
+			'transform',
+			function (s) {
+				return 'scale(' + ($elm$core$String$fromFloat(s) + ')');
+			},
+			lookup);
 	});
-var $elm$core$List$takeTailRec = F2(
-	function (n, list) {
-		return $elm$core$List$reverse(
-			A3($elm$core$List$takeReverse, n, list, _List_Nil));
-	});
-var $elm$core$List$takeFast = F3(
-	function (ctr, n, list) {
-		if (n <= 0) {
-			return _List_Nil;
-		} else {
-			var _v0 = _Utils_Tuple2(n, list);
-			_v0$1:
-			while (true) {
-				_v0$5:
-				while (true) {
-					if (!_v0.b.b) {
-						return list;
-					} else {
-						if (_v0.b.b.b) {
-							switch (_v0.a) {
-								case 1:
-									break _v0$1;
-								case 2:
-									var _v2 = _v0.b;
-									var x = _v2.a;
-									var _v3 = _v2.b;
-									var y = _v3.a;
-									return _List_fromArray(
-										[x, y]);
-								case 3:
-									if (_v0.b.b.b.b) {
-										var _v4 = _v0.b;
-										var x = _v4.a;
-										var _v5 = _v4.b;
-										var y = _v5.a;
-										var _v6 = _v5.b;
-										var z = _v6.a;
-										return _List_fromArray(
-											[x, y, z]);
-									} else {
-										break _v0$5;
-									}
-								default:
-									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
-										var _v7 = _v0.b;
-										var x = _v7.a;
-										var _v8 = _v7.b;
-										var y = _v8.a;
-										var _v9 = _v8.b;
-										var z = _v9.a;
-										var _v10 = _v9.b;
-										var w = _v10.a;
-										var tl = _v10.b;
-										return (ctr > 1000) ? A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
-									} else {
-										break _v0$5;
-									}
-							}
-						} else {
-							if (_v0.a === 1) {
-								break _v0$1;
-							} else {
-								break _v0$5;
-							}
-						}
-					}
-				}
-				return list;
-			}
-			var _v1 = _v0.b;
-			var x = _v1.a;
-			return _List_fromArray(
-				[x]);
-		}
-	});
-var $elm$core$List$take = F2(
-	function (n, list) {
-		return A3($elm$core$List$takeFast, 0, n, list);
-	});
-var $author$project$Main$viewMiniStep = function (stepText) {
-	return A2(
-		$elm$html$Html$p,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'margin', '4px 0'),
-				A2($elm$html$Html$Attributes$style, 'line-height', '1.25'),
-				A2($elm$html$Html$Attributes$style, 'font-size', '11px'),
-				A2($elm$html$Html$Attributes$style, 'color', '#1f2a44'),
-				A2($elm$html$Html$Attributes$style, 'white-space', 'nowrap'),
-				A2($elm$html$Html$Attributes$style, 'overflow', 'hidden'),
-				A2($elm$html$Html$Attributes$style, 'text-overflow', 'ellipsis')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text(stepText)
-			]));
-};
-var $author$project$Main$viewPlacedMiniature = F6(
-	function (activeId, dragging, miniatureLayout, focusTimeline, compact, item) {
+var $author$project$Main$viewMiniature = F2(
+	function (model, item) {
 		var _v0 = item.pos;
 		if (_v0.$ === 'Nothing') {
 			return $elm$html$Html$text('');
 		} else {
 			var pos = _v0.a;
-			var smallScale = compact ? 0.33 : 0.36;
-			var previewSteps = compact ? A2($elm$core$List$take, 3, item.steps) : A2($elm$core$List$take, 4, item.steps);
+			var isFocused = _Utils_eq(
+				$mdgriffith$elm_animator$Animator$current(model.focusTimeline),
+				$elm$core$Maybe$Just(item.id));
 			var isDragging = function () {
-				if (dragging.$ === 'Just') {
-					var dragState = dragging.a;
+				var _v1 = model.dragging;
+				if (_v1.$ === 'Just') {
+					var dragState = _v1.a;
 					return _Utils_eq(dragState.propositionId, item.id);
 				} else {
 					return false;
 				}
 			}();
-			var isActiveTab = _Utils_eq(
-				activeId,
-				$elm$core$Maybe$Just(item.id));
-			var miniatureBorder = isActiveTab ? '2px solid #0f62fe' : '1px solid #7a92c8';
-			var focusedScale = smallScale + 0.08;
-			var transformFor = function (selected) {
-				return _Utils_eq(
-					selected,
-					$elm$core$Maybe$Just(item.id)) ? A2(
-					$mdgriffith$elm_animator$Animator$arriveSmoothly,
-					0.65,
-					$mdgriffith$elm_animator$Animator$at(focusedScale)) : A2(
-					$mdgriffith$elm_animator$Animator$arriveSmoothly,
-					0.65,
-					$mdgriffith$elm_animator$Animator$at(smallScale));
-			};
-			var fallbackPosition = A2(
-				$elm$core$Maybe$withDefault,
-				pos,
-				A2(
-					$elm$core$Dict$get,
-					item.id,
-					$mdgriffith$elm_animator$Animator$current(miniatureLayout)));
-			var baseWidth = compact ? 300 : 360;
-			var baseHeight = compact ? 206 : 236;
+			var cursorStyle = isDragging ? 'grabbing' : 'grab';
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$draggable('true'),
-						$author$project$Main$onDragStartCard(item.id),
-						$author$project$Main$onDragEndCard,
-						$elm$html$Html$Events$onClick(
-						$author$project$Main$SelectProposition(item.id)),
-						A2($elm$html$Html$Attributes$attribute, 'data-drag-source', 'miniature'),
-						A2($elm$html$Html$Attributes$attribute, 'data-badge', item.badge),
-						A2($elm$html$Html$Attributes$attribute, 'data-title', item.title),
-						A2($elm$html$Html$Attributes$attribute, 'data-preview', item.preview),
 						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-						A4(
-						$mdgriffith$elm_animator$Animator$Inline$style,
-						miniatureLayout,
+						A2(
+						$elm$html$Html$Attributes$style,
 						'left',
-						function (x) {
-							return $elm$core$String$fromFloat(x) + '%';
-						},
-						function (layout) {
-							return A2(
-								$mdgriffith$elm_animator$Animator$arriveSmoothly,
-								0.6,
-								$mdgriffith$elm_animator$Animator$at(
-									function (value) {
-										return value * 100;
-									}(
-										A2(
-											$elm$core$Maybe$withDefault,
-											fallbackPosition,
-											A2($elm$core$Dict$get, item.id, layout)).x)));
-						}),
-						A4(
-						$mdgriffith$elm_animator$Animator$Inline$style,
-						miniatureLayout,
+						$elm$core$String$fromFloat(pos.x * 100) + '%'),
+						A2(
+						$elm$html$Html$Attributes$style,
 						'top',
-						function (y) {
-							return $elm$core$String$fromFloat(y) + '%';
-						},
-						function (layout) {
-							return A2(
-								$mdgriffith$elm_animator$Animator$arriveSmoothly,
-								0.6,
-								$mdgriffith$elm_animator$Animator$at(
-									function (value) {
-										return value * 100;
-									}(
-										A2(
-											$elm$core$Maybe$withDefault,
-											fallbackPosition,
-											A2($elm$core$Dict$get, item.id, layout)).y)));
-						}),
-						A4(
-						$mdgriffith$elm_animator$Animator$Inline$style,
-						focusTimeline,
-						'transform',
-						function (scaleValue) {
-							return 'translate(-50%, -50%) scale(' + ($elm$core$String$fromFloat(scaleValue) + ')');
-						},
-						transformFor),
-						A2($elm$html$Html$Attributes$style, 'transform-origin', 'top left'),
+						$elm$core$String$fromFloat(pos.y * 100) + '%'),
+						A2($elm$html$Html$Attributes$style, 'transform', 'translate(-50%, -50%)'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'z-index',
-						isDragging ? '70' : (isActiveTab ? '35' : '20')),
-						A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
-						A2($elm$html$Html$Attributes$style, 'user-select', 'none')
+						isDragging ? '70' : (isFocused ? '45' : '30')),
+						A2($elm$html$Html$Attributes$style, 'cursor', cursorStyle),
+						A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
+						A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
+						$author$project$Main$onMiniMouseDown(item.id),
+						$author$project$Main$onMiniTouchStart(item.id)
 					]),
 				_List_fromArray(
 					[
@@ -8911,32 +8912,46 @@ var $author$project$Main$viewPlacedMiniature = F6(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
+								A2(
+								$mdgriffith$elm_animator$Animator$Inline$scale,
+								model.focusTimeline,
+								function (focusedId) {
+									return _Utils_eq(
+										focusedId,
+										$elm$core$Maybe$Just(item.id)) ? A2(
+										$mdgriffith$elm_animator$Animator$arriveSmoothly,
+										0.65,
+										$mdgriffith$elm_animator$Animator$at($author$project$Main$focusedScale)) : A2(
+										$mdgriffith$elm_animator$Animator$arriveSmoothly,
+										0.65,
+										$mdgriffith$elm_animator$Animator$at($author$project$Main$miniScale));
+								}),
+								A2($elm$html$Html$Attributes$style, 'transform-origin', 'top left'),
 								A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 								A2(
 								$elm$html$Html$Attributes$style,
 								'width',
-								$elm$core$String$fromFloat(baseWidth) + 'px'),
+								$elm$core$String$fromFloat($author$project$Main$miniatureWidth) + 'px'),
 								A2(
 								$elm$html$Html$Attributes$style,
 								'height',
-								$elm$core$String$fromFloat(baseHeight) + 'px'),
-								A2($elm$html$Html$Attributes$style, 'overflow', 'hidden'),
-								A2($elm$html$Html$Attributes$style, 'border', miniatureBorder),
-								A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
+								$elm$core$String$fromFloat($author$project$Main$miniatureHeight) + 'px'),
+								A2(
+								$elm$html$Html$Attributes$style,
+								'border',
+								isFocused ? '2px solid #0f62fe' : '1px solid #7a92c8'),
 								A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+								A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
 								A2(
 								$elm$html$Html$Attributes$style,
 								'box-shadow',
-								isDragging ? '0 10px 22px rgba(15,34,80,0.26)' : '0 4px 12px rgba(0,0,0,0.14)'),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-								A2(
-								$elm$html$Html$Attributes$style,
-								'opacity',
-								isDragging ? '0.9' : '1')
+								isDragging ? '0 12px 24px rgba(15,34,80,0.25)' : '0 4px 12px rgba(0,0,0,0.14)'),
+								A2($elm$html$Html$Attributes$style, 'padding', '12px'),
+								A2($elm$html$Html$Attributes$style, 'overflow', 'hidden')
 							]),
 						_List_fromArray(
 							[
-								A2($author$project$Main$badgeView, item.badge, '12px'),
+								$author$project$Main$notchBadge(item.badge),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -8949,8 +8964,9 @@ var $author$project$Main$viewPlacedMiniature = F6(
 										$elm$html$Html$h3,
 										_List_fromArray(
 											[
-												A2($elm$html$Html$Attributes$style, 'margin', '0 0 3px'),
-												A2($elm$html$Html$Attributes$style, 'font-size', '15px')
+												A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px'),
+												A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
+												A2($elm$html$Html$Attributes$style, 'color', '#1a2947')
 											]),
 										_List_fromArray(
 											[
@@ -8961,661 +8977,167 @@ var $author$project$Main$viewPlacedMiniature = F6(
 										_List_fromArray(
 											[
 												A2($elm$html$Html$Attributes$style, 'margin', '0'),
-												A2($elm$html$Html$Attributes$style, 'font-size', '11px'),
+												A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
 												A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Version eleve')
+												$elm$html$Html$text('Cliquer pour agrandir, glisser pour placer.')
 											]))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										A2($elm$html$Html$Attributes$style, 'margin-top', '8px'),
-										A2($elm$html$Html$Attributes$style, 'padding-right', '3px')
+										A2($elm$html$Html$Attributes$style, 'margin-top', '12px')
 									]),
-								A2($elm$core$List$map, $author$project$Main$viewMiniStep, previewSteps))
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												A2($elm$html$Html$Attributes$style, 'margin', '0'),
+												A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+												A2($elm$html$Html$Attributes$style, 'color', '#33425f')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Version miniaturisee')
+											])),
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												A2($elm$html$Html$Attributes$style, 'margin', '8px 0 0'),
+												A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+												A2($elm$html$Html$Attributes$style, 'color', '#5a6986')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('La redaction complete s\'affiche au clic.')
+											]))
+									]))
 							]))
 					]));
 		}
 	});
-var $author$project$Main$boardPanel = F3(
-	function (model, placedPropositions, compact) {
-		var boardHeight = compact ? '56vh' : '560px';
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'background', 'white'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '14px'),
-					A2($elm$html$Html$Attributes$style, 'flex', '2 1 520px')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$h2,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '4px 0 10px')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Plan Precision / Rigueur')
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'position', 'relative')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-									A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between'),
-									A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
-									A2($elm$html$Html$Attributes$style, 'margin-bottom', '4px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#40506a')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$span,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Rigueur elevee')
-										])),
-									A2(
-									$elm$html$Html$span,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text('')
-										]))
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$id('board'),
-									$author$project$Main$onBoardDragOver,
-									$author$project$Main$onBoardDrop,
-									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-									A2($elm$html$Html$Attributes$style, 'height', boardHeight),
-									A2($elm$html$Html$Attributes$style, 'min-height', '320px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b9c9e6'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-									A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)')
-								]),
-							_Utils_ap(
-								_List_fromArray(
-									[$author$project$Main$axisLines]),
-								_Utils_ap(
-									A2(
-										$elm$core$List$map,
-										A5($author$project$Main$viewPlacedMiniature, model.activePropositionId, model.dragging, model.miniatureLayout, model.focusTimeline, compact),
-										placedPropositions),
-									_List_fromArray(
-										[
-											$author$project$Main$dragOverlay(model.dragging)
-										])))),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-									A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between'),
-									A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
-									A2($elm$html$Html$Attributes$style, 'margin-top', '6px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#40506a')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$span,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Precision faible')
-										])),
-									A2(
-									$elm$html$Html$span,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Precision elevee')
-										]))
-								]))
-						])),
-					A2(
-					$elm$html$Html$small,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'display', 'block'),
-							A2($elm$html$Html$Attributes$style, 'margin-top', '10px'),
-							A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Cliquer une miniature la reouvre en grand. Drag tactile : appui long + glisser.')
-						]))
-				]));
-	});
-var $author$project$Main$UpdateEmail = function (a) {
-	return {$: 'UpdateEmail', a: a};
-};
-var $author$project$Main$UpdateSelectedComment = function (a) {
-	return {$: 'UpdateSelectedComment', a: a};
-};
-var $author$project$Main$activeProposition = function (model) {
-	var _v0 = model.activePropositionId;
-	if (_v0.$ === 'Nothing') {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		var activeId = _v0.a;
-		return $elm$core$List$head(
-			A2(
-				$elm$core$List$filter,
-				function (item) {
-					return _Utils_eq(item.id, activeId);
-				},
-				model.propositions));
-	}
-};
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
-	return _VirtualDom_keyedNode(
-		_VirtualDom_noScript(tag));
-};
-var $elm$html$Html$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNode;
-var $elm$html$Html$Events$alwaysStop = function (x) {
-	return _Utils_Tuple2(x, true);
-};
-var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var $elm$html$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
-	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
-var $elm$html$Html$Events$onInput = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$html$Html$Events$alwaysStop,
-			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
-};
-var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$html$Html$Attributes$rows = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'rows',
-		$elm$core$String$fromInt(n));
-};
-var $author$project$Main$miniBadge = function (badge) {
-	return A2(
-		$elm$html$Html$span,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'display', 'inline-flex'),
-				A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-				A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-				A2($elm$html$Html$Attributes$style, 'min-width', '20px'),
-				A2($elm$html$Html$Attributes$style, 'height', '20px'),
-				A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
-				A2($elm$html$Html$Attributes$style, 'background', '#2563eb'),
-				A2($elm$html$Html$Attributes$style, 'color', 'white'),
-				A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
-				A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text(badge)
-			]));
-};
-var $author$project$Main$tabItem = F4(
-	function (activeId, allPropositions, compact, item) {
-		var isAlreadyPlaced = A2($author$project$Main$isPlaced, item.id, allPropositions);
-		var isActive = _Utils_eq(
-			activeId,
-			$elm$core$Maybe$Just(item.id));
-		var borderStyle = isActive ? '2px solid #0f62fe' : (isAlreadyPlaced ? '1px solid #2f8f4e' : '1px solid #b7c7e6');
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Events$onClick(
-					$author$project$Main$SelectProposition(item.id)),
-					A2($elm$html$Html$Attributes$style, 'display', 'inline-flex'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-					A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-					A2($elm$html$Html$Attributes$style, 'padding', '6px 10px'),
-					A2($elm$html$Html$Attributes$style, 'min-width', '38px'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
-					A2($elm$html$Html$Attributes$style, 'border', borderStyle),
-					A2($elm$html$Html$Attributes$style, 'background', 'white'),
-					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
-				]),
-			_List_fromArray(
-				[
-					compact ? $author$project$Main$miniBadge(item.badge) : A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'display', 'inline-flex'),
-							A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-							A2($elm$html$Html$Attributes$style, 'gap', '8px')
-						]),
-					_List_fromArray(
-						[
-							$author$project$Main$miniBadge(item.badge),
-							A2(
-							$elm$html$Html$span,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
-									A2($elm$html$Html$Attributes$style, 'font-weight', '700'),
-									A2($elm$html$Html$Attributes$style, 'color', '#304368')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(item.title)
-								]))
-						]))
-				]));
-	});
-var $author$project$Main$tabsView = F2(
-	function (model, compact) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
-					A2($elm$html$Html$Attributes$style, 'gap', '8px'),
-					A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
-				]),
-			A2(
-				$elm$core$List$map,
-				A3($author$project$Main$tabItem, model.activePropositionId, model.propositions, compact),
-				model.propositions));
-	});
-var $elm$html$Html$textarea = _VirtualDom_node('textarea');
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$viewStep = function (stepText) {
-	return A2(
-		$elm$html$Html$p,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'margin', '6px 0'),
-				A2($elm$html$Html$Attributes$style, 'line-height', '1.35'),
-				A2($elm$html$Html$Attributes$style, 'color', '#1f2a44')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text(stepText)
-			]));
-};
-var $author$project$Main$viewDraggableSheet = F3(
-	function (dragging, item, heightText) {
-		var isDragging = function () {
-			if (dragging.$ === 'Just') {
-				var dragState = dragging.a;
-				return _Utils_eq(dragState.propositionId, item.id);
-			} else {
-				return false;
-			}
-		}();
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$draggable('true'),
-					$author$project$Main$onDragStartCard(item.id),
-					$author$project$Main$onDragEndCard,
-					$elm$html$Html$Events$onClick(
-					$author$project$Main$SelectProposition(item.id)),
-					A2($elm$html$Html$Attributes$attribute, 'data-drag-source', 'proposition'),
-					A2($elm$html$Html$Attributes$attribute, 'data-badge', item.badge),
-					A2($elm$html$Html$Attributes$attribute, 'data-title', item.title),
-					A2($elm$html$Html$Attributes$attribute, 'data-preview', item.preview),
-					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-					A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
-					A2($elm$html$Html$Attributes$style, 'padding', '12px'),
-					A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
-					A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
-					A2(
-					$elm$html$Html$Attributes$style,
-					'opacity',
-					isDragging ? '0.94' : '1')
-				]),
-			_List_fromArray(
-				[
-					A2($author$project$Main$badgeView, item.badge, '18px'),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin-left', '58px')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$h3,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(item.title)
-								])),
-							A2(
-							$elm$html$Html$p,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '0'),
-									A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Version eleve')
-								]))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin-top', '10px'),
-							A2($elm$html$Html$Attributes$style, 'max-height', heightText),
-							A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
-							A2($elm$html$Html$Attributes$style, 'padding-right', '4px')
-						]),
-					A2($elm$core$List$map, $author$project$Main$viewStep, item.steps))
-				]));
-	});
-var $author$project$Main$panelView = F2(
-	function (model, compact) {
-		var cardHeight = compact ? '160px' : '260px';
-		var active = $author$project$Main$activeProposition(model);
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'background', 'white'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '12px'),
-					A2($elm$html$Html$Attributes$style, 'flex', '1 1 420px')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$h2,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '0 0 8px'),
-							A2($elm$html$Html$Attributes$style, 'font-size', '18px')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Copies')
-						])),
-					A2($author$project$Main$tabsView, model, compact),
-					function () {
-					if (active.$ === 'Nothing') {
-						return A2(
-							$elm$html$Html$p,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'color', '#5a6986'),
-									A2($elm$html$Html$Attributes$style, 'font-size', '14px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Toutes les copies sont placees. Clique une miniature pour la rouvrir.')
-								]));
-					} else {
-						var item = active.a;
-						return A2(
-							$elm$html$Html$div,
-							_List_Nil,
-							_List_fromArray(
-								[
-									A3(
-									$elm$html$Html$Keyed$node,
-									'div',
-									_List_Nil,
-									_List_fromArray(
-										[
-											_Utils_Tuple2(
-											$elm$core$String$fromInt(item.id),
-											A3($author$project$Main$viewDraggableSheet, model.dragging, item, cardHeight))
-										])),
-									A2(
-									$elm$html$Html$h3,
-									_List_fromArray(
-										[
-											A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Commentaire')
-										])),
-									A2(
-									$elm$html$Html$textarea,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$rows(
-											compact ? 2 : 5),
-											A2($elm$html$Html$Attributes$style, 'width', '100%'),
-											A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
-											A2($elm$html$Html$Attributes$style, 'padding', '8px'),
-											A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-											A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-											$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
-											$elm$html$Html$Attributes$value(item.comment),
-											$elm$html$Html$Events$onInput($author$project$Main$UpdateSelectedComment)
-										]),
-									_List_Nil)
-								]));
-					}
-				}(),
-					A2(
-					$elm$html$Html$h3,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Email (optionnel)')
-						])),
-					A2(
-					$elm$html$Html$input,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$type_('email'),
-							$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
-							$elm$html$Html$Attributes$value(model.email),
-							$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
-							A2($elm$html$Html$Attributes$style, 'width', '100%'),
-							A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
-						]),
-					_List_Nil),
-					A2(
-					$elm$html$Html$p,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
-							A2($elm$html$Html$Attributes$style, 'color', '#6b7892'),
-							A2($elm$html$Html$Attributes$style, 'margin', '8px 0 0')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('L\'email reste facultatif et separe des evaluations.')
-						]))
-				]));
-	});
-var $author$project$Main$desktopWorkspace = F2(
-	function (model, placed) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'gap', '16px'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'flex-start')
-				]),
-			_List_fromArray(
-				[
-					A2($author$project$Main$panelView, model, false),
-					A3($author$project$Main$boardPanel, model, placed, false)
-				]));
-	});
-var $author$project$Main$isMobileViewport = function (viewport) {
-	return viewport.width < 980;
-};
-var $author$project$Main$mobileWorkspace = F2(
-	function (model, placed) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'flex-direction', 'column'),
-					A2($elm$html$Html$Attributes$style, 'gap', '10px')
-				]),
-			_List_fromArray(
-				[
-					A2($author$project$Main$panelView, model, true),
-					A3($author$project$Main$boardPanel, model, placed, true)
-				]));
-	});
-var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $author$project$Main$topHeader = F3(
-	function (placedCount, totalCount, remainingCount) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'margin-bottom', '12px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '12px'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d5deef'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-					A2($elm$html$Html$Attributes$style, 'background', 'white')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$h1,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '0 0 8px'),
-							A2($elm$html$Html$Attributes$style, 'font-size', '24px')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Evaluation de productions d\'eleves')
-						])),
-					A2(
-					$elm$html$Html$p,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '0'),
-							A2($elm$html$Html$Attributes$style, 'color', '#33425f')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Exercice : resoudre '),
-							A2(
-							$elm$html$Html$span,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('$\\cos(2x)=\\sin(x)$')
-								])),
-							$elm$html$Html$text(' sur '),
-							A2(
-							$elm$html$Html$span,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('$[0;2\\pi[$')
-								])),
-							$elm$html$Html$text('.')
-						])),
-					A2(
-					$elm$html$Html$p,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '8px 0 0'),
-							A2($elm$html$Html$Attributes$style, 'color', '#516182'),
-							A2($elm$html$Html$Attributes$style, 'font-size', '14px')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(
-							'Placees : ' + ($elm$core$String$fromInt(placedCount) + (' / ' + ($elm$core$String$fromInt(totalCount) + ('  |  Restantes : ' + $elm$core$String$fromInt(remainingCount))))))
-						]))
-				]));
-	});
-var $author$project$Main$view = function (model) {
-	var totalCount = $elm$core$List$length(model.propositions);
-	var placed = A2(
-		$elm$core$List$filter,
-		function (item) {
-			return !_Utils_eq(item.pos, $elm$core$Maybe$Nothing);
-		},
-		model.propositions);
-	var placedCount = $elm$core$List$length(placed);
-	var remainingCount = totalCount - placedCount;
-	var mobile = $author$project$Main$isMobileViewport(model.viewport);
+var $author$project$Main$boardView = function (model) {
+	var overlay = function () {
+		var _v0 = $author$project$Main$selectedProposition(model);
+		if (_v0.$ === 'Nothing') {
+			return $elm$html$Html$text('');
+		} else {
+			var item = _v0.a;
+			return A2($author$project$Main$viewExpandedOverlay, model, item);
+		}
+	}();
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'font-family', 'system-ui, sans-serif'),
+				$elm$html$Html$Attributes$id('board'),
+				$author$project$Main$onBoardMouseMove,
+				$author$project$Main$onBoardMouseUp,
+				$author$project$Main$onBoardMouseLeave,
+				$author$project$Main$onBoardTouchMove,
+				$author$project$Main$onBoardTouchEnd,
+				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+				A2($elm$html$Html$Attributes$style, 'flex', '1'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
+				A2($elm$html$Html$Attributes$style, 'border', '1px solid #b9c9e6'),
+				A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+				A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)'),
+				A2($elm$html$Html$Attributes$style, 'overflow', 'hidden'),
+				A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
+			]),
+		_Utils_ap(
+			_List_fromArray(
+				[$author$project$Main$axisLines]),
+			_Utils_ap(
+				A2(
+					$elm$core$List$map,
+					$author$project$Main$viewMiniature(model),
+					model.propositions),
+				_List_fromArray(
+					[$author$project$Main$boardLegend, overlay]))));
+};
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $author$project$Main$topHeader = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			A2($elm$html$Html$Attributes$style, 'padding', '10px 12px'),
+			A2($elm$html$Html$Attributes$style, 'border', '1px solid #d5deef'),
+			A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
+			A2($elm$html$Html$Attributes$style, 'background', 'white'),
+			A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$h1,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'margin', '0'),
+					A2($elm$html$Html$Attributes$style, 'font-size', '24px')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Evaluation de productions d\'eleves')
+				])),
+			A2(
+			$elm$html$Html$p,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'margin', '6px 0 0'),
+					A2($elm$html$Html$Attributes$style, 'color', '#33425f')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Exercice : resoudre '),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('$\\cos(2x)=\\sin(x)$')
+						])),
+					$elm$html$Html$text(' sur '),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('$[0;2\\pi[$')
+						])),
+					$elm$html$Html$text('.')
+				]))
+		]));
+var $author$project$Main$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
 				A2($elm$html$Html$Attributes$style, 'margin', '0'),
-				A2($elm$html$Html$Attributes$style, 'padding', '16px'),
-				A2($elm$html$Html$Attributes$style, 'background', '#eef3fb'),
-				A2($elm$html$Html$Attributes$style, 'min-height', '100vh')
+				A2($elm$html$Html$Attributes$style, 'min-height', '100vh'),
+				A2($elm$html$Html$Attributes$style, 'height', '100vh'),
+				A2($elm$html$Html$Attributes$style, 'padding', '12px'),
+				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+				A2($elm$html$Html$Attributes$style, 'flex-direction', 'column'),
+				A2($elm$html$Html$Attributes$style, 'background', '#eaf0fb'),
+				A2($elm$html$Html$Attributes$style, 'font-family', 'system-ui, sans-serif')
 			]),
 		_List_fromArray(
 			[
-				A3($author$project$Main$topHeader, placedCount, totalCount, remainingCount),
-				mobile ? A2($author$project$Main$mobileWorkspace, model, placed) : A2($author$project$Main$desktopWorkspace, model, placed)
+				$author$project$Main$topHeader,
+				$author$project$Main$boardView(model)
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

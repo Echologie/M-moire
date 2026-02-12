@@ -9,94 +9,10 @@
   <body>
     <div id="elm-main"></div>
 
-    <script type="module" src="vendor/drag-drop-touch/drag-drop-touch.esm.min.js?autoload"></script>
     <script src="vendor/katex/katex.min.js"></script>
     <script src="vendor/katex/auto-render.min.js"></script>
     <script src="main.js"></script>
     <script>
-      function createDragGhost(badge, title, preview) {
-        var root = document.createElement("div");
-        root.style.position = "fixed";
-        root.style.top = "-1000px";
-        root.style.left = "-1000px";
-        root.style.width = "200px";
-        root.style.height = "128px";
-        root.style.background = "#fbfdff";
-        root.style.border = "1px solid #7a92c8";
-        root.style.borderRadius = "12px";
-        root.style.boxShadow = "0 10px 24px rgba(15,34,80,0.25)";
-        root.style.padding = "10px";
-        root.style.fontFamily = "system-ui, sans-serif";
-        root.style.overflow = "hidden";
-
-        var pill = document.createElement("div");
-        pill.textContent = badge;
-        pill.style.display = "inline-flex";
-        pill.style.alignItems = "center";
-        pill.style.justifyContent = "center";
-        pill.style.minWidth = "30px";
-        pill.style.height = "24px";
-        pill.style.borderRadius = "999px";
-        pill.style.color = "white";
-        pill.style.fontWeight = "800";
-        pill.style.fontSize = "13px";
-        pill.style.background = "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)";
-
-        var label = document.createElement("div");
-        label.textContent = title;
-        label.style.marginTop = "6px";
-        label.style.fontSize = "13px";
-        label.style.fontWeight = "700";
-        label.style.color = "#253556";
-        label.style.whiteSpace = "nowrap";
-        label.style.overflow = "hidden";
-        label.style.textOverflow = "ellipsis";
-
-        var line = document.createElement("div");
-        line.textContent = preview || "";
-        line.style.marginTop = "8px";
-        line.style.fontSize = "11px";
-        line.style.color = "#425476";
-        line.style.whiteSpace = "nowrap";
-        line.style.overflow = "hidden";
-        line.style.textOverflow = "ellipsis";
-
-        var faint = document.createElement("div");
-        faint.style.marginTop = "8px";
-        faint.style.height = "2px";
-        faint.style.background = "linear-gradient(90deg, #c8d6ef 0%, transparent 100%)";
-
-        root.appendChild(pill);
-        root.appendChild(label);
-        root.appendChild(line);
-        root.appendChild(faint);
-        return root;
-      }
-
-      document.addEventListener("dragstart", function (event) {
-        var target = event.target && event.target.closest("[data-drag-source]");
-        if (!target) {
-          return;
-        }
-
-        if (!event.dataTransfer || !event.dataTransfer.setDragImage) {
-          return;
-        }
-
-        var badge = target.getAttribute("data-badge") || "?";
-        var title = target.getAttribute("data-title") || "Copie";
-        var preview = target.getAttribute("data-preview") || "";
-        var ghost = createDragGhost(badge, title, preview);
-        document.body.appendChild(ghost);
-        event.dataTransfer.setDragImage(ghost, 24, 24);
-
-        window.setTimeout(function () {
-          if (ghost.parentNode) {
-            ghost.parentNode.removeChild(ghost);
-          }
-        }, 0);
-      });
-
       var app = Elm.Main.init({ node: document.getElementById("elm-main") });
 
       function renderMath() {
