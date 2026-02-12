@@ -5869,8 +5869,26 @@ var $author$project$Main$dragPointDecoder = $elm$json$Json$Decode$oneOf(
 			A3(
 			$elm$json$Json$Decode$map2,
 			$elm$core$Tuple$pair,
+			A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float),
+			A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float)),
+			A3(
+			$elm$json$Json$Decode$map2,
+			$elm$core$Tuple$pair,
 			A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
 			A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)),
+			A3(
+			$elm$json$Json$Decode$map2,
+			$elm$core$Tuple$pair,
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['touches', '0', 'pageX']),
+				$elm$json$Json$Decode$float),
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['touches', '0', 'pageY']),
+				$elm$json$Json$Decode$float)),
 			A3(
 			$elm$json$Json$Decode$map2,
 			$elm$core$Tuple$pair,
@@ -5883,6 +5901,19 @@ var $author$project$Main$dragPointDecoder = $elm$json$Json$Decode$oneOf(
 				$elm$json$Json$Decode$at,
 				_List_fromArray(
 					['touches', '0', 'clientY']),
+				$elm$json$Json$Decode$float)),
+			A3(
+			$elm$json$Json$Decode$map2,
+			$elm$core$Tuple$pair,
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['changedTouches', '0', 'pageX']),
+				$elm$json$Json$Decode$float),
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['changedTouches', '0', 'pageY']),
 				$elm$json$Json$Decode$float)),
 			A3(
 			$elm$json$Json$Decode$map2,

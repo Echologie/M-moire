@@ -511,11 +511,20 @@ dragPointDecoder : Decode.Decoder ( Float, Float )
 dragPointDecoder =
     Decode.oneOf
         [ Decode.map2 Tuple.pair
+            (Decode.field "pageX" Decode.float)
+            (Decode.field "pageY" Decode.float)
+        , Decode.map2 Tuple.pair
             (Decode.field "clientX" Decode.float)
             (Decode.field "clientY" Decode.float)
         , Decode.map2 Tuple.pair
+            (Decode.at [ "touches", "0", "pageX" ] Decode.float)
+            (Decode.at [ "touches", "0", "pageY" ] Decode.float)
+        , Decode.map2 Tuple.pair
             (Decode.at [ "touches", "0", "clientX" ] Decode.float)
             (Decode.at [ "touches", "0", "clientY" ] Decode.float)
+        , Decode.map2 Tuple.pair
+            (Decode.at [ "changedTouches", "0", "pageX" ] Decode.float)
+            (Decode.at [ "changedTouches", "0", "pageY" ] Decode.float)
         , Decode.map2 Tuple.pair
             (Decode.at [ "changedTouches", "0", "clientX" ] Decode.float)
             (Decode.at [ "changedTouches", "0", "clientY" ] Decode.float)
