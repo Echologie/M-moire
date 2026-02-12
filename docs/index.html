@@ -14,19 +14,20 @@
     <script src="vendor/katex/auto-render.min.js"></script>
     <script src="main.js"></script>
     <script>
-      function createDragGhost(badge, title) {
+      function createDragGhost(badge, title, preview) {
         var root = document.createElement("div");
         root.style.position = "fixed";
         root.style.top = "-1000px";
         root.style.left = "-1000px";
-        root.style.width = "150px";
-        root.style.minHeight = "56px";
-        root.style.background = "white";
+        root.style.width = "200px";
+        root.style.height = "128px";
+        root.style.background = "#fbfdff";
         root.style.border = "1px solid #7a92c8";
         root.style.borderRadius = "12px";
-        root.style.boxShadow = "0 6px 20px rgba(0,0,0,0.18)";
-        root.style.padding = "8px 8px 8px 10px";
+        root.style.boxShadow = "0 10px 24px rgba(15,34,80,0.25)";
+        root.style.padding = "10px";
         root.style.fontFamily = "system-ui, sans-serif";
+        root.style.overflow = "hidden";
 
         var pill = document.createElement("div");
         pill.textContent = badge;
@@ -44,12 +45,31 @@
         var label = document.createElement("div");
         label.textContent = title;
         label.style.marginTop = "6px";
-        label.style.fontSize = "12px";
+        label.style.fontSize = "13px";
         label.style.fontWeight = "700";
         label.style.color = "#253556";
+        label.style.whiteSpace = "nowrap";
+        label.style.overflow = "hidden";
+        label.style.textOverflow = "ellipsis";
+
+        var line = document.createElement("div");
+        line.textContent = preview || "";
+        line.style.marginTop = "8px";
+        line.style.fontSize = "11px";
+        line.style.color = "#425476";
+        line.style.whiteSpace = "nowrap";
+        line.style.overflow = "hidden";
+        line.style.textOverflow = "ellipsis";
+
+        var faint = document.createElement("div");
+        faint.style.marginTop = "8px";
+        faint.style.height = "2px";
+        faint.style.background = "linear-gradient(90deg, #c8d6ef 0%, transparent 100%)";
 
         root.appendChild(pill);
         root.appendChild(label);
+        root.appendChild(line);
+        root.appendChild(faint);
         return root;
       }
 
@@ -65,7 +85,8 @@
 
         var badge = target.getAttribute("data-badge") || "?";
         var title = target.getAttribute("data-title") || "Copie";
-        var ghost = createDragGhost(badge, title);
+        var preview = target.getAttribute("data-preview") || "";
+        var ghost = createDragGhost(badge, title, preview);
         document.body.appendChild(ghost);
         event.dataTransfer.setDragImage(ghost, 24, 24);
 
