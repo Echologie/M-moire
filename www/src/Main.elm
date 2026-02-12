@@ -48,7 +48,7 @@ type alias Model =
 
 type Msg
     = StartDrag Int
-    | DragOver Float Float
+    | DragOver
     | DropOnBoard Float Float
     | EndDrag
     | SelectCard Int
@@ -108,17 +108,8 @@ update msg model =
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
 
-        DragOver clientX clientY ->
-            case ( model.dragging, model.boardRect ) of
-                ( Just dragState, Just rect ) ->
-                    let
-                        pos =
-                            positionFromClient rect clientX clientY
-                    in
-                    ( { model | cards = updateCardPosition dragState.cardId pos model.cards }, Cmd.none )
-
-                _ ->
-                    ( model, Cmd.none )
+        DragOver ->
+            ( model, Cmd.none )
 
         DropOnBoard clientX clientY ->
             case ( model.dragging, model.boardRect ) of
@@ -297,7 +288,7 @@ leftPanel model unplacedCards =
         [ h2 [ style "margin" "4px 0 10px" ] [ text "Propositions" ]
         , p [ style "margin" "0 0 10px", style "font-size" "14px", style "color" "#4b5a75" ] [ text "Carte non placée : glisser vers le plan." ]
         , div [ style "display" "flex", style "flex-direction" "column", style "gap" "8px" ]
-            (List.map (viewCardInList model.selectedCardId) unplacedCards)
+            (List.map (viewCardInList model.selectedCardId model.dragging) unplacedCards)
         , h3 [ style "margin" "18px 0 8px" ] [ text "Commentaire" ]
         , case selectedCard of
             Nothing ->
@@ -346,11 +337,19 @@ leftPanel model unplacedCards =
         ]
 
 
-viewCardInList : Maybe Int -> Card -> Html Msg
-viewCardInList selectedId card =
+viewCardInList : Maybe Int -> Maybe DragState -> Card -> Html Msg
+viewCardInList selectedId dragging card =
     let
         isSelected =
             selectedId == Just card.id
+
+        isDragging =
+            case dragging of
+                Just dragState ->
+                    dragState.cardId == card.id
+
+                Nothing ->
+                    False
     in
     div
         [ draggable "true"
@@ -369,6 +368,13 @@ viewCardInList selectedId card =
         , style "background" "#fbfcff"
         , style "cursor" "grab"
         , style "user-select" "none"
+        , style "opacity"
+            (if isDragging then
+                "0"
+
+             else
+                "1"
+            )
         ]
         [ text card.title ]
 
@@ -395,7 +401,7 @@ boardPanel model placedCards =
                 , style "border-radius" "8px"
                 , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
                 ]
-                ([ axisLines ] ++ List.map (viewCardOnBoard model.selectedCardId) placedCards ++ [ dragOverlay model.dragging ])
+                ([ axisLines ] ++ List.map (viewCardOnBoard model.selectedCardId model.dragging) placedCards ++ [ dragOverlay model.dragging ])
             , div [ style "display" "flex", style "justify-content" "space-between", style "font-size" "13px", style "margin-top" "6px", style "color" "#40506a" ]
                 [ span [] [ text "Précision faible" ], span [] [ text "Précision élevée" ] ]
             ]
@@ -445,8 +451,8 @@ dragOverlay dragging =
                 []
 
 
-viewCardOnBoard : Maybe Int -> Card -> Html Msg
-viewCardOnBoard selectedId card =
+viewCardOnBoard : Maybe Int -> Maybe DragState -> Card -> Html Msg
+viewCardOnBoard selectedId dragging card =
     case card.pos of
         Nothing ->
             text ""
@@ -455,6 +461,14 @@ viewCardOnBoard selectedId card =
             let
                 isSelected =
                     selectedId == Just card.id
+
+                isDragging =
+                    case dragging of
+                        Just dragState ->
+                            dragState.cardId == card.id
+
+                        Nothing ->
+                            False
             in
             div
                 [ draggable "true"
@@ -479,6 +493,13 @@ viewCardOnBoard selectedId card =
                 , style "cursor" "grab"
                 , style "user-select" "none"
                 , style "font-size" "14px"
+                , style "opacity"
+                    (if isDragging then
+                        "0"
+
+                     else
+                        "1"
+                    )
                 ]
                 [ text card.title ]
 
@@ -506,11 +527,7 @@ onDragEndCard =
 
 onBoardDragOver : Html.Attribute Msg
 onBoardDragOver =
-    preventDefaultOn "dragover"
-        (Decode.map
-            (\( x, y ) -> ( DragOver x y, True ))
-            dragPointDecoder
-        )
+    preventDefaultOn "dragover" (Decode.succeed ( DragOver, True ))
 
 
 onBoardDrop : Html.Attribute Msg

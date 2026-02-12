@@ -5696,30 +5696,14 @@ var $author$project$Main$update = F2(
 						$author$project$Main$GotBoardRect,
 						$elm$browser$Browser$Dom$getElement('board')));
 			case 'DragOver':
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 'DropOnBoard':
 				var clientX = msg.a;
 				var clientY = msg.b;
 				var _v1 = _Utils_Tuple2(model.dragging, model.boardRect);
 				if ((_v1.a.$ === 'Just') && (_v1.b.$ === 'Just')) {
 					var dragState = _v1.a.a;
 					var rect = _v1.b.a;
-					var pos = A3($author$project$Main$positionFromClient, rect, clientX, clientY);
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								cards: A3($author$project$Main$updateCardPosition, dragState.cardId, pos, model.cards)
-							}),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				}
-			case 'DropOnBoard':
-				var clientX = msg.a;
-				var clientY = msg.b;
-				var _v2 = _Utils_Tuple2(model.dragging, model.boardRect);
-				if ((_v2.a.$ === 'Just') && (_v2.b.$ === 'Just')) {
-					var dragState = _v2.a.a;
-					var rect = _v2.b.a;
 					var pos = A3($author$project$Main$positionFromClient, rect, clientX, clientY);
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -5753,11 +5737,11 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'UpdateSelectedComment':
 				var newComment = msg.a;
-				var _v3 = model.selectedCardId;
-				if (_v3.$ === 'Nothing') {
+				var _v2 = model.selectedCardId;
+				if (_v2.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var cardId = _v3.a;
+					var cardId = _v2.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -5800,7 +5784,7 @@ var $author$project$Main$update = F2(
 					model,
 					A2(
 						$elm$core$Task$perform,
-						function (_v5) {
+						function (_v4) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(20)));
@@ -5839,9 +5823,26 @@ var $author$project$Main$axisLines = A2(
 				]),
 			_List_Nil)
 		]));
-var $author$project$Main$DragOver = F2(
+var $author$project$Main$DragOver = {$: 'DragOver'};
+var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var $author$project$Main$onBoardDragOver = A2(
+	$elm$html$Html$Events$preventDefaultOn,
+	'dragover',
+	$elm$json$Json$Decode$succeed(
+		_Utils_Tuple2($author$project$Main$DragOver, true)));
+var $author$project$Main$DropOnBoard = F2(
 	function (a, b) {
-		return {$: 'DragOver', a: a, b: b};
+		return {$: 'DropOnBoard', a: a, b: b};
 	});
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
@@ -5919,34 +5920,6 @@ var $author$project$Main$dragPointDecoder = $elm$json$Json$Decode$oneOf(
 					['changedTouches', '0', 'clientY']),
 				$elm$json$Json$Decode$float))
 		]));
-var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
-	return {$: 'MayPreventDefault', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$preventDefaultOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
-	});
-var $author$project$Main$onBoardDragOver = A2(
-	$elm$html$Html$Events$preventDefaultOn,
-	'dragover',
-	A2(
-		$elm$json$Json$Decode$map,
-		function (_v0) {
-			var x = _v0.a;
-			var y = _v0.b;
-			return _Utils_Tuple2(
-				A2($author$project$Main$DragOver, x, y),
-				true);
-		},
-		$author$project$Main$dragPointDecoder));
-var $author$project$Main$DropOnBoard = F2(
-	function (a, b) {
-		return {$: 'DropOnBoard', a: a, b: b};
-	});
 var $author$project$Main$onBoardDrop = A2(
 	$elm$html$Html$Events$preventDefaultOn,
 	'drop',
@@ -6027,8 +6000,8 @@ var $author$project$Main$onDragStartCard = function (cardId) {
 		$elm$json$Json$Decode$succeed(
 			$author$project$Main$StartDrag(cardId)));
 };
-var $author$project$Main$viewCardOnBoard = F2(
-	function (selectedId, card) {
+var $author$project$Main$viewCardOnBoard = F3(
+	function (selectedId, dragging, card) {
 		var _v0 = card.pos;
 		if (_v0.$ === 'Nothing') {
 			return $elm$html$Html$text('');
@@ -6037,6 +6010,14 @@ var $author$project$Main$viewCardOnBoard = F2(
 			var isSelected = _Utils_eq(
 				selectedId,
 				$elm$core$Maybe$Just(card.id));
+			var isDragging = function () {
+				if (dragging.$ === 'Just') {
+					var dragState = dragging.a;
+					return _Utils_eq(dragState.cardId, card.id);
+				} else {
+					return false;
+				}
+			}();
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -6066,7 +6047,11 @@ var $author$project$Main$viewCardOnBoard = F2(
 						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 1px 5px rgba(0,0,0,0.08)'),
 						A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
 						A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
-						A2($elm$html$Html$Attributes$style, 'font-size', '14px')
+						A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'opacity',
+						isDragging ? '0' : '1')
 					]),
 				_List_fromArray(
 					[
@@ -6151,7 +6136,7 @@ var $author$project$Main$boardPanel = F2(
 								_Utils_ap(
 									A2(
 										$elm$core$List$map,
-										$author$project$Main$viewCardOnBoard(model.selectedCardId),
+										A2($author$project$Main$viewCardOnBoard, model.selectedCardId, model.dragging),
 										placedCards),
 									_List_fromArray(
 										[
@@ -6283,11 +6268,19 @@ var $author$project$Main$selectedCardFromModel = function (model) {
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$viewCardInList = F2(
-	function (selectedId, card) {
+var $author$project$Main$viewCardInList = F3(
+	function (selectedId, dragging, card) {
 		var isSelected = _Utils_eq(
 			selectedId,
 			$elm$core$Maybe$Just(card.id));
+		var isDragging = function () {
+			if (dragging.$ === 'Just') {
+				var dragState = dragging.a;
+				return _Utils_eq(dragState.cardId, card.id);
+			} else {
+				return false;
+			}
+		}();
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6305,7 +6298,11 @@ var $author$project$Main$viewCardInList = F2(
 					A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
 					A2($elm$html$Html$Attributes$style, 'background', '#fbfcff'),
 					A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
-					A2($elm$html$Html$Attributes$style, 'user-select', 'none')
+					A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'opacity',
+					isDragging ? '0' : '1')
 				]),
 			_List_fromArray(
 				[
@@ -6360,7 +6357,7 @@ var $author$project$Main$leftPanel = F2(
 						]),
 					A2(
 						$elm$core$List$map,
-						$author$project$Main$viewCardInList(model.selectedCardId),
+						A2($author$project$Main$viewCardInList, model.selectedCardId, model.dragging),
 						unplacedCards)),
 					A2(
 					$elm$html$Html$h3,
