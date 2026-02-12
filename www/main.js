@@ -5159,7 +5159,6 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$PanelExpanded = {$: 'PanelExpanded'};
 var $author$project$Main$RefreshBoardRect = {$: 'RefreshBoardRect'};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$List$head = function (list) {
@@ -5241,7 +5240,6 @@ var $author$project$Main$init = function (_v0) {
 			boardRect: $elm$core$Maybe$Nothing,
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
-			panelState: $author$project$Main$PanelExpanded,
 			propositions: initial,
 			viewport: {height: 800, width: 1200}
 		},
@@ -5683,7 +5681,6 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $author$project$Main$GotBoardRect = function (a) {
 	return {$: 'GotBoardRect', a: a};
 };
-var $author$project$Main$PanelCollapsed = {$: 'PanelCollapsed'};
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
 		return g(
@@ -5734,9 +5731,6 @@ var $author$project$Main$firstUnplacedId = function (propositions) {
 				propositions)));
 };
 var $elm$browser$Browser$Dom$getElement = _Browser_getElement;
-var $author$project$Main$isMobileViewport = function (viewport) {
-	return viewport.width < 980;
-};
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -5823,15 +5817,13 @@ var $author$project$Main$update = F2(
 		switch (msg.$) {
 			case 'StartDrag':
 				var propositionId = msg.a;
-				var nextPanel = $author$project$Main$isMobileViewport(model.viewport) ? $author$project$Main$PanelCollapsed : model.panelState;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							activePropositionId: $elm$core$Maybe$Just(propositionId),
 							dragging: $elm$core$Maybe$Just(
-								{propositionId: propositionId}),
-							panelState: nextPanel
+								{propositionId: propositionId})
 						}),
 					A2(
 						$elm$core$Task$attempt,
@@ -5878,8 +5870,7 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							activePropositionId: $elm$core$Maybe$Just(propositionId),
-							panelState: $author$project$Main$isMobileViewport(model.viewport) ? $author$project$Main$PanelExpanded : model.panelState
+							activePropositionId: $elm$core$Maybe$Just(propositionId)
 						}),
 					$author$project$Main$scheduleMathRender);
 			case 'UpdateSelectedComment':
@@ -5904,20 +5895,6 @@ var $author$project$Main$update = F2(
 						model,
 						{email: newEmail}),
 					$elm$core$Platform$Cmd$none);
-			case 'TogglePanel':
-				var nextState = function () {
-					var _v3 = model.panelState;
-					if (_v3.$ === 'PanelExpanded') {
-						return $author$project$Main$PanelCollapsed;
-					} else {
-						return $author$project$Main$PanelExpanded;
-					}
-				}();
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{panelState: nextState}),
-					$author$project$Main$scheduleMathRender);
 			case 'RefreshBoardRect':
 				return _Utils_Tuple2(
 					model,
@@ -5943,15 +5920,15 @@ var $author$project$Main$update = F2(
 			case 'WindowResized':
 				var width = msg.a;
 				var height = msg.b;
-				var updatedViewport = {height: height, width: width};
-				var nextPanelState = $author$project$Main$isMobileViewport(updatedViewport) ? model.panelState : $author$project$Main$PanelExpanded;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{panelState: nextPanelState, viewport: updatedViewport}),
+						{
+							viewport: {height: height, width: width}
+						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v5) {
+						function (_v4) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(20)));
@@ -6137,6 +6114,14 @@ var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$SelectProposition = function (a) {
 	return {$: 'SelectProposition', a: a};
 };
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $author$project$Main$badgeView = F2(
 	function (label, sizeText) {
 		return A2(
@@ -6203,7 +6188,7 @@ var $author$project$Main$viewPlacedMiniature = F4(
 			return $elm$html$Html$text('');
 		} else {
 			var pos = _v0.a;
-			var widthText = compact ? '138px' : '170px';
+			var widthText = compact ? '128px' : '168px';
 			var isDragging = function () {
 				if (dragging.$ === 'Just') {
 					var dragState = dragging.a;
@@ -6224,6 +6209,9 @@ var $author$project$Main$viewPlacedMiniature = F4(
 						$author$project$Main$onDragEndCard,
 						$elm$html$Html$Events$onClick(
 						$author$project$Main$SelectProposition(item.id)),
+						A2($elm$html$Html$Attributes$attribute, 'data-drag-source', 'miniature'),
+						A2($elm$html$Html$Attributes$attribute, 'data-badge', item.badge),
+						A2($elm$html$Html$Attributes$attribute, 'data-title', item.title),
 						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 						A2(
 						$elm$html$Html$Attributes$style,
@@ -6235,7 +6223,7 @@ var $author$project$Main$viewPlacedMiniature = F4(
 						$elm$core$String$fromFloat(pos.y * 100) + '%'),
 						A2($elm$html$Html$Attributes$style, 'transform', 'translate(-50%, -50%)'),
 						A2($elm$html$Html$Attributes$style, 'width', widthText),
-						A2($elm$html$Html$Attributes$style, 'min-height', '62px'),
+						A2($elm$html$Html$Attributes$style, 'min-height', '58px'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'border',
@@ -6243,7 +6231,7 @@ var $author$project$Main$viewPlacedMiniature = F4(
 						A2($elm$html$Html$Attributes$style, 'background', 'white'),
 						A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
 						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.10)'),
-						A2($elm$html$Html$Attributes$style, 'padding', '10px 10px 10px 12px'),
+						A2($elm$html$Html$Attributes$style, 'padding', '8px 8px 8px 10px'),
 						A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
 						A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
 						A2(
@@ -6253,13 +6241,13 @@ var $author$project$Main$viewPlacedMiniature = F4(
 					]),
 				_List_fromArray(
 					[
-						A2($author$project$Main$badgeView, item.badge, '14px'),
+						A2($author$project$Main$badgeView, item.badge, '13px'),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								A2($elm$html$Html$Attributes$style, 'padding-left', '52px'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+								A2($elm$html$Html$Attributes$style, 'padding-left', '48px'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '11px'),
 								A2($elm$html$Html$Attributes$style, 'color', '#253556')
 							]),
 						_List_fromArray(
@@ -6279,7 +6267,7 @@ var $author$project$Main$viewPlacedMiniature = F4(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										A2($elm$html$Html$Attributes$style, 'font-size', '11px'),
+										A2($elm$html$Html$Attributes$style, 'font-size', '10px'),
 										A2($elm$html$Html$Attributes$style, 'color', '#5f6f8e')
 									]),
 								_List_fromArray(
@@ -6290,9 +6278,9 @@ var $author$project$Main$viewPlacedMiniature = F4(
 					]));
 		}
 	});
-var $author$project$Main$boardPanel = F4(
-	function (model, placedPropositions, isMobile, isLandscape) {
-		var boardHeight = isMobile ? (isLandscape ? '78vh' : '64vh') : '560px';
+var $author$project$Main$boardPanel = F3(
+	function (model, placedPropositions, compact) {
+		var boardHeight = compact ? '56vh' : '560px';
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6301,8 +6289,7 @@ var $author$project$Main$boardPanel = F4(
 					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
 					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
 					A2($elm$html$Html$Attributes$style, 'padding', '14px'),
-					A2($elm$html$Html$Attributes$style, 'flex', '2 1 520px'),
-					A2($elm$html$Html$Attributes$style, 'min-width', '280px')
+					A2($elm$html$Html$Attributes$style, 'flex', '2 1 520px')
 				]),
 			_List_fromArray(
 				[
@@ -6369,7 +6356,7 @@ var $author$project$Main$boardPanel = F4(
 								_Utils_ap(
 									A2(
 										$elm$core$List$map,
-										A3($author$project$Main$viewPlacedMiniature, model.activePropositionId, model.dragging, isMobile),
+										A3($author$project$Main$viewPlacedMiniature, model.activePropositionId, model.dragging, compact),
 										placedPropositions),
 									_List_fromArray(
 										[
@@ -6470,6 +6457,12 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 };
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$Attributes$rows = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'rows',
+		$elm$core$String$fromInt(n));
+};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $author$project$Main$miniBadge = function (badge) {
 	return A2(
@@ -6492,8 +6485,8 @@ var $author$project$Main$miniBadge = function (badge) {
 				$elm$html$Html$text(badge)
 			]));
 };
-var $author$project$Main$selectorItem = F3(
-	function (activeId, allPropositions, item) {
+var $author$project$Main$tabItem = F4(
+	function (activeId, allPropositions, compact, item) {
 		var isAlreadyPlaced = A2($author$project$Main$isPlaced, item.id, allPropositions);
 		var isActive = _Utils_eq(
 			activeId,
@@ -6504,7 +6497,7 @@ var $author$project$Main$selectorItem = F3(
 				[
 					$elm$html$Html$Events$onClick(
 					$author$project$Main$SelectProposition(item.id)),
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'display', 'inline-flex'),
 					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
 					A2($elm$html$Html$Attributes$style, 'gap', '6px'),
 					A2($elm$html$Html$Attributes$style, 'padding', '6px 10px'),
@@ -6519,7 +6512,7 @@ var $author$project$Main$selectorItem = F3(
 			_List_fromArray(
 				[
 					$author$project$Main$miniBadge(item.badge),
-					A2(
+					compact ? $elm$html$Html$text('') : A2(
 					$elm$html$Html$span,
 					_List_fromArray(
 						[
@@ -6547,32 +6540,41 @@ var $author$project$Main$selectorItem = F3(
 					_List_Nil)
 				]));
 	});
-var $author$project$Main$propositionSelector = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-				A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
-				A2($elm$html$Html$Attributes$style, 'gap', '8px'),
-				A2($elm$html$Html$Attributes$style, 'margin-bottom', '12px')
-			]),
-		A2(
-			$elm$core$List$map,
-			A2($author$project$Main$selectorItem, model.activePropositionId, model.propositions),
-			model.propositions));
-};
-var $elm$html$Html$Attributes$rows = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'rows',
-		$elm$core$String$fromInt(n));
-};
+var $author$project$Main$tabsView = F2(
+	function (model, compact) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
+					A2($elm$html$Html$Attributes$style, 'gap', '8px'),
+					A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
+				]),
+			A2(
+				$elm$core$List$map,
+				A3($author$project$Main$tabItem, model.activePropositionId, model.propositions, compact),
+				model.propositions));
+	});
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$viewDragMiniature = F3(
-	function (dragging, item, compact) {
+var $author$project$Main$viewStep = function (stepText) {
+	return A2(
+		$elm$html$Html$p,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'margin', '6px 0'),
+				A2($elm$html$Html$Attributes$style, 'line-height', '1.35'),
+				A2($elm$html$Html$Attributes$style, 'color', '#1f2a44')
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(stepText)
+			]));
+};
+var $author$project$Main$viewDraggableSheet = F3(
+	function (dragging, item, heightText) {
 		var isDragging = function () {
 			if (dragging.$ === 'Just') {
 				var dragState = dragging.a;
@@ -6590,87 +6592,20 @@ var $author$project$Main$viewDragMiniature = F3(
 					$author$project$Main$onDragEndCard,
 					$elm$html$Html$Events$onClick(
 					$author$project$Main$SelectProposition(item.id)),
+					A2($elm$html$Html$Attributes$attribute, 'data-drag-source', 'proposition'),
+					A2($elm$html$Html$Attributes$attribute, 'data-badge', item.badge),
+					A2($elm$html$Html$Attributes$attribute, 'data-title', item.title),
 					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-					A2(
-					$elm$html$Html$Attributes$style,
-					'width',
-					compact ? '150px' : '170px'),
-					A2($elm$html$Html$Attributes$style, 'min-height', '64px'),
+					A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
 					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #9cb4e6'),
-					A2($elm$html$Html$Attributes$style, 'background', 'white'),
-					A2($elm$html$Html$Attributes$style, 'padding', '10px 10px 10px 12px'),
-					A2($elm$html$Html$Attributes$style, 'box-shadow', '0 4px 12px rgba(20,55,120,0.10)'),
+					A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
+					A2($elm$html$Html$Attributes$style, 'padding', '12px'),
 					A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
 					A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
 					A2(
 					$elm$html$Html$Attributes$style,
 					'opacity',
 					isDragging ? '0' : '1')
-				]),
-			_List_fromArray(
-				[
-					A2($author$project$Main$badgeView, item.badge, '14px'),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'padding-left', '52px'),
-							A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
-							A2($elm$html$Html$Attributes$style, 'color', '#253556')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'font-weight', '700'),
-									A2($elm$html$Html$Attributes$style, 'margin-bottom', '2px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(item.title)
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'font-size', '11px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#5f6f8e')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(item.preview)
-								]))
-						]))
-				]));
-	});
-var $author$project$Main$viewStep = function (stepText) {
-	return A2(
-		$elm$html$Html$p,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'margin', '6px 0'),
-				A2($elm$html$Html$Attributes$style, 'line-height', '1.4'),
-				A2($elm$html$Html$Attributes$style, 'color', '#1f2a44')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text(stepText)
-			]));
-};
-var $author$project$Main$viewLargePropositionCard = F3(
-	function (dragging, item, compact) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-					A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
-					A2($elm$html$Html$Attributes$style, 'padding', '12px')
 				]),
 			_List_fromArray(
 				[
@@ -6707,45 +6642,45 @@ var $author$project$Main$viewLargePropositionCard = F3(
 								]))
 						])),
 					A2(
-					$elm$html$Html$p,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '10px 0 8px'),
-							A2($elm$html$Html$Attributes$style, 'color', '#22314f'),
-							A2($elm$html$Html$Attributes$style, 'font-weight', '600')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Texte de la copie')
-						])),
-					A2(
 					$elm$html$Html$div,
-					_List_Nil,
-					A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
-					A2(
-					$elm$html$Html$p,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'margin', '12px 0 6px'),
-							A2($elm$html$Html$Attributes$style, 'color', '#5a6986'),
-							A2($elm$html$Html$Attributes$style, 'font-size', '13px')
+							A2($elm$html$Html$Attributes$style, 'margin-top', '10px'),
+							A2($elm$html$Html$Attributes$style, 'max-height', heightText),
+							A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
+							A2($elm$html$Html$Attributes$style, 'padding-right', '4px')
 						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Miniature a glisser vers le plan :')
-						])),
-					A3($author$project$Main$viewDragMiniature, dragging, item, compact)
+					A2($elm$core$List$map, $author$project$Main$viewStep, item.steps))
 				]));
 	});
-var $author$project$Main$panelBody = F2(
+var $author$project$Main$panelView = F2(
 	function (model, compact) {
+		var cardHeight = compact ? '180px' : '260px';
 		var active = $author$project$Main$activeProposition(model);
 		return A2(
 			$elm$html$Html$div,
-			_List_Nil,
 			_List_fromArray(
 				[
-					$author$project$Main$propositionSelector(model),
+					A2($elm$html$Html$Attributes$style, 'background', 'white'),
+					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+					A2($elm$html$Html$Attributes$style, 'padding', '12px'),
+					A2($elm$html$Html$Attributes$style, 'flex', '1 1 420px')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h2,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin', '0 0 8px'),
+							A2($elm$html$Html$Attributes$style, 'font-size', '18px')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Copies')
+						])),
+					A2($author$project$Main$tabsView, model, compact),
 					function () {
 					if (active.$ === 'Nothing') {
 						return A2(
@@ -6766,7 +6701,7 @@ var $author$project$Main$panelBody = F2(
 							_List_Nil,
 							_List_fromArray(
 								[
-									A3($author$project$Main$viewLargePropositionCard, model.dragging, item, compact),
+									A3($author$project$Main$viewDraggableSheet, model.dragging, item, cardHeight),
 									A2(
 									$elm$html$Html$h3,
 									_List_fromArray(
@@ -6782,7 +6717,7 @@ var $author$project$Main$panelBody = F2(
 									_List_fromArray(
 										[
 											$elm$html$Html$Attributes$rows(
-											compact ? 4 : 5),
+											compact ? 2 : 5),
 											A2($elm$html$Html$Attributes$style, 'width', '100%'),
 											A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
 											A2($elm$html$Html$Attributes$style, 'padding', '8px'),
@@ -6800,7 +6735,7 @@ var $author$project$Main$panelBody = F2(
 					$elm$html$Html$h3,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
+							A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
 						]),
 					_List_fromArray(
 						[
@@ -6834,88 +6769,8 @@ var $author$project$Main$panelBody = F2(
 						]))
 				]));
 	});
-var $author$project$Main$TogglePanel = {$: 'TogglePanel'};
-var $author$project$Main$panelHeader = F4(
-	function (model, remainingCount, totalCount, isMobile) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-					A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between'),
-					A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$h2,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '0'),
-									A2($elm$html$Html$Attributes$style, 'font-size', '18px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Copies')
-								])),
-							A2(
-							$elm$html$Html$p,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '4px 0 0'),
-									A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#566483')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(
-									'A placer : ' + ($elm$core$String$fromInt(remainingCount) + (' / ' + $elm$core$String$fromInt(totalCount))))
-								]))
-						])),
-					isMobile ? A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Events$onClick($author$project$Main$TogglePanel),
-							A2($elm$html$Html$Attributes$style, 'padding', '6px 10px'),
-							A2($elm$html$Html$Attributes$style, 'border', '1px solid #9ab0da'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-							A2($elm$html$Html$Attributes$style, 'background', 'white'),
-							A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Masquer')
-						])) : $elm$html$Html$text('')
-				]));
-	});
-var $author$project$Main$desktopPanel = F3(
-	function (model, remainingCount, totalCount) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'background', 'white'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '14px'),
-					A2($elm$html$Html$Attributes$style, 'flex', '1 1 420px'),
-					A2($elm$html$Html$Attributes$style, 'max-width', '520px')
-				]),
-			_List_fromArray(
-				[
-					A4($author$project$Main$panelHeader, model, remainingCount, totalCount, false),
-					A2($author$project$Main$panelBody, model, false)
-				]));
-	});
-var $author$project$Main$desktopWorkspace = F4(
-	function (model, placed, remainingCount, totalCount) {
+var $author$project$Main$desktopWorkspace = F2(
+	function (model, placed) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6926,86 +6781,27 @@ var $author$project$Main$desktopWorkspace = F4(
 				]),
 			_List_fromArray(
 				[
-					A3($author$project$Main$desktopPanel, model, remainingCount, totalCount),
-					A4($author$project$Main$boardPanel, model, placed, false, false)
+					A2($author$project$Main$panelView, model, false),
+					A3($author$project$Main$boardPanel, model, placed, false)
 				]));
 	});
-var $author$project$Main$isLandscapeViewport = function (viewport) {
-	return _Utils_cmp(viewport.width, viewport.height) > 0;
+var $author$project$Main$isMobileViewport = function (viewport) {
+	return viewport.width < 980;
 };
-var $author$project$Main$mobileOverlay = F4(
-	function (model, remainingCount, totalCount, landscape) {
-		var _v0 = model.panelState;
-		if (_v0.$ === 'PanelCollapsed') {
-			return A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick($author$project$Main$TogglePanel),
-						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-						A2($elm$html$Html$Attributes$style, 'top', '10px'),
-						A2($elm$html$Html$Attributes$style, 'left', '10px'),
-						A2($elm$html$Html$Attributes$style, 'z-index', '80'),
-						A2($elm$html$Html$Attributes$style, 'padding', '8px 12px'),
-						A2($elm$html$Html$Attributes$style, 'border', '1px solid #99add6'),
-						A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
-						A2($elm$html$Html$Attributes$style, 'background', 'white'),
-						A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.12)')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Afficher les copies (' + ($elm$core$String$fromInt(totalCount - remainingCount) + ('/' + ($elm$core$String$fromInt(totalCount) + ')'))))
-					]));
-		} else {
-			var placement = landscape ? _List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'left', '10px'),
-					A2($elm$html$Html$Attributes$style, 'top', '10px'),
-					A2($elm$html$Html$Attributes$style, 'bottom', '10px'),
-					A2($elm$html$Html$Attributes$style, 'width', '44%')
-				]) : _List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'left', '10px'),
-					A2($elm$html$Html$Attributes$style, 'right', '10px'),
-					A2($elm$html$Html$Attributes$style, 'bottom', '10px'),
-					A2($elm$html$Html$Attributes$style, 'max-height', '50%')
-				]);
-			var common = _List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-					A2($elm$html$Html$Attributes$style, 'z-index', '80'),
-					A2($elm$html$Html$Attributes$style, 'background', 'rgba(255,255,255,0.97)'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #c4d2ee'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-					A2($elm$html$Html$Attributes$style, 'box-shadow', '0 10px 28px rgba(0,0,0,0.16)'),
-					A2($elm$html$Html$Attributes$style, 'overflow', 'auto')
-				]);
-			return A2(
-				$elm$html$Html$div,
-				_Utils_ap(common, placement),
-				_List_fromArray(
-					[
-						A4($author$project$Main$panelHeader, model, remainingCount, totalCount, true),
-						A2($author$project$Main$panelBody, model, true)
-					]));
-		}
-	});
-var $author$project$Main$mobileWorkspace = F5(
-	function (model, placed, remainingCount, totalCount, landscape) {
+var $author$project$Main$mobileWorkspace = F2(
+	function (model, placed) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-					A2($elm$html$Html$Attributes$style, 'width', '100%')
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'flex-direction', 'column'),
+					A2($elm$html$Html$Attributes$style, 'gap', '10px')
 				]),
 			_List_fromArray(
 				[
-					A4($author$project$Main$boardPanel, model, placed, true, landscape),
-					A4($author$project$Main$mobileOverlay, model, remainingCount, totalCount, landscape)
+					A2($author$project$Main$panelView, model, true),
+					A3($author$project$Main$boardPanel, model, placed, true)
 				]));
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
@@ -7094,7 +6890,6 @@ var $author$project$Main$view = function (model) {
 	var placedCount = $elm$core$List$length(placed);
 	var remainingCount = totalCount - placedCount;
 	var mobile = $author$project$Main$isMobileViewport(model.viewport);
-	var landscape = $author$project$Main$isLandscapeViewport(model.viewport);
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -7108,7 +6903,7 @@ var $author$project$Main$view = function (model) {
 		_List_fromArray(
 			[
 				A3($author$project$Main$topHeader, placedCount, totalCount, remainingCount),
-				mobile ? A5($author$project$Main$mobileWorkspace, model, placed, remainingCount, totalCount, landscape) : A4($author$project$Main$desktopWorkspace, model, placed, remainingCount, totalCount)
+				mobile ? A2($author$project$Main$mobileWorkspace, model, placed) : A2($author$project$Main$desktopWorkspace, model, placed)
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

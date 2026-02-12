@@ -49,11 +49,6 @@ type alias Viewport =
     }
 
 
-type PanelState
-    = PanelExpanded
-    | PanelCollapsed
-
-
 type alias Model =
     { propositions : List Proposition
     , activePropositionId : Maybe Int
@@ -61,7 +56,6 @@ type alias Model =
     , boardRect : Maybe BoardRect
     , email : String
     , viewport : Viewport
-    , panelState : PanelState
     }
 
 
@@ -73,7 +67,6 @@ type Msg
     | SelectProposition Int
     | UpdateSelectedComment String
     | UpdateEmail String
-    | TogglePanel
     | RefreshBoardRect
     | GotBoardRect (Result Dom.Error Dom.Element)
     | WindowResized Int Int
@@ -102,7 +95,6 @@ init _ =
       , boardRect = Nothing
       , email = ""
       , viewport = { width = 1200, height = 800 }
-      , panelState = PanelExpanded
       }
     , Cmd.batch
         [ Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
@@ -180,18 +172,9 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         StartDrag propositionId ->
-            let
-                nextPanel =
-                    if isMobileViewport model.viewport then
-                        PanelCollapsed
-
-                    else
-                        model.panelState
-            in
             ( { model
                 | dragging = Just { propositionId = propositionId }
                 , activePropositionId = Just propositionId
-                , panelState = nextPanel
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
@@ -234,17 +217,7 @@ update msg model =
             ( { model | dragging = Nothing }, Cmd.none )
 
         SelectProposition propositionId ->
-            ( { model
-                | activePropositionId = Just propositionId
-                , panelState =
-                    if isMobileViewport model.viewport then
-                        PanelExpanded
-
-                    else
-                        model.panelState
-              }
-            , scheduleMathRender
-            )
+            ( { model | activePropositionId = Just propositionId }, scheduleMathRender )
 
         UpdateSelectedComment newComment ->
             case model.activePropositionId of
@@ -256,18 +229,6 @@ update msg model =
 
         UpdateEmail newEmail ->
             ( { model | email = newEmail }, Cmd.none )
-
-        TogglePanel ->
-            let
-                nextState =
-                    case model.panelState of
-                        PanelExpanded ->
-                            PanelCollapsed
-
-                        PanelCollapsed ->
-                            PanelExpanded
-            in
-            ( { model | panelState = nextState }, scheduleMathRender )
 
         RefreshBoardRect ->
             ( model, Task.attempt GotBoardRect (Dom.getElement "board") )
@@ -291,18 +252,7 @@ update msg model =
                     ( model, Cmd.none )
 
         WindowResized width height ->
-            let
-                updatedViewport =
-                    { width = width, height = height }
-
-                nextPanelState =
-                    if isMobileViewport updatedViewport then
-                        model.panelState
-
-                    else
-                        PanelExpanded
-            in
-            ( { model | viewport = updatedViewport, panelState = nextPanelState }
+            ( { model | viewport = { width = width, height = height } }
             , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 20)
             )
 
@@ -318,11 +268,6 @@ scheduleMathRender =
 isMobileViewport : Viewport -> Bool
 isMobileViewport viewport =
     viewport.width < 980
-
-
-isLandscapeViewport : Viewport -> Bool
-isLandscapeViewport viewport =
-    viewport.width > viewport.height
 
 
 isPlaced : Int -> List Proposition -> Bool
@@ -420,9 +365,6 @@ view model =
 
         mobile =
             isMobileViewport model.viewport
-
-        landscape =
-            isLandscapeViewport model.viewport
     in
     div
         [ style "font-family" "system-ui, sans-serif"
@@ -433,10 +375,10 @@ view model =
         ]
         [ topHeader placedCount totalCount remainingCount
         , if mobile then
-            mobileWorkspace model placed remainingCount totalCount landscape
+            mobileWorkspace model placed
 
           else
-            desktopWorkspace model placed remainingCount totalCount
+            desktopWorkspace model placed
         ]
 
 
@@ -470,159 +412,64 @@ topHeader placedCount totalCount remainingCount =
         ]
 
 
-desktopWorkspace : Model -> List Proposition -> Int -> Int -> Html Msg
-desktopWorkspace model placed remainingCount totalCount =
+desktopWorkspace : Model -> List Proposition -> Html Msg
+desktopWorkspace model placed =
     div
         [ style "display" "flex"
         , style "gap" "16px"
         , style "align-items" "flex-start"
         ]
-        [ desktopPanel model remainingCount totalCount
-        , boardPanel model placed False False
+        [ panelView model False
+        , boardPanel model placed False
         ]
 
 
-mobileWorkspace : Model -> List Proposition -> Int -> Int -> Bool -> Html Msg
-mobileWorkspace model placed remainingCount totalCount landscape =
+mobileWorkspace : Model -> List Proposition -> Html Msg
+mobileWorkspace model placed =
     div
-        [ style "position" "relative"
-        , style "width" "100%"
+        [ style "display" "flex"
+        , style "flex-direction" "column"
+        , style "gap" "10px"
         ]
-        [ boardPanel model placed True landscape
-        , mobileOverlay model remainingCount totalCount landscape
+        [ panelView model True
+        , boardPanel model placed True
         ]
 
 
-desktopPanel : Model -> Int -> Int -> Html Msg
-desktopPanel model remainingCount totalCount =
+panelView : Model -> Bool -> Html Msg
+panelView model compact =
+    let
+        active =
+            activeProposition model
+
+        cardHeight =
+            if compact then
+                "180px"
+
+            else
+                "260px"
+    in
     div
         [ style "background" "white"
         , style "border" "1px solid #d9e0ee"
         , style "border-radius" "12px"
-        , style "padding" "14px"
+        , style "padding" "12px"
         , style "flex" "1 1 420px"
-        , style "max-width" "520px"
         ]
-        [ panelHeader model remainingCount totalCount False
-        , panelBody model False
-        ]
-
-
-mobileOverlay : Model -> Int -> Int -> Bool -> Html Msg
-mobileOverlay model remainingCount totalCount landscape =
-    case model.panelState of
-        PanelCollapsed ->
-            button
-                [ onClick TogglePanel
-                , style "position" "absolute"
-                , style "top" "10px"
-                , style "left" "10px"
-                , style "z-index" "80"
-                , style "padding" "8px 12px"
-                , style "border" "1px solid #99add6"
-                , style "border-radius" "999px"
-                , style "background" "white"
-                , style "cursor" "pointer"
-                , style "box-shadow" "0 2px 8px rgba(0,0,0,0.12)"
-                ]
-                [ text
-                    ("Afficher les copies ("
-                        ++ String.fromInt (totalCount - remainingCount)
-                        ++ "/"
-                        ++ String.fromInt totalCount
-                        ++ ")"
-                    )
-                ]
-
-        PanelExpanded ->
-            let
-                common =
-                    [ style "position" "absolute"
-                    , style "z-index" "80"
-                    , style "background" "rgba(255,255,255,0.97)"
-                    , style "border" "1px solid #c4d2ee"
-                    , style "border-radius" "12px"
-                    , style "padding" "10px"
-                    , style "box-shadow" "0 10px 28px rgba(0,0,0,0.16)"
-                    , style "overflow" "auto"
-                    ]
-
-                placement =
-                    if landscape then
-                        [ style "left" "10px"
-                        , style "top" "10px"
-                        , style "bottom" "10px"
-                        , style "width" "44%"
-                        ]
-
-                    else
-                        [ style "left" "10px"
-                        , style "right" "10px"
-                        , style "bottom" "10px"
-                        , style "max-height" "50%"
-                        ]
-            in
-            div (common ++ placement)
-                [ panelHeader model remainingCount totalCount True
-                , panelBody model True
-                ]
-
-
-panelHeader : Model -> Int -> Int -> Bool -> Html Msg
-panelHeader model remainingCount totalCount isMobile =
-    div
-        [ style "display" "flex"
-        , style "align-items" "center"
-        , style "justify-content" "space-between"
-        , style "margin-bottom" "10px"
-        ]
-        [ div []
-            [ h2 [ style "margin" "0", style "font-size" "18px" ] [ text "Copies" ]
-            , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#566483" ]
-                [ text
-                    ("A placer : "
-                        ++ String.fromInt remainingCount
-                        ++ " / "
-                        ++ String.fromInt totalCount
-                    )
-                ]
-            ]
-        , if isMobile then
-            button
-                [ onClick TogglePanel
-                , style "padding" "6px 10px"
-                , style "border" "1px solid #9ab0da"
-                , style "border-radius" "8px"
-                , style "background" "white"
-                , style "cursor" "pointer"
-                ]
-                [ text "Masquer" ]
-
-          else
-            text ""
-        ]
-
-
-panelBody : Model -> Bool -> Html Msg
-panelBody model compact =
-    let
-        active =
-            activeProposition model
-    in
-    div []
-        [ propositionSelector model
+        [ h2 [ style "margin" "0 0 8px", style "font-size" "18px" ] [ text "Copies" ]
+        , tabsView model compact
         , case active of
             Nothing ->
                 p [ style "color" "#5a6986", style "font-size" "14px" ] [ text "Toutes les copies sont placees. Clique une miniature pour la rouvrir." ]
 
             Just item ->
                 div []
-                    [ viewLargePropositionCard model.dragging item compact
+                    [ viewDraggableSheet model.dragging item cardHeight
                     , h3 [ style "margin" "12px 0 8px" ] [ text "Commentaire" ]
                     , textarea
                         [ rows
                             (if compact then
-                                4
+                                2
 
                              else
                                 5
@@ -638,7 +485,7 @@ panelBody model compact =
                         ]
                         []
                     ]
-        , h3 [ style "margin" "14px 0 8px" ] [ text "Email (optionnel)" ]
+        , h3 [ style "margin" "12px 0 8px" ] [ text "Email (optionnel)" ]
         , input
             [ type_ "email"
             , placeholder "nom@exemple.fr"
@@ -655,14 +502,19 @@ panelBody model compact =
         ]
 
 
-propositionSelector : Model -> Html Msg
-propositionSelector model =
-    div [ style "display" "flex", style "flex-wrap" "wrap", style "gap" "8px", style "margin-bottom" "12px" ]
-        (List.map (selectorItem model.activePropositionId model.propositions) model.propositions)
+tabsView : Model -> Bool -> Html Msg
+tabsView model compact =
+    div
+        [ style "display" "flex"
+        , style "flex-wrap" "wrap"
+        , style "gap" "8px"
+        , style "margin-bottom" "10px"
+        ]
+        (List.map (tabItem model.activePropositionId model.propositions compact) model.propositions)
 
 
-selectorItem : Maybe Int -> List Proposition -> Proposition -> Html Msg
-selectorItem activeId allPropositions item =
+tabItem : Maybe Int -> List Proposition -> Bool -> Proposition -> Html Msg
+tabItem activeId allPropositions compact item =
     let
         isActive =
             activeId == Just item.id
@@ -672,7 +524,7 @@ selectorItem activeId allPropositions item =
     in
     button
         [ onClick (SelectProposition item.id)
-        , style "display" "flex"
+        , style "display" "inline-flex"
         , style "align-items" "center"
         , style "gap" "6px"
         , style "padding" "6px 10px"
@@ -688,7 +540,11 @@ selectorItem activeId allPropositions item =
         , style "cursor" "pointer"
         ]
         [ miniBadge item.badge
-        , span [ style "font-size" "13px", style "font-weight" "600", style "color" "#2d3f63" ] [ text item.title ]
+        , if compact then
+            text ""
+
+          else
+            span [ style "font-size" "13px", style "font-weight" "600", style "color" "#2d3f63" ] [ text item.title ]
         , span
             [ style "display" "inline-block"
             , style "width" "8px"
@@ -706,35 +562,8 @@ selectorItem activeId allPropositions item =
         ]
 
 
-viewLargePropositionCard : Maybe DragState -> Proposition -> Bool -> Html Msg
-viewLargePropositionCard dragging item compact =
-    div
-        [ style "position" "relative"
-        , style "border" "1px solid #c8d6ef"
-        , style "border-radius" "12px"
-        , style "background" "#fbfdff"
-        , style "padding" "12px"
-        ]
-        [ badgeView item.badge "18px"
-        , div [ style "margin-left" "58px" ]
-            [ h3 [ style "margin" "0 0 4px" ] [ text item.title ]
-            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
-            ]
-        , p [ style "margin" "10px 0 8px", style "color" "#22314f", style "font-weight" "600" ] [ text "Texte de la copie" ]
-        , div [] (List.map viewStep item.steps)
-        , p [ style "margin" "12px 0 6px", style "color" "#5a6986", style "font-size" "13px" ]
-            [ text "Miniature a glisser vers le plan :" ]
-        , viewDragMiniature dragging item compact
-        ]
-
-
-viewStep : String -> Html msg
-viewStep stepText =
-    p [ style "margin" "6px 0", style "line-height" "1.4", style "color" "#1f2a44" ] [ text stepText ]
-
-
-viewDragMiniature : Maybe DragState -> Proposition -> Bool -> Html Msg
-viewDragMiniature dragging item compact =
+viewDraggableSheet : Maybe DragState -> Proposition -> String -> Html Msg
+viewDraggableSheet dragging item heightText =
     let
         isDragging =
             case dragging of
@@ -749,20 +578,14 @@ viewDragMiniature dragging item compact =
         , onDragStartCard item.id
         , onDragEndCard
         , onClick (SelectProposition item.id)
+        , attribute "data-drag-source" "proposition"
+        , attribute "data-badge" item.badge
+        , attribute "data-title" item.title
         , style "position" "relative"
-        , style "width"
-            (if compact then
-                "150px"
-
-             else
-                "170px"
-            )
-        , style "min-height" "64px"
+        , style "border" "1px solid #c8d6ef"
         , style "border-radius" "12px"
-        , style "border" "1px solid #9cb4e6"
-        , style "background" "white"
-        , style "padding" "10px 10px 10px 12px"
-        , style "box-shadow" "0 4px 12px rgba(20,55,120,0.10)"
+        , style "background" "#fbfdff"
+        , style "padding" "12px"
         , style "cursor" "grab"
         , style "user-select" "none"
         , style "opacity"
@@ -773,12 +596,24 @@ viewDragMiniature dragging item compact =
                 "1"
             )
         ]
-        [ badgeView item.badge "14px"
-        , div [ style "padding-left" "52px", style "font-size" "12px", style "color" "#253556" ]
-            [ div [ style "font-weight" "700", style "margin-bottom" "2px" ] [ text item.title ]
-            , div [ style "font-size" "11px", style "color" "#5f6f8e" ] [ text item.preview ]
+        [ badgeView item.badge "18px"
+        , div [ style "margin-left" "58px" ]
+            [ h3 [ style "margin" "0 0 4px" ] [ text item.title ]
+            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
             ]
+        , div
+            [ style "margin-top" "10px"
+            , style "max-height" heightText
+            , style "overflow" "auto"
+            , style "padding-right" "4px"
+            ]
+            (List.map viewStep item.steps)
         ]
+
+
+viewStep : String -> Html msg
+viewStep stepText =
+    p [ style "margin" "6px 0", style "line-height" "1.35", style "color" "#1f2a44" ] [ text stepText ]
 
 
 miniBadge : String -> Html msg
@@ -819,16 +654,12 @@ badgeView label sizeText =
         [ text label ]
 
 
-boardPanel : Model -> List Proposition -> Bool -> Bool -> Html Msg
-boardPanel model placedPropositions isMobile isLandscape =
+boardPanel : Model -> List Proposition -> Bool -> Html Msg
+boardPanel model placedPropositions compact =
     let
         boardHeight =
-            if isMobile then
-                if isLandscape then
-                    "78vh"
-
-                else
-                    "64vh"
+            if compact then
+                "56vh"
 
             else
                 "560px"
@@ -839,7 +670,6 @@ boardPanel model placedPropositions isMobile isLandscape =
         , style "border-radius" "12px"
         , style "padding" "14px"
         , style "flex" "2 1 520px"
-        , style "min-width" "280px"
         ]
         [ h2 [ style "margin" "4px 0 10px" ] [ text "Plan Precision / Rigueur" ]
         , div [ style "position" "relative" ]
@@ -854,7 +684,7 @@ boardPanel model placedPropositions isMobile isLandscape =
                 , style "border-radius" "8px"
                 , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
                 ]
-                ([ axisLines ] ++ List.map (viewPlacedMiniature model.activePropositionId model.dragging isMobile) placedPropositions ++ [ dragOverlay model.dragging ])
+                ([ axisLines ] ++ List.map (viewPlacedMiniature model.activePropositionId model.dragging compact) placedPropositions ++ [ dragOverlay model.dragging ])
             , div [ style "display" "flex", style "justify-content" "space-between", style "font-size" "13px", style "margin-top" "6px", style "color" "#40506a" ]
                 [ span [] [ text "Precision faible" ], span [] [ text "Precision elevee" ] ]
             ]
@@ -925,22 +755,25 @@ viewPlacedMiniature activeId dragging compact item =
 
                 widthText =
                     if compact then
-                        "138px"
+                        "128px"
 
                     else
-                        "170px"
+                        "168px"
             in
             div
                 [ draggable "true"
                 , onDragStartCard item.id
                 , onDragEndCard
                 , onClick (SelectProposition item.id)
+                , attribute "data-drag-source" "miniature"
+                , attribute "data-badge" item.badge
+                , attribute "data-title" item.title
                 , style "position" "absolute"
                 , style "left" (String.fromFloat (pos.x * 100) ++ "%")
                 , style "top" (String.fromFloat (pos.y * 100) ++ "%")
                 , style "transform" "translate(-50%, -50%)"
                 , style "width" widthText
-                , style "min-height" "62px"
+                , style "min-height" "58px"
                 , style "border"
                     (if isActive then
                         "2px solid #0f62fe"
@@ -951,7 +784,7 @@ viewPlacedMiniature activeId dragging compact item =
                 , style "background" "white"
                 , style "border-radius" "12px"
                 , style "box-shadow" "0 2px 8px rgba(0,0,0,0.10)"
-                , style "padding" "10px 10px 10px 12px"
+                , style "padding" "8px 8px 8px 10px"
                 , style "cursor" "grab"
                 , style "user-select" "none"
                 , style "opacity"
@@ -962,10 +795,10 @@ viewPlacedMiniature activeId dragging compact item =
                         "1"
                     )
                 ]
-                [ badgeView item.badge "14px"
-                , div [ style "padding-left" "52px", style "font-size" "12px", style "color" "#253556" ]
+                [ badgeView item.badge "13px"
+                , div [ style "padding-left" "48px", style "font-size" "11px", style "color" "#253556" ]
                     [ div [ style "font-weight" "700", style "margin-bottom" "2px" ] [ text item.title ]
-                    , div [ style "font-size" "11px", style "color" "#5f6f8e" ] [ text item.preview ]
+                    , div [ style "font-size" "10px", style "color" "#5f6f8e" ] [ text item.preview ]
                     ]
                 ]
 
