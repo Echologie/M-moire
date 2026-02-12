@@ -240,6 +240,7 @@ view model =
         , style "padding" "20px"
         , style "background" "#f5f7fb"
         , style "min-height" "100vh"
+        , style "touch-action" "none"
         , onTouchMovePointer
         , onTouchEndDrag
         , onTouchCancelDrag
@@ -469,9 +470,9 @@ onTouchStartDrag cardId =
 
 onTouchMovePointer : Html.Attribute Msg
 onTouchMovePointer =
-    on "touchmove"
+    preventDefaultOn "touchmove"
         (Decode.map
-            (\( x, y ) -> PointerMoved x y)
+            (\( x, y ) -> ( PointerMoved x y, True ))
             touchPointDecoder
         )
 
@@ -490,9 +491,9 @@ touchPointDecoder : Decode.Decoder ( Float, Float )
 touchPointDecoder =
     Decode.oneOf
         [ Decode.map2 Tuple.pair
-            (Decode.at [ "touches" ] (Decode.index 0 (Decode.field "clientX" Decode.float)))
-            (Decode.at [ "touches" ] (Decode.index 0 (Decode.field "clientY" Decode.float)))
+            (Decode.at [ "touches", "0", "clientX" ] Decode.float)
+            (Decode.at [ "touches", "0", "clientY" ] Decode.float)
         , Decode.map2 Tuple.pair
-            (Decode.at [ "changedTouches" ] (Decode.index 0 (Decode.field "clientX" Decode.float)))
-            (Decode.at [ "changedTouches" ] (Decode.index 0 (Decode.field "clientY" Decode.float)))
+            (Decode.at [ "changedTouches", "0", "clientX" ] Decode.float)
+            (Decode.at [ "changedTouches", "0", "clientY" ] Decode.float)
         ]

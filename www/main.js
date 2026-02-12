@@ -6367,7 +6367,6 @@ var $author$project$Main$onTouchEndDrag = A2(
 	$elm$html$Html$Events$on,
 	'touchend',
 	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
-var $elm$json$Json$Decode$index = _Json_decodeIndex;
 var $elm$json$Json$Decode$oneOf = _Json_oneOf;
 var $elm$core$Tuple$pair = F2(
 	function (a, b) {
@@ -6382,48 +6381,38 @@ var $author$project$Main$touchPointDecoder = $elm$json$Json$Decode$oneOf(
 			A2(
 				$elm$json$Json$Decode$at,
 				_List_fromArray(
-					['touches']),
-				A2(
-					$elm$json$Json$Decode$index,
-					0,
-					A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float))),
+					['touches', '0', 'clientX']),
+				$elm$json$Json$Decode$float),
 			A2(
 				$elm$json$Json$Decode$at,
 				_List_fromArray(
-					['touches']),
-				A2(
-					$elm$json$Json$Decode$index,
-					0,
-					A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)))),
+					['touches', '0', 'clientY']),
+				$elm$json$Json$Decode$float)),
 			A3(
 			$elm$json$Json$Decode$map2,
 			$elm$core$Tuple$pair,
 			A2(
 				$elm$json$Json$Decode$at,
 				_List_fromArray(
-					['changedTouches']),
-				A2(
-					$elm$json$Json$Decode$index,
-					0,
-					A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float))),
+					['changedTouches', '0', 'clientX']),
+				$elm$json$Json$Decode$float),
 			A2(
 				$elm$json$Json$Decode$at,
 				_List_fromArray(
-					['changedTouches']),
-				A2(
-					$elm$json$Json$Decode$index,
-					0,
-					A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float))))
+					['changedTouches', '0', 'clientY']),
+				$elm$json$Json$Decode$float))
 		]));
 var $author$project$Main$onTouchMovePointer = A2(
-	$elm$html$Html$Events$on,
+	$elm$html$Html$Events$preventDefaultOn,
 	'touchmove',
 	A2(
 		$elm$json$Json$Decode$map,
 		function (_v0) {
 			var x = _v0.a;
 			var y = _v0.b;
-			return A2($author$project$Main$PointerMoved, x, y);
+			return _Utils_Tuple2(
+				A2($author$project$Main$PointerMoved, x, y),
+				true);
 		},
 		$author$project$Main$touchPointDecoder));
 var $author$project$Main$strongText = function (txt) {
@@ -6460,6 +6449,7 @@ var $author$project$Main$view = function (model) {
 				A2($elm$html$Html$Attributes$style, 'padding', '20px'),
 				A2($elm$html$Html$Attributes$style, 'background', '#f5f7fb'),
 				A2($elm$html$Html$Attributes$style, 'min-height', '100vh'),
+				A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
 				$author$project$Main$onTouchMovePointer,
 				$author$project$Main$onTouchEndDrag,
 				$author$project$Main$onTouchCancelDrag
