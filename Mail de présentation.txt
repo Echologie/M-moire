@@ -1,6 +1,7 @@
-Objet : Proposition de direction de mémoire – didactique des mathématiques
+Objet : Présentation de mon projet de mémoire
 
-Bonjour Madame / Monsieur [Nom],
+Bonjour Monsieur Hache,
+
 
 Je me permets de vous écrire car je souhaiterais vous proposer la direction de mon mémoire de [Master / formation], en didactique des mathématiques.
 
@@ -23,8 +24,8 @@ Si vous êtes disponible, je serais très heureux(se) d’échanger avec vous po
 
 Je vous remercie par avance pour votre attention.
 
+
+
 Bien cordialement,
 
-[Prénom NOM]
-[Formation / Université]
-[Coordonnées]
+Jean-Christophe Jameux
