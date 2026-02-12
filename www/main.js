@@ -5183,7 +5183,7 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		'Copie A',
 		'$\\cos(2x)=1-2\\sin(x)$',
 		_List_fromArray(
-			['On cherche les solutions de $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$.', 'Je remplace par $\\cos(2x)=1-2\\sin(x)$.', 'Donc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$.', 'Alors $\\sin(x)=\\dfrac{1}{3}$, donc $x\\approx0{,}34$ ou $x\\approx2{,}80$.'])),
+			['Je remplace par $\\cos(2x)=1-2\\sin(x)$.', 'Donc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$.', 'Alors $\\sin(x)=\\dfrac{1}{3}$, donc $x\\approx0{,}34$ ou $x\\approx2{,}80$.'])),
 		A5(
 		$author$project$Main$proposition,
 		2,
@@ -5191,7 +5191,7 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		'Copie B',
 		'$2\\sin^2(x)+\\sin(x)-1=0$',
 		_List_fromArray(
-			['On part de $\\cos(2x)=\\sin(x)$ et de $\\cos(2x)=1-2\\sin^2(x)$.', 'On obtient $1-2\\sin^2(x)=\\sin(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'En posant $y=\\sin(x)$ : $2y^2+y-1=0$, d\'ou $y=\\dfrac{1}{2}$ ou $y=-1$.', 'Donc $x=\\dfrac{\\pi}{6}$, $\\dfrac{5\\pi}{6}$ ou $\\dfrac{3\\pi}{2}$ sur l\'intervalle.'])),
+			['On part de $\\cos(2x)=1-2\\sin^2(x)$.', 'On obtient $1-2\\sin^2(x)=\\sin(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'En posant $y=\\sin(x)$ : $2y^2+y-1=0$, d\'ou $y=\\dfrac{1}{2}$ ou $y=-1$.', 'Donc $x=\\dfrac{\\pi}{6}$, $\\dfrac{5\\pi}{6}$ ou $\\dfrac{3\\pi}{2}$ sur l\'intervalle.'])),
 		A5(
 		$author$project$Main$proposition,
 		3,
@@ -5199,7 +5199,7 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		'Copie C',
 		'$(2\\sin(x)-1)(\\sin(x)+1)=0$',
 		_List_fromArray(
-			['On resout $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$.', 'Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$.', 'Factorisation : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Alors $\\sin(x)=\\dfrac{1}{2}$ ou $\\sin(x)=-1$.', 'Dans $[0;2\\pi[$ : $x\\in\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.'])),
+			['Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$.', 'Factorisation : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Alors $\\sin(x)=\\dfrac{1}{2}$ ou $\\sin(x)=-1$.', 'Dans $[0;2\\pi[$ : $x\\in\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.'])),
 		A5(
 		$author$project$Main$proposition,
 		4,
@@ -5207,7 +5207,7 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		'Copie D',
 		'$x=\\dfrac{\\pi}{6}+2k\\pi$',
 		_List_fromArray(
-			['Equation : $\\cos(2x)=\\sin(x)$.', 'Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'Produit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Cas 1 : $\\sin(x)=\\dfrac{1}{2}\\iff x=\\dfrac{\\pi}{6}+2k\\pi$ ou $x=\\dfrac{5\\pi}{6}+2k\\pi$.', 'Cas 2 : $\\sin(x)=-1\\iff x=\\dfrac{3\\pi}{2}+2k\\pi$.', 'Intersection avec $[0;2\\pi[$ : $S=\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.']))
+			['Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'Produit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Cas 1 : $\\sin(x)=\\dfrac{1}{2}\\iff x=\\dfrac{\\pi}{6}+2k\\pi$ ou $x=\\dfrac{5\\pi}{6}+2k\\pi$.', 'Cas 2 : $\\sin(x)=-1\\iff x=\\dfrac{3\\pi}{2}+2k\\pi$.', 'Intersection avec $[0;2\\pi[$ : $S=\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.']))
 	]);
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
@@ -5240,6 +5240,7 @@ var $author$project$Main$init = function (_v0) {
 			boardRect: $elm$core$Maybe$Nothing,
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
+			lastDraggedPropositionId: $elm$core$Maybe$Nothing,
 			propositions: initial,
 			viewport: {height: 800, width: 1200}
 		},
@@ -5705,6 +5706,15 @@ var $elm$core$Task$attempt = F2(
 							$elm$core$Result$Ok),
 						task))));
 	});
+var $author$project$Main$currentDraggedId = function (model) {
+	var _v0 = model.dragging;
+	if (_v0.$ === 'Just') {
+		var dragState = _v0.a;
+		return $elm$core$Maybe$Just(dragState.propositionId);
+	} else {
+		return model.lastDraggedPropositionId;
+	}
+};
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -5823,7 +5833,8 @@ var $author$project$Main$update = F2(
 						{
 							activePropositionId: $elm$core$Maybe$Just(propositionId),
 							dragging: $elm$core$Maybe$Just(
-								{propositionId: propositionId})
+								{propositionId: propositionId}),
+							lastDraggedPropositionId: $elm$core$Maybe$Just(propositionId)
 						}),
 					A2(
 						$elm$core$Task$attempt,
@@ -5834,22 +5845,29 @@ var $author$project$Main$update = F2(
 			case 'DropOnBoard':
 				var clientX = msg.a;
 				var clientY = msg.b;
-				var _v1 = _Utils_Tuple2(model.dragging, model.boardRect);
+				var _v1 = _Utils_Tuple2(
+					$author$project$Main$currentDraggedId(model),
+					model.boardRect);
 				if ((_v1.a.$ === 'Just') && (_v1.b.$ === 'Just')) {
-					var dragState = _v1.a.a;
+					var propositionId = _v1.a.a;
 					var rect = _v1.b.a;
 					var pos = A3($author$project$Main$positionFromClient, rect, clientX, clientY);
-					var updated = A3($author$project$Main$updatePropositionPosition, dragState.propositionId, pos, model.propositions);
-					var alreadyPlaced = A2($author$project$Main$isPlaced, dragState.propositionId, model.propositions);
-					var nextActive = alreadyPlaced ? $elm$core$Maybe$Just(dragState.propositionId) : $elm$core$Maybe$Just(
+					var updated = A3($author$project$Main$updatePropositionPosition, propositionId, pos, model.propositions);
+					var alreadyPlaced = A2($author$project$Main$isPlaced, propositionId, model.propositions);
+					var nextActive = alreadyPlaced ? $elm$core$Maybe$Just(propositionId) : $elm$core$Maybe$Just(
 						A2(
 							$elm$core$Maybe$withDefault,
-							dragState.propositionId,
+							propositionId,
 							$author$project$Main$firstUnplacedId(updated)));
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{activePropositionId: nextActive, dragging: $elm$core$Maybe$Nothing, propositions: updated}),
+							{
+								activePropositionId: nextActive,
+								dragging: $elm$core$Maybe$Nothing,
+								lastDraggedPropositionId: $elm$core$Maybe$Just(propositionId),
+								propositions: updated
+							}),
 						$author$project$Main$scheduleMathRender);
 				} else {
 					return _Utils_Tuple2(
@@ -6427,6 +6445,11 @@ var $author$project$Main$activeProposition = function (model) {
 };
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
+	return _VirtualDom_keyedNode(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNode;
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -6463,7 +6486,6 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $author$project$Main$miniBadge = function (badge) {
 	return A2(
 		$elm$html$Html$span,
@@ -6491,53 +6513,49 @@ var $author$project$Main$tabItem = F4(
 		var isActive = _Utils_eq(
 			activeId,
 			$elm$core$Maybe$Just(item.id));
+		var borderStyle = isActive ? '2px solid #0f62fe' : (isAlreadyPlaced ? '1px solid #2f8f4e' : '1px solid #b7c7e6');
 		return A2(
-			$elm$html$Html$button,
+			$elm$html$Html$div,
 			_List_fromArray(
 				[
 					$elm$html$Html$Events$onClick(
 					$author$project$Main$SelectProposition(item.id)),
 					A2($elm$html$Html$Attributes$style, 'display', 'inline-flex'),
 					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-					A2($elm$html$Html$Attributes$style, 'gap', '6px'),
+					A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
 					A2($elm$html$Html$Attributes$style, 'padding', '6px 10px'),
+					A2($elm$html$Html$Attributes$style, 'min-width', '38px'),
 					A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
-					A2(
-					$elm$html$Html$Attributes$style,
-					'border',
-					isActive ? '2px solid #0f62fe' : '1px solid #b7c7e6'),
+					A2($elm$html$Html$Attributes$style, 'border', borderStyle),
 					A2($elm$html$Html$Attributes$style, 'background', 'white'),
 					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
 				]),
 			_List_fromArray(
 				[
-					$author$project$Main$miniBadge(item.badge),
-					compact ? $elm$html$Html$text('') : A2(
-					$elm$html$Html$span,
+					compact ? $author$project$Main$miniBadge(item.badge) : A2(
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
-							A2($elm$html$Html$Attributes$style, 'font-weight', '600'),
-							A2($elm$html$Html$Attributes$style, 'color', '#2d3f63')
+							A2($elm$html$Html$Attributes$style, 'display', 'inline-flex'),
+							A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+							A2($elm$html$Html$Attributes$style, 'gap', '8px')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(item.title)
-						])),
-					A2(
-					$elm$html$Html$span,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'display', 'inline-block'),
-							A2($elm$html$Html$Attributes$style, 'width', '8px'),
-							A2($elm$html$Html$Attributes$style, 'height', '8px'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '999px'),
+							$author$project$Main$miniBadge(item.badge),
 							A2(
-							$elm$html$Html$Attributes$style,
-							'background',
-							isAlreadyPlaced ? '#16a34a' : '#94a3b8')
-						]),
-					_List_Nil)
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+									A2($elm$html$Html$Attributes$style, 'font-weight', '700'),
+									A2($elm$html$Html$Attributes$style, 'color', '#304368')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(item.title)
+								]))
+						]))
 				]));
 	});
 var $author$project$Main$tabsView = F2(
@@ -6655,7 +6673,7 @@ var $author$project$Main$viewDraggableSheet = F3(
 	});
 var $author$project$Main$panelView = F2(
 	function (model, compact) {
-		var cardHeight = compact ? '180px' : '260px';
+		var cardHeight = compact ? '160px' : '260px';
 		var active = $author$project$Main$activeProposition(model);
 		return A2(
 			$elm$html$Html$div,
@@ -6701,7 +6719,16 @@ var $author$project$Main$panelView = F2(
 							_List_Nil,
 							_List_fromArray(
 								[
-									A3($author$project$Main$viewDraggableSheet, model.dragging, item, cardHeight),
+									A3(
+									$elm$html$Html$Keyed$node,
+									'div',
+									_List_Nil,
+									_List_fromArray(
+										[
+											_Utils_Tuple2(
+											$elm$core$String$fromInt(item.id),
+											A3($author$project$Main$viewDraggableSheet, model.dragging, item, cardHeight))
+										])),
 									A2(
 									$elm$html$Html$h3,
 									_List_fromArray(

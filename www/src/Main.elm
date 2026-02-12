@@ -3,9 +3,10 @@ port module Main exposing (main)
 import Browser
 import Browser.Dom as Dom
 import Browser.Events
-import Html exposing (Html, button, div, h1, h2, h3, input, p, small, span, text, textarea)
+import Html exposing (Html, div, h1, h2, h3, input, p, small, span, text, textarea)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, onInput, preventDefaultOn)
+import Html.Keyed as Keyed
 import Json.Decode as Decode
 import Process
 import Task
@@ -53,6 +54,7 @@ type alias Model =
     { propositions : List Proposition
     , activePropositionId : Maybe Int
     , dragging : Maybe DragState
+    , lastDraggedPropositionId : Maybe Int
     , boardRect : Maybe BoardRect
     , email : String
     , viewport : Viewport
@@ -92,6 +94,7 @@ init _ =
     ( { propositions = initial
       , activePropositionId = initial |> List.head |> Maybe.map .id
       , dragging = Nothing
+      , lastDraggedPropositionId = Nothing
       , boardRect = Nothing
       , email = ""
       , viewport = { width = 1200, height = 800 }
@@ -110,8 +113,7 @@ initialPropositions =
         "A"
         "Copie A"
         "$\\cos(2x)=1-2\\sin(x)$"
-        [ "On cherche les solutions de $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$."
-        , "Je remplace par $\\cos(2x)=1-2\\sin(x)$."
+        [ "Je remplace par $\\cos(2x)=1-2\\sin(x)$."
         , "Donc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$."
         , "Alors $\\sin(x)=\\dfrac{1}{3}$, donc $x\\approx0{,}34$ ou $x\\approx2{,}80$."
         ]
@@ -120,7 +122,7 @@ initialPropositions =
         "B"
         "Copie B"
         "$2\\sin^2(x)+\\sin(x)-1=0$"
-        [ "On part de $\\cos(2x)=\\sin(x)$ et de $\\cos(2x)=1-2\\sin^2(x)$."
+        [ "On part de $\\cos(2x)=1-2\\sin^2(x)$."
         , "On obtient $1-2\\sin^2(x)=\\sin(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$."
         , "En posant $y=\\sin(x)$ : $2y^2+y-1=0$, d'ou $y=\\dfrac{1}{2}$ ou $y=-1$."
         , "Donc $x=\\dfrac{\\pi}{6}$, $\\dfrac{5\\pi}{6}$ ou $\\dfrac{3\\pi}{2}$ sur l'intervalle."
@@ -130,8 +132,7 @@ initialPropositions =
         "C"
         "Copie C"
         "$(2\\sin(x)-1)(\\sin(x)+1)=0$"
-        [ "On resout $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$."
-        , "Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$."
+        [ "Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$."
         , "Factorisation : $(2\\sin(x)-1)(\\sin(x)+1)=0$."
         , "Alors $\\sin(x)=\\dfrac{1}{2}$ ou $\\sin(x)=-1$."
         , "Dans $[0;2\\pi[$ : $x\\in\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$."
@@ -141,8 +142,7 @@ initialPropositions =
         "D"
         "Copie D"
         "$x=\\dfrac{\\pi}{6}+2k\\pi$"
-        [ "Equation : $\\cos(2x)=\\sin(x)$."
-        , "Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$."
+        [ "Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$."
         , "Produit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$."
         , "Cas 1 : $\\sin(x)=\\dfrac{1}{2}\\iff x=\\dfrac{\\pi}{6}+2k\\pi$ ou $x=\\dfrac{5\\pi}{6}+2k\\pi$."
         , "Cas 2 : $\\sin(x)=-1\\iff x=\\dfrac{3\\pi}{2}+2k\\pi$."
@@ -174,6 +174,7 @@ update msg model =
         StartDrag propositionId ->
             ( { model
                 | dragging = Just { propositionId = propositionId }
+                , lastDraggedPropositionId = Just propositionId
                 , activePropositionId = Just propositionId
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
@@ -183,28 +184,29 @@ update msg model =
             ( model, Cmd.none )
 
         DropOnBoard clientX clientY ->
-            case ( model.dragging, model.boardRect ) of
-                ( Just dragState, Just rect ) ->
+            case ( currentDraggedId model, model.boardRect ) of
+                ( Just propositionId, Just rect ) ->
                     let
                         alreadyPlaced =
-                            isPlaced dragState.propositionId model.propositions
+                            isPlaced propositionId model.propositions
 
                         pos =
                             positionFromClient rect clientX clientY
 
                         updated =
-                            updatePropositionPosition dragState.propositionId pos model.propositions
+                            updatePropositionPosition propositionId pos model.propositions
 
                         nextActive =
                             if alreadyPlaced then
-                                Just dragState.propositionId
+                                Just propositionId
 
                             else
-                                firstUnplacedId updated |> Maybe.withDefault dragState.propositionId |> Just
+                                firstUnplacedId updated |> Maybe.withDefault propositionId |> Just
                     in
                     ( { model
                         | propositions = updated
                         , dragging = Nothing
+                        , lastDraggedPropositionId = Just propositionId
                         , activePropositionId = nextActive
                       }
                     , scheduleMathRender
@@ -258,6 +260,16 @@ update msg model =
 
         RenderMathNow ->
             ( model, renderMath "refresh" )
+
+
+currentDraggedId : Model -> Maybe Int
+currentDraggedId model =
+    case model.dragging of
+        Just dragState ->
+            Just dragState.propositionId
+
+        Nothing ->
+            model.lastDraggedPropositionId
 
 
 scheduleMathRender : Cmd Msg
@@ -444,7 +456,7 @@ panelView model compact =
 
         cardHeight =
             if compact then
-                "180px"
+                "160px"
 
             else
                 "260px"
@@ -464,7 +476,7 @@ panelView model compact =
 
             Just item ->
                 div []
-                    [ viewDraggableSheet model.dragging item cardHeight
+                    [ Keyed.node "div" [] [ ( String.fromInt item.id, viewDraggableSheet model.dragging item cardHeight ) ]
                     , h3 [ style "margin" "12px 0 8px" ] [ text "Commentaire" ]
                     , textarea
                         [ rows
@@ -521,44 +533,37 @@ tabItem activeId allPropositions compact item =
 
         isAlreadyPlaced =
             isPlaced item.id allPropositions
+
+        borderStyle =
+            if isActive then
+                "2px solid #0f62fe"
+
+            else if isAlreadyPlaced then
+                "1px solid #2f8f4e"
+
+            else
+                "1px solid #b7c7e6"
     in
-    button
+    div
         [ onClick (SelectProposition item.id)
         , style "display" "inline-flex"
         , style "align-items" "center"
-        , style "gap" "6px"
+        , style "justify-content" "center"
         , style "padding" "6px 10px"
+        , style "min-width" "38px"
         , style "border-radius" "999px"
-        , style "border"
-            (if isActive then
-                "2px solid #0f62fe"
-
-             else
-                "1px solid #b7c7e6"
-            )
+        , style "border" borderStyle
         , style "background" "white"
         , style "cursor" "pointer"
         ]
-        [ miniBadge item.badge
-        , if compact then
-            text ""
+        [ if compact then
+            miniBadge item.badge
 
           else
-            span [ style "font-size" "13px", style "font-weight" "600", style "color" "#2d3f63" ] [ text item.title ]
-        , span
-            [ style "display" "inline-block"
-            , style "width" "8px"
-            , style "height" "8px"
-            , style "border-radius" "999px"
-            , style "background"
-                (if isAlreadyPlaced then
-                    "#16a34a"
-
-                 else
-                    "#94a3b8"
-                )
-            ]
-            []
+            div [ style "display" "inline-flex", style "align-items" "center", style "gap" "8px" ]
+                [ miniBadge item.badge
+                , span [ style "font-size" "12px", style "font-weight" "700", style "color" "#304368" ] [ text item.title ]
+                ]
         ]
 
 
