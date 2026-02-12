@@ -244,6 +244,9 @@ view model =
         , onTouchMovePointer
         , onTouchEndDrag
         , onTouchCancelDrag
+        , onPointerMovePointer
+        , onPointerUpDrag
+        , onPointerCancelDrag
         ]
         [ h1 [ style "margin-top" "0" ] [ text "Prototype UX – Évaluation de productions" ]
         , p []
@@ -341,6 +344,7 @@ viewCardInList selectedId card =
     in
     div
         [ onMouseDown (StartDrag card.id)
+        , onPointerDownDrag card.id
         , onTouchStartDrag card.id
         , onClick (SelectCard card.id)
         , style "padding" "10px"
@@ -427,6 +431,7 @@ viewCardOnBoard selectedId card =
             in
             div
                 [ onMouseDown (StartDrag card.id)
+                , onPointerDownDrag card.id
                 , onTouchStartDrag card.id
                 , onClick (SelectCard card.id)
                 , style "position" "absolute"
@@ -485,6 +490,37 @@ onTouchEndDrag =
 onTouchCancelDrag : Html.Attribute Msg
 onTouchCancelDrag =
     on "touchcancel" (Decode.succeed EndDrag)
+
+
+onPointerDownDrag : Int -> Html.Attribute Msg
+onPointerDownDrag cardId =
+    preventDefaultOn "pointerdown" (Decode.succeed ( StartDrag cardId, True ))
+
+
+onPointerMovePointer : Html.Attribute Msg
+onPointerMovePointer =
+    preventDefaultOn "pointermove"
+        (Decode.map
+            (\( x, y ) -> ( PointerMoved x y, True ))
+            pointerPointDecoder
+        )
+
+
+onPointerUpDrag : Html.Attribute Msg
+onPointerUpDrag =
+    on "pointerup" (Decode.succeed EndDrag)
+
+
+onPointerCancelDrag : Html.Attribute Msg
+onPointerCancelDrag =
+    on "pointercancel" (Decode.succeed EndDrag)
+
+
+pointerPointDecoder : Decode.Decoder ( Float, Float )
+pointerPointDecoder =
+    Decode.map2 Tuple.pair
+        (Decode.field "clientX" Decode.float)
+        (Decode.field "clientY" Decode.float)
 
 
 touchPointDecoder : Decode.Decoder ( Float, Float )

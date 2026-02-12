@@ -5903,6 +5903,15 @@ var $elm$html$Html$Events$preventDefaultOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
 	});
+var $author$project$Main$onPointerDownDrag = function (cardId) {
+	return A2(
+		$elm$html$Html$Events$preventDefaultOn,
+		'pointerdown',
+		$elm$json$Json$Decode$succeed(
+			_Utils_Tuple2(
+				$author$project$Main$StartDrag(cardId),
+				true)));
+};
 var $author$project$Main$onTouchStartDrag = function (cardId) {
 	return A2(
 		$elm$html$Html$Events$preventDefaultOn,
@@ -5928,6 +5937,7 @@ var $author$project$Main$viewCardOnBoard = F2(
 					[
 						$elm$html$Html$Events$onMouseDown(
 						$author$project$Main$StartDrag(card.id)),
+						$author$project$Main$onPointerDownDrag(card.id),
 						$author$project$Main$onTouchStartDrag(card.id),
 						$elm$html$Html$Events$onClick(
 						$author$project$Main$SelectCard(card.id)),
@@ -6178,6 +6188,7 @@ var $author$project$Main$viewCardInList = F2(
 				[
 					$elm$html$Html$Events$onMouseDown(
 					$author$project$Main$StartDrag(card.id)),
+					$author$project$Main$onPointerDownDrag(card.id),
 					$author$project$Main$onTouchStartDrag(card.id),
 					$elm$html$Html$Events$onClick(
 					$author$project$Main$SelectCard(card.id)),
@@ -6359,6 +6370,36 @@ var $author$project$Main$leftPanel = F2(
 				]));
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$onPointerCancelDrag = A2(
+	$elm$html$Html$Events$on,
+	'pointercancel',
+	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$Main$pointerPointDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$elm$core$Tuple$pair,
+	A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float));
+var $author$project$Main$onPointerMovePointer = A2(
+	$elm$html$Html$Events$preventDefaultOn,
+	'pointermove',
+	A2(
+		$elm$json$Json$Decode$map,
+		function (_v0) {
+			var x = _v0.a;
+			var y = _v0.b;
+			return _Utils_Tuple2(
+				A2($author$project$Main$PointerMoved, x, y),
+				true);
+		},
+		$author$project$Main$pointerPointDecoder));
+var $author$project$Main$onPointerUpDrag = A2(
+	$elm$html$Html$Events$on,
+	'pointerup',
+	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
 var $author$project$Main$onTouchCancelDrag = A2(
 	$elm$html$Html$Events$on,
 	'touchcancel',
@@ -6368,10 +6409,6 @@ var $author$project$Main$onTouchEndDrag = A2(
 	'touchend',
 	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
 var $elm$json$Json$Decode$oneOf = _Json_oneOf;
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
 var $author$project$Main$touchPointDecoder = $elm$json$Json$Decode$oneOf(
 	_List_fromArray(
 		[
@@ -6452,7 +6489,10 @@ var $author$project$Main$view = function (model) {
 				A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
 				$author$project$Main$onTouchMovePointer,
 				$author$project$Main$onTouchEndDrag,
-				$author$project$Main$onTouchCancelDrag
+				$author$project$Main$onTouchCancelDrag,
+				$author$project$Main$onPointerMovePointer,
+				$author$project$Main$onPointerUpDrag,
+				$author$project$Main$onPointerCancelDrag
 			]),
 		_List_fromArray(
 			[
