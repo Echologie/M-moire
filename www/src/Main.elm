@@ -389,15 +389,13 @@ boardPanel model placedCards =
                 [ span [] [ text "Rigueur élevée" ], span [] [ text "" ] ]
             , div
                 [ id "board"
-                , onBoardDragOver
-                , onBoardDrop
                 , style "position" "relative"
                 , style "height" "560px"
                 , style "border" "1px solid #b9c9e6"
                 , style "border-radius" "8px"
                 , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
                 ]
-                ([ axisLines ] ++ List.map (viewCardOnBoard model.selectedCardId) placedCards)
+                ([ axisLines ] ++ List.map (viewCardOnBoard model.selectedCardId) placedCards ++ [ dragOverlay model.dragging ])
             , div [ style "display" "flex", style "justify-content" "space-between", style "font-size" "13px", style "margin-top" "6px", style "color" "#40506a" ]
                 [ span [] [ text "Précision faible" ], span [] [ text "Précision élevée" ] ]
             ]
@@ -428,6 +426,23 @@ axisLines =
             ]
             []
         ]
+
+
+dragOverlay : Maybe DragState -> Html Msg
+dragOverlay dragging =
+    case dragging of
+        Nothing ->
+            text ""
+
+        Just _ ->
+            div
+                [ onBoardDragOver
+                , onBoardDrop
+                , style "position" "absolute"
+                , style "inset" "0"
+                , style "z-index" "50"
+                ]
+                []
 
 
 viewCardOnBoard : Maybe Int -> Card -> Html Msg

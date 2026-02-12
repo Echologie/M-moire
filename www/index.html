@@ -8,10 +8,13 @@
   <body>
     <div id="elm-main"></div>
 
-    <script
-      type="module"
-      src="https://unpkg.com/@dragdroptouch/drag-drop-touch@2.0.3/dist/drag-drop-touch.esm.min.js?autoload"
-    ></script>
+    <script type="module">
+      import { enableDragDropTouch } from "https://unpkg.com/@dragdroptouch/drag-drop-touch@2.0.3/dist/drag-drop-touch.esm.min.js";
+      enableDragDropTouch(document, document, {
+        forceListen: true,
+        allowDragScroll: false,
+      });
+    </script>
     <script src="main.js"></script>
     <script>
       var app = Elm.Main.init({ node: document.getElementById("elm-main") });

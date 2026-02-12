@@ -5839,16 +5839,6 @@ var $author$project$Main$axisLines = A2(
 				]),
 			_List_Nil)
 		]));
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $author$project$Main$DragOver = F2(
 	function (a, b) {
 		return {$: 'DragOver', a: a, b: b};
@@ -5970,10 +5960,37 @@ var $author$project$Main$onBoardDrop = A2(
 				true);
 		},
 		$author$project$Main$dragPointDecoder));
-var $elm$html$Html$small = _VirtualDom_node('small');
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$dragOverlay = function (dragging) {
+	if (dragging.$ === 'Nothing') {
+		return $elm$html$Html$text('');
+	} else {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$author$project$Main$onBoardDragOver,
+					$author$project$Main$onBoardDrop,
+					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+					A2($elm$html$Html$Attributes$style, 'inset', '0'),
+					A2($elm$html$Html$Attributes$style, 'z-index', '50')
+				]),
+			_List_Nil);
+	}
+};
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$small = _VirtualDom_node('small');
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$SelectCard = function (a) {
 	return {$: 'SelectCard', a: a};
 };
@@ -6122,8 +6139,6 @@ var $author$project$Main$boardPanel = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$id('board'),
-									$author$project$Main$onBoardDragOver,
-									$author$project$Main$onBoardDrop,
 									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 									A2($elm$html$Html$Attributes$style, 'height', '560px'),
 									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b9c9e6'),
@@ -6133,10 +6148,15 @@ var $author$project$Main$boardPanel = F2(
 							_Utils_ap(
 								_List_fromArray(
 									[$author$project$Main$axisLines]),
-								A2(
-									$elm$core$List$map,
-									$author$project$Main$viewCardOnBoard(model.selectedCardId),
-									placedCards))),
+								_Utils_ap(
+									A2(
+										$elm$core$List$map,
+										$author$project$Main$viewCardOnBoard(model.selectedCardId),
+										placedCards),
+									_List_fromArray(
+										[
+											$author$project$Main$dragOverlay(model.dragging)
+										])))),
 							A2(
 							$elm$html$Html$div,
 							_List_fromArray(
