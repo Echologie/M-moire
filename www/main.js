@@ -5171,11 +5171,11 @@ var $author$project$Main$init = function (_v0) {
 			boardRect: $elm$core$Maybe$Nothing,
 			cards: _List_fromArray(
 				[
-					A2($author$project$Main$newCard, 1, 'Production A'),
-					A2($author$project$Main$newCard, 2, 'Production B'),
-					A2($author$project$Main$newCard, 3, 'Production C'),
-					A2($author$project$Main$newCard, 4, 'Production D'),
-					A2($author$project$Main$newCard, 5, 'Production E')
+					A2($author$project$Main$newCard, 1, 'Proposition A'),
+					A2($author$project$Main$newCard, 2, 'Proposition B'),
+					A2($author$project$Main$newCard, 3, 'Proposition C'),
+					A2($author$project$Main$newCard, 4, 'Proposition D'),
+					A2($author$project$Main$newCard, 5, 'Proposition E')
 				]),
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
@@ -5188,20 +5188,13 @@ var $author$project$Main$init = function (_v0) {
 			},
 			$elm$core$Process$sleep(60)));
 };
-var $author$project$Main$EndDrag = {$: 'EndDrag'};
-var $author$project$Main$PointerMoved = F2(
-	function (a, b) {
-		return {$: 'PointerMoved', a: a, b: b};
-	});
 var $author$project$Main$WindowResized = F2(
 	function (a, b) {
 		return {$: 'WindowResized', a: a, b: b};
 	});
-var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$browser$Browser$Events$Window = {$: 'Window'};
 var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$browser$Browser$Events$Document = {$: 'Document'};
+var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$browser$Browser$Events$MySub = F3(
 	function (a, b, c) {
 		return {$: 'MySub', a: a, b: b, c: c};
@@ -5601,10 +5594,6 @@ var $elm$browser$Browser$Events$on = F3(
 		return $elm$browser$Browser$Events$subscription(
 			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
 	});
-var $elm$browser$Browser$Events$onMouseMove = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'mousemove');
-var $elm$browser$Browser$Events$onMouseUp = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'mouseup');
-var $elm$browser$Browser$Events$Window = {$: 'Window'};
-var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$browser$Browser$Events$onResize = function (func) {
 	return A3(
 		$elm$browser$Browser$Events$on,
@@ -5619,32 +5608,8 @@ var $elm$browser$Browser$Events$onResize = function (func) {
 				A2($elm$json$Json$Decode$field, 'innerWidth', $elm$json$Json$Decode$int),
 				A2($elm$json$Json$Decode$field, 'innerHeight', $elm$json$Json$Decode$int))));
 };
-var $author$project$Main$subscriptions = function (model) {
-	var mouseSubs = function () {
-		var _v0 = model.dragging;
-		if (_v0.$ === 'Nothing') {
-			return $elm$core$Platform$Sub$none;
-		} else {
-			return $elm$core$Platform$Sub$batch(
-				_List_fromArray(
-					[
-						$elm$browser$Browser$Events$onMouseMove(
-						A3(
-							$elm$json$Json$Decode$map2,
-							$author$project$Main$PointerMoved,
-							A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
-							A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float))),
-						$elm$browser$Browser$Events$onMouseUp(
-						$elm$json$Json$Decode$succeed($author$project$Main$EndDrag))
-					]));
-		}
-	}();
-	return $elm$core$Platform$Sub$batch(
-		_List_fromArray(
-			[
-				$elm$browser$Browser$Events$onResize($author$project$Main$WindowResized),
-				mouseSubs
-			]));
+var $author$project$Main$subscriptions = function (_v0) {
+	return $elm$browser$Browser$Events$onResize($author$project$Main$WindowResized);
 };
 var $author$project$Main$GotBoardRect = function (a) {
 	return {$: 'GotBoardRect', a: a};
@@ -5682,9 +5647,11 @@ var $author$project$Main$clamp = F3(
 	});
 var $author$project$Main$positionFromClient = F3(
 	function (rect, clientX, clientY) {
+		var safeWidth = (rect.width <= 0) ? 1 : rect.width;
+		var safeHeight = (rect.height <= 0) ? 1 : rect.height;
 		return {
-			x: A3($author$project$Main$clamp, 0, 1, (clientX - rect.x) / rect.width),
-			y: A3($author$project$Main$clamp, 0, 1, (clientY - rect.y) / rect.height)
+			x: A3($author$project$Main$clamp, 0, 1, (clientX - rect.x) / safeWidth),
+			y: A3($author$project$Main$clamp, 0, 1, (clientY - rect.y) / safeHeight)
 		};
 	});
 var $author$project$Main$updateCardComment = F3(
@@ -5728,7 +5695,7 @@ var $author$project$Main$update = F2(
 						$elm$core$Task$attempt,
 						$author$project$Main$GotBoardRect,
 						$elm$browser$Browser$Dom$getElement('board')));
-			case 'PointerMoved':
+			case 'DragOver':
 				var clientX = msg.a;
 				var clientY = msg.b;
 				var _v1 = _Utils_Tuple2(model.dragging, model.boardRect);
@@ -5745,6 +5712,29 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 'DropOnBoard':
+				var clientX = msg.a;
+				var clientY = msg.b;
+				var _v2 = _Utils_Tuple2(model.dragging, model.boardRect);
+				if ((_v2.a.$ === 'Just') && (_v2.b.$ === 'Just')) {
+					var dragState = _v2.a.a;
+					var rect = _v2.b.a;
+					var pos = A3($author$project$Main$positionFromClient, rect, clientX, clientY);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								cards: A3($author$project$Main$updateCardPosition, dragState.cardId, pos, model.cards),
+								dragging: $elm$core$Maybe$Nothing
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{dragging: $elm$core$Maybe$Nothing}),
+						$elm$core$Platform$Cmd$none);
 				}
 			case 'EndDrag':
 				return _Utils_Tuple2(
@@ -5763,11 +5753,11 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'UpdateSelectedComment':
 				var newComment = msg.a;
-				var _v2 = model.selectedCardId;
-				if (_v2.$ === 'Nothing') {
+				var _v3 = model.selectedCardId;
+				if (_v3.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var cardId = _v2.a;
+					var cardId = _v3.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -5810,7 +5800,7 @@ var $author$project$Main$update = F2(
 					model,
 					A2(
 						$elm$core$Task$perform,
-						function (_v4) {
+						function (_v5) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(20)));
@@ -5859,6 +5849,96 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $author$project$Main$DragOver = F2(
+	function (a, b) {
+		return {$: 'DragOver', a: a, b: b};
+	});
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$Main$dragPointDecoder = $elm$json$Json$Decode$oneOf(
+	_List_fromArray(
+		[
+			A3(
+			$elm$json$Json$Decode$map2,
+			$elm$core$Tuple$pair,
+			A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
+			A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)),
+			A3(
+			$elm$json$Json$Decode$map2,
+			$elm$core$Tuple$pair,
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['touches', '0', 'clientX']),
+				$elm$json$Json$Decode$float),
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['touches', '0', 'clientY']),
+				$elm$json$Json$Decode$float)),
+			A3(
+			$elm$json$Json$Decode$map2,
+			$elm$core$Tuple$pair,
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['changedTouches', '0', 'clientX']),
+				$elm$json$Json$Decode$float),
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['changedTouches', '0', 'clientY']),
+				$elm$json$Json$Decode$float))
+		]));
+var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var $author$project$Main$onBoardDragOver = A2(
+	$elm$html$Html$Events$preventDefaultOn,
+	'dragover',
+	A2(
+		$elm$json$Json$Decode$map,
+		function (_v0) {
+			var x = _v0.a;
+			var y = _v0.b;
+			return _Utils_Tuple2(
+				A2($author$project$Main$DragOver, x, y),
+				true);
+		},
+		$author$project$Main$dragPointDecoder));
+var $author$project$Main$DropOnBoard = F2(
+	function (a, b) {
+		return {$: 'DropOnBoard', a: a, b: b};
+	});
+var $author$project$Main$onBoardDrop = A2(
+	$elm$html$Html$Events$preventDefaultOn,
+	'drop',
+	A2(
+		$elm$json$Json$Decode$map,
+		function (_v0) {
+			var x = _v0.a;
+			var y = _v0.b;
+			return _Utils_Tuple2(
+				A2($author$project$Main$DropOnBoard, x, y),
+				true);
+		},
+		$author$project$Main$dragPointDecoder));
 var $elm$html$Html$small = _VirtualDom_node('small');
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
@@ -5866,14 +5946,11 @@ var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$SelectCard = function (a) {
 	return {$: 'SelectCard', a: a};
 };
-var $author$project$Main$StartDrag = function (a) {
-	return {$: 'StartDrag', a: a};
-};
+var $elm$html$Html$Attributes$draggable = _VirtualDom_attribute('draggable');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$on = F2(
 	function (event, decoder) {
 		return A2(
@@ -5887,39 +5964,20 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$html$Html$Events$onMouseDown = function (msg) {
+var $author$project$Main$EndDrag = {$: 'EndDrag'};
+var $author$project$Main$onDragEndCard = A2(
+	$elm$html$Html$Events$on,
+	'dragend',
+	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
+var $author$project$Main$StartDrag = function (a) {
+	return {$: 'StartDrag', a: a};
+};
+var $author$project$Main$onDragStartCard = function (cardId) {
 	return A2(
 		$elm$html$Html$Events$on,
-		'mousedown',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
-	return {$: 'MayPreventDefault', a: a};
-};
-var $elm$html$Html$Events$preventDefaultOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
-	});
-var $author$project$Main$onPointerDownDrag = function (cardId) {
-	return A2(
-		$elm$html$Html$Events$preventDefaultOn,
-		'pointerdown',
+		'dragstart',
 		$elm$json$Json$Decode$succeed(
-			_Utils_Tuple2(
-				$author$project$Main$StartDrag(cardId),
-				true)));
-};
-var $author$project$Main$onTouchStartDrag = function (cardId) {
-	return A2(
-		$elm$html$Html$Events$preventDefaultOn,
-		'touchstart',
-		$elm$json$Json$Decode$succeed(
-			_Utils_Tuple2(
-				$author$project$Main$StartDrag(cardId),
-				true)));
+			$author$project$Main$StartDrag(cardId)));
 };
 var $author$project$Main$viewCardOnBoard = F2(
 	function (selectedId, card) {
@@ -5935,10 +5993,9 @@ var $author$project$Main$viewCardOnBoard = F2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Events$onMouseDown(
-						$author$project$Main$StartDrag(card.id)),
-						$author$project$Main$onPointerDownDrag(card.id),
-						$author$project$Main$onTouchStartDrag(card.id),
+						$elm$html$Html$Attributes$draggable('true'),
+						$author$project$Main$onDragStartCard(card.id),
+						$author$project$Main$onDragEndCard,
 						$elm$html$Html$Events$onClick(
 						$author$project$Main$SelectCard(card.id)),
 						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
@@ -5961,7 +6018,6 @@ var $author$project$Main$viewCardOnBoard = F2(
 						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 1px 5px rgba(0,0,0,0.08)'),
 						A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
 						A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
-						A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
 						A2($elm$html$Html$Attributes$style, 'font-size', '14px')
 					]),
 				_List_fromArray(
@@ -5979,7 +6035,9 @@ var $author$project$Main$boardPanel = F2(
 					A2($elm$html$Html$Attributes$style, 'background', 'white'),
 					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
 					A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '14px')
+					A2($elm$html$Html$Attributes$style, 'padding', '14px'),
+					A2($elm$html$Html$Attributes$style, 'flex', '2 1 520px'),
+					A2($elm$html$Html$Attributes$style, 'min-width', '280px')
 				]),
 			_List_fromArray(
 				[
@@ -6033,12 +6091,13 @@ var $author$project$Main$boardPanel = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$id('board'),
+									$author$project$Main$onBoardDragOver,
+									$author$project$Main$onBoardDrop,
 									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 									A2($elm$html$Html$Attributes$style, 'height', '560px'),
 									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b9c9e6'),
 									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-									A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)'),
-									A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
+									A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)')
 								]),
 							_Utils_ap(
 								_List_fromArray(
@@ -6085,7 +6144,7 @@ var $author$project$Main$boardPanel = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Astuce: clique une carte pour la commenter, puis glisse-la pour la repositionner.')
+							$elm$html$Html$text('Astuce : appuie longuement puis glisse pour déplacer une carte sur mobile.')
 						]))
 				]));
 	});
@@ -6122,10 +6181,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			$elm$virtual_dom$VirtualDom$on,
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
-	});
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
 	});
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $elm$html$Html$Events$targetValue = A2(
@@ -6186,10 +6241,9 @@ var $author$project$Main$viewCardInList = F2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Events$onMouseDown(
-					$author$project$Main$StartDrag(card.id)),
-					$author$project$Main$onPointerDownDrag(card.id),
-					$author$project$Main$onTouchStartDrag(card.id),
+					$elm$html$Html$Attributes$draggable('true'),
+					$author$project$Main$onDragStartCard(card.id),
+					$author$project$Main$onDragEndCard,
 					$elm$html$Html$Events$onClick(
 					$author$project$Main$SelectCard(card.id)),
 					A2($elm$html$Html$Attributes$style, 'padding', '10px'),
@@ -6200,8 +6254,7 @@ var $author$project$Main$viewCardInList = F2(
 					A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
 					A2($elm$html$Html$Attributes$style, 'background', '#fbfcff'),
 					A2($elm$html$Html$Attributes$style, 'cursor', 'grab'),
-					A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
-					A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
+					A2($elm$html$Html$Attributes$style, 'user-select', 'none')
 				]),
 			_List_fromArray(
 				[
@@ -6218,7 +6271,9 @@ var $author$project$Main$leftPanel = F2(
 					A2($elm$html$Html$Attributes$style, 'background', 'white'),
 					A2($elm$html$Html$Attributes$style, 'border', '1px solid #d9e0ee'),
 					A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '14px')
+					A2($elm$html$Html$Attributes$style, 'padding', '14px'),
+					A2($elm$html$Html$Attributes$style, 'flex', '1 1 300px'),
+					A2($elm$html$Html$Attributes$style, 'max-width', '360px')
 				]),
 			_List_fromArray(
 				[
@@ -6230,7 +6285,7 @@ var $author$project$Main$leftPanel = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Productions')
+							$elm$html$Html$text('Propositions')
 						])),
 					A2(
 					$elm$html$Html$p,
@@ -6242,7 +6297,7 @@ var $author$project$Main$leftPanel = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Carte non placée: glisser vers le plan.')
+							$elm$html$Html$text('Carte non placée : glisser vers le plan.')
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -6277,7 +6332,7 @@ var $author$project$Main$leftPanel = F2(
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Sélectionne une production pour commenter.')
+									$elm$html$Html$text('Sélectionne une proposition pour commenter.')
 								]));
 					} else {
 						var card = selectedCard.a;
@@ -6307,7 +6362,7 @@ var $author$project$Main$leftPanel = F2(
 											A2($elm$html$Html$Attributes$style, 'padding', '8px'),
 											A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
 											A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-											$elm$html$Html$Attributes$placeholder('Observations sur la production...'),
+											$elm$html$Html$Attributes$placeholder('Observations sur la proposition...'),
 											$elm$html$Html$Attributes$value(card.comment),
 											$elm$html$Html$Events$onInput($author$project$Main$UpdateSelectedComment)
 										]),
@@ -6370,88 +6425,6 @@ var $author$project$Main$leftPanel = F2(
 				]));
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Main$onPointerCancelDrag = A2(
-	$elm$html$Html$Events$on,
-	'pointercancel',
-	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
-var $author$project$Main$pointerPointDecoder = A3(
-	$elm$json$Json$Decode$map2,
-	$elm$core$Tuple$pair,
-	A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float));
-var $author$project$Main$onPointerMovePointer = A2(
-	$elm$html$Html$Events$preventDefaultOn,
-	'pointermove',
-	A2(
-		$elm$json$Json$Decode$map,
-		function (_v0) {
-			var x = _v0.a;
-			var y = _v0.b;
-			return _Utils_Tuple2(
-				A2($author$project$Main$PointerMoved, x, y),
-				true);
-		},
-		$author$project$Main$pointerPointDecoder));
-var $author$project$Main$onPointerUpDrag = A2(
-	$elm$html$Html$Events$on,
-	'pointerup',
-	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
-var $author$project$Main$onTouchCancelDrag = A2(
-	$elm$html$Html$Events$on,
-	'touchcancel',
-	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
-var $author$project$Main$onTouchEndDrag = A2(
-	$elm$html$Html$Events$on,
-	'touchend',
-	$elm$json$Json$Decode$succeed($author$project$Main$EndDrag));
-var $elm$json$Json$Decode$oneOf = _Json_oneOf;
-var $author$project$Main$touchPointDecoder = $elm$json$Json$Decode$oneOf(
-	_List_fromArray(
-		[
-			A3(
-			$elm$json$Json$Decode$map2,
-			$elm$core$Tuple$pair,
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['touches', '0', 'clientX']),
-				$elm$json$Json$Decode$float),
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['touches', '0', 'clientY']),
-				$elm$json$Json$Decode$float)),
-			A3(
-			$elm$json$Json$Decode$map2,
-			$elm$core$Tuple$pair,
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['changedTouches', '0', 'clientX']),
-				$elm$json$Json$Decode$float),
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['changedTouches', '0', 'clientY']),
-				$elm$json$Json$Decode$float))
-		]));
-var $author$project$Main$onTouchMovePointer = A2(
-	$elm$html$Html$Events$preventDefaultOn,
-	'touchmove',
-	A2(
-		$elm$json$Json$Decode$map,
-		function (_v0) {
-			var x = _v0.a;
-			var y = _v0.b;
-			return _Utils_Tuple2(
-				A2($author$project$Main$PointerMoved, x, y),
-				true);
-		},
-		$author$project$Main$touchPointDecoder));
 var $author$project$Main$strongText = function (txt) {
 	return A2(
 		$elm$html$Html$span,
@@ -6485,14 +6458,7 @@ var $author$project$Main$view = function (model) {
 				A2($elm$html$Html$Attributes$style, 'margin', '0'),
 				A2($elm$html$Html$Attributes$style, 'padding', '20px'),
 				A2($elm$html$Html$Attributes$style, 'background', '#f5f7fb'),
-				A2($elm$html$Html$Attributes$style, 'min-height', '100vh'),
-				A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
-				$author$project$Main$onTouchMovePointer,
-				$author$project$Main$onTouchEndDrag,
-				$author$project$Main$onTouchCancelDrag,
-				$author$project$Main$onPointerMovePointer,
-				$author$project$Main$onPointerUpDrag,
-				$author$project$Main$onPointerCancelDrag
+				A2($elm$html$Html$Attributes$style, 'min-height', '100vh')
 			]),
 		_List_fromArray(
 			[
@@ -6511,7 +6477,7 @@ var $author$project$Main$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Glisse chaque production sur le plan selon les axes : '),
+						$elm$html$Html$text('Glisse chaque proposition sur le plan selon les axes : '),
 						$author$project$Main$strongText('Précision'),
 						$elm$html$Html$text(' (horizontal) et '),
 						$author$project$Main$strongText('Rigueur'),
@@ -6521,9 +6487,10 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-						A2($elm$html$Html$Attributes$style, 'grid-template-columns', '320px 1fr'),
-						A2($elm$html$Html$Attributes$style, 'gap', '16px')
+						A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+						A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
+						A2($elm$html$Html$Attributes$style, 'gap', '16px'),
+						A2($elm$html$Html$Attributes$style, 'align-items', 'flex-start')
 					]),
 				_List_fromArray(
 					[

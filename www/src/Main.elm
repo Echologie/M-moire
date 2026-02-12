@@ -5,7 +5,7 @@ import Browser.Dom as Dom
 import Browser.Events
 import Html exposing (Html, button, div, h1, h2, h3, input, p, small, span, text, textarea)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, onClick, onInput, onMouseDown, preventDefaultOn)
+import Html.Events exposing (on, onClick, onInput, preventDefaultOn)
 import Json.Decode as Decode
 import Process
 import Task
@@ -48,7 +48,8 @@ type alias Model =
 
 type Msg
     = StartDrag Int
-    | PointerMoved Float Float
+    | DragOver Float Float
+    | DropOnBoard Float Float
     | EndDrag
     | SelectCard Int
     | UpdateSelectedComment String
@@ -71,11 +72,11 @@ main =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { cards =
-            [ newCard 1 "Production A"
-            , newCard 2 "Production B"
-            , newCard 3 "Production C"
-            , newCard 4 "Production D"
-            , newCard 5 "Production E"
+            [ newCard 1 "Proposition A"
+            , newCard 2 "Proposition B"
+            , newCard 3 "Proposition C"
+            , newCard 4 "Proposition D"
+            , newCard 5 "Proposition E"
             ]
       , selectedCardId = Nothing
       , dragging = Nothing
@@ -92,27 +93,8 @@ newCard id title =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    let
-        mouseSubs =
-            case model.dragging of
-                Nothing ->
-                    Sub.none
-
-                Just _ ->
-                    Sub.batch
-                        [ Browser.Events.onMouseMove
-                            (Decode.map2 PointerMoved
-                                (Decode.field "clientX" Decode.float)
-                                (Decode.field "clientY" Decode.float)
-                            )
-                        , Browser.Events.onMouseUp (Decode.succeed EndDrag)
-                        ]
-    in
-    Sub.batch
-        [ Browser.Events.onResize WindowResized
-        , mouseSubs
-        ]
+subscriptions _ =
+    Browser.Events.onResize WindowResized
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -126,7 +108,7 @@ update msg model =
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
 
-        PointerMoved clientX clientY ->
+        DragOver clientX clientY ->
             case ( model.dragging, model.boardRect ) of
                 ( Just dragState, Just rect ) ->
                     let
@@ -137,6 +119,23 @@ update msg model =
 
                 _ ->
                     ( model, Cmd.none )
+
+        DropOnBoard clientX clientY ->
+            case ( model.dragging, model.boardRect ) of
+                ( Just dragState, Just rect ) ->
+                    let
+                        pos =
+                            positionFromClient rect clientX clientY
+                    in
+                    ( { model
+                        | cards = updateCardPosition dragState.cardId pos model.cards
+                        , dragging = Nothing
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( { model | dragging = Nothing }, Cmd.none )
 
         EndDrag ->
             ( { model | dragging = Nothing }, Cmd.none )
@@ -208,8 +207,23 @@ updateCardComment cardId newComment cards =
 
 positionFromClient : BoardRect -> Float -> Float -> Position
 positionFromClient rect clientX clientY =
-    { x = clamp 0 1 ((clientX - rect.x) / rect.width)
-    , y = clamp 0 1 ((clientY - rect.y) / rect.height)
+    let
+        safeWidth =
+            if rect.width <= 0 then
+                1
+
+            else
+                rect.width
+
+        safeHeight =
+            if rect.height <= 0 then
+                1
+
+            else
+                rect.height
+    in
+    { x = clamp 0 1 ((clientX - rect.x) / safeWidth)
+    , y = clamp 0 1 ((clientY - rect.y) / safeHeight)
     }
 
 
@@ -240,26 +254,20 @@ view model =
         , style "padding" "20px"
         , style "background" "#f5f7fb"
         , style "min-height" "100vh"
-        , style "touch-action" "none"
-        , onTouchMovePointer
-        , onTouchEndDrag
-        , onTouchCancelDrag
-        , onPointerMovePointer
-        , onPointerUpDrag
-        , onPointerCancelDrag
         ]
         [ h1 [ style "margin-top" "0" ] [ text "Prototype UX – Évaluation de productions" ]
         , p []
-            [ text "Glisse chaque production sur le plan selon les axes : "
+            [ text "Glisse chaque proposition sur le plan selon les axes : "
             , strongText "Précision"
             , text " (horizontal) et "
             , strongText "Rigueur"
             , text " (vertical)."
             ]
         , div
-            [ style "display" "grid"
-            , style "grid-template-columns" "320px 1fr"
+            [ style "display" "flex"
+            , style "flex-wrap" "wrap"
             , style "gap" "16px"
+            , style "align-items" "flex-start"
             ]
             [ leftPanel model unplacedCards
             , boardPanel model placedCards
@@ -283,15 +291,17 @@ leftPanel model unplacedCards =
         , style "border" "1px solid #d9e0ee"
         , style "border-radius" "10px"
         , style "padding" "14px"
+        , style "flex" "1 1 300px"
+        , style "max-width" "360px"
         ]
-        [ h2 [ style "margin" "4px 0 10px" ] [ text "Productions" ]
-        , p [ style "margin" "0 0 10px", style "font-size" "14px", style "color" "#4b5a75" ] [ text "Carte non placée: glisser vers le plan." ]
+        [ h2 [ style "margin" "4px 0 10px" ] [ text "Propositions" ]
+        , p [ style "margin" "0 0 10px", style "font-size" "14px", style "color" "#4b5a75" ] [ text "Carte non placée : glisser vers le plan." ]
         , div [ style "display" "flex", style "flex-direction" "column", style "gap" "8px" ]
             (List.map (viewCardInList model.selectedCardId) unplacedCards)
         , h3 [ style "margin" "18px 0 8px" ] [ text "Commentaire" ]
         , case selectedCard of
             Nothing ->
-                p [ style "font-size" "14px", style "color" "#6b7892" ] [ text "Sélectionne une production pour commenter." ]
+                p [ style "font-size" "14px", style "color" "#6b7892" ] [ text "Sélectionne une proposition pour commenter." ]
 
             Just card ->
                 div []
@@ -303,7 +313,7 @@ leftPanel model unplacedCards =
                         , style "padding" "8px"
                         , style "border" "1px solid #c7d3ea"
                         , style "border-radius" "8px"
-                        , placeholder "Observations sur la production..."
+                        , placeholder "Observations sur la proposition..."
                         , value card.comment
                         , onInput UpdateSelectedComment
                         ]
@@ -343,9 +353,9 @@ viewCardInList selectedId card =
             selectedId == Just card.id
     in
     div
-        [ onMouseDown (StartDrag card.id)
-        , onPointerDownDrag card.id
-        , onTouchStartDrag card.id
+        [ draggable "true"
+        , onDragStartCard card.id
+        , onDragEndCard
         , onClick (SelectCard card.id)
         , style "padding" "10px"
         , style "border"
@@ -359,7 +369,6 @@ viewCardInList selectedId card =
         , style "background" "#fbfcff"
         , style "cursor" "grab"
         , style "user-select" "none"
-        , style "touch-action" "none"
         ]
         [ text card.title ]
 
@@ -371,6 +380,8 @@ boardPanel model placedCards =
         , style "border" "1px solid #d9e0ee"
         , style "border-radius" "10px"
         , style "padding" "14px"
+        , style "flex" "2 1 520px"
+        , style "min-width" "280px"
         ]
         [ h2 [ style "margin" "4px 0 10px" ] [ text "Plan de positionnement" ]
         , div [ style "position" "relative" ]
@@ -378,19 +389,20 @@ boardPanel model placedCards =
                 [ span [] [ text "Rigueur élevée" ], span [] [ text "" ] ]
             , div
                 [ id "board"
+                , onBoardDragOver
+                , onBoardDrop
                 , style "position" "relative"
                 , style "height" "560px"
                 , style "border" "1px solid #b9c9e6"
                 , style "border-radius" "8px"
                 , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
-                , style "touch-action" "none"
                 ]
                 ([ axisLines ] ++ List.map (viewCardOnBoard model.selectedCardId) placedCards)
             , div [ style "display" "flex", style "justify-content" "space-between", style "font-size" "13px", style "margin-top" "6px", style "color" "#40506a" ]
                 [ span [] [ text "Précision faible" ], span [] [ text "Précision élevée" ] ]
             ]
         , small [ style "display" "block", style "margin-top" "10px", style "color" "#6b7892" ]
-            [ text "Astuce: clique une carte pour la commenter, puis glisse-la pour la repositionner." ]
+            [ text "Astuce : appuie longuement puis glisse pour déplacer une carte sur mobile." ]
         ]
 
 
@@ -430,9 +442,9 @@ viewCardOnBoard selectedId card =
                     selectedId == Just card.id
             in
             div
-                [ onMouseDown (StartDrag card.id)
-                , onPointerDownDrag card.id
-                , onTouchStartDrag card.id
+                [ draggable "true"
+                , onDragStartCard card.id
+                , onDragEndCard
                 , onClick (SelectCard card.id)
                 , style "position" "absolute"
                 , style "left" (String.fromFloat (pos.x * 100) ++ "%")
@@ -451,7 +463,6 @@ viewCardOnBoard selectedId card =
                 , style "box-shadow" "0 1px 5px rgba(0,0,0,0.08)"
                 , style "cursor" "grab"
                 , style "user-select" "none"
-                , style "touch-action" "none"
                 , style "font-size" "14px"
                 ]
                 [ text card.title ]
@@ -468,65 +479,41 @@ selectedCardFromModel model =
                 |> List.head
 
 
-onTouchStartDrag : Int -> Html.Attribute Msg
-onTouchStartDrag cardId =
-    preventDefaultOn "touchstart" (Decode.succeed ( StartDrag cardId, True ))
+onDragStartCard : Int -> Html.Attribute Msg
+onDragStartCard cardId =
+    on "dragstart" (Decode.succeed (StartDrag cardId))
 
 
-onTouchMovePointer : Html.Attribute Msg
-onTouchMovePointer =
-    preventDefaultOn "touchmove"
+onDragEndCard : Html.Attribute Msg
+onDragEndCard =
+    on "dragend" (Decode.succeed EndDrag)
+
+
+onBoardDragOver : Html.Attribute Msg
+onBoardDragOver =
+    preventDefaultOn "dragover"
         (Decode.map
-            (\( x, y ) -> ( PointerMoved x y, True ))
-            touchPointDecoder
+            (\( x, y ) -> ( DragOver x y, True ))
+            dragPointDecoder
         )
 
 
-onTouchEndDrag : Html.Attribute Msg
-onTouchEndDrag =
-    on "touchend" (Decode.succeed EndDrag)
-
-
-onTouchCancelDrag : Html.Attribute Msg
-onTouchCancelDrag =
-    on "touchcancel" (Decode.succeed EndDrag)
-
-
-onPointerDownDrag : Int -> Html.Attribute Msg
-onPointerDownDrag cardId =
-    preventDefaultOn "pointerdown" (Decode.succeed ( StartDrag cardId, True ))
-
-
-onPointerMovePointer : Html.Attribute Msg
-onPointerMovePointer =
-    preventDefaultOn "pointermove"
+onBoardDrop : Html.Attribute Msg
+onBoardDrop =
+    preventDefaultOn "drop"
         (Decode.map
-            (\( x, y ) -> ( PointerMoved x y, True ))
-            pointerPointDecoder
+            (\( x, y ) -> ( DropOnBoard x y, True ))
+            dragPointDecoder
         )
 
 
-onPointerUpDrag : Html.Attribute Msg
-onPointerUpDrag =
-    on "pointerup" (Decode.succeed EndDrag)
-
-
-onPointerCancelDrag : Html.Attribute Msg
-onPointerCancelDrag =
-    on "pointercancel" (Decode.succeed EndDrag)
-
-
-pointerPointDecoder : Decode.Decoder ( Float, Float )
-pointerPointDecoder =
-    Decode.map2 Tuple.pair
-        (Decode.field "clientX" Decode.float)
-        (Decode.field "clientY" Decode.float)
-
-
-touchPointDecoder : Decode.Decoder ( Float, Float )
-touchPointDecoder =
+dragPointDecoder : Decode.Decoder ( Float, Float )
+dragPointDecoder =
     Decode.oneOf
         [ Decode.map2 Tuple.pair
+            (Decode.field "clientX" Decode.float)
+            (Decode.field "clientY" Decode.float)
+        , Decode.map2 Tuple.pair
             (Decode.at [ "touches", "0", "clientX" ] Decode.float)
             (Decode.at [ "touches", "0", "clientY" ] Decode.float)
         , Decode.map2 Tuple.pair
