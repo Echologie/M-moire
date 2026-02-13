@@ -7837,21 +7837,16 @@ var $author$project$Main$boardView = function (model) {
 				_List_fromArray(
 					[$author$project$Main$boardLegend]))));
 };
-var $author$project$Main$selectedProposition = function (model) {
-	var _v0 = model.expandedPropositionId;
-	if (_v0.$ === 'Nothing') {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		var propositionId = _v0.a;
+var $author$project$Main$propositionById = F2(
+	function (propositionId, propositions) {
 		return $elm$core$List$head(
 			A2(
 				$elm$core$List$filter,
 				function (item) {
 					return _Utils_eq(item.id, propositionId);
 				},
-				model.propositions));
-	}
-};
+				propositions));
+	});
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $author$project$Main$selectedBadgeLabel = function (maybeId) {
 	if (maybeId.$ === 'Just') {
@@ -8195,14 +8190,45 @@ var $author$project$Main$viewExpandedOverlay = F2(
 						]))
 				]));
 	});
+var $author$project$Main$viewMissingOverlay = function (propositionId) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'position', 'fixed'),
+				A2($elm$html$Html$Attributes$style, 'top', '0'),
+				A2($elm$html$Html$Attributes$style, 'right', '0'),
+				A2($elm$html$Html$Attributes$style, 'bottom', '0'),
+				A2($elm$html$Html$Attributes$style, 'left', '0'),
+				A2($elm$html$Html$Attributes$style, 'z-index', '2147483647'),
+				A2($elm$html$Html$Attributes$style, 'background', 'rgba(255,0,0,0.38)'),
+				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+				A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+				A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+				A2($elm$html$Html$Attributes$style, 'font-size', '28px'),
+				A2($elm$html$Html$Attributes$style, 'font-weight', '800'),
+				A2($elm$html$Html$Attributes$style, 'color', '#7f1d1d')
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(
+				'Overlay missing proposition id=' + $elm$core$String$fromInt(propositionId))
+			]));
+};
 var $author$project$Main$view = function (model) {
 	var overlay = function () {
-		var _v0 = $author$project$Main$selectedProposition(model);
+		var _v0 = model.expandedPropositionId;
 		if (_v0.$ === 'Nothing') {
 			return $elm$html$Html$text('');
 		} else {
-			var item = _v0.a;
-			return A2($author$project$Main$viewExpandedOverlay, model, item);
+			var propositionId = _v0.a;
+			var _v1 = A2($author$project$Main$propositionById, propositionId, model.propositions);
+			if (_v1.$ === 'Just') {
+				var item = _v1.a;
+				return A2($author$project$Main$viewExpandedOverlay, model, item);
+			} else {
+				return $author$project$Main$viewMissingOverlay(propositionId);
+			}
 		}
 	}();
 	return A2(

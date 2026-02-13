@@ -550,12 +550,17 @@ view : Model -> Html Msg
 view model =
     let
         overlay =
-            case selectedProposition model of
+            case model.expandedPropositionId of
                 Nothing ->
                     text ""
 
-                Just item ->
-                    viewExpandedOverlay model item
+                Just propositionId ->
+                    case propositionById propositionId model.propositions of
+                        Just item ->
+                            viewExpandedOverlay model item
+
+                        Nothing ->
+                            viewMissingOverlay propositionId
     in
     div
         [ style "margin" "0"
@@ -915,6 +920,13 @@ isEditableTarget targetTag =
     List.member (String.toUpper targetTag) [ "INPUT", "TEXTAREA", "SELECT" ]
 
 
+propositionById : Int -> List Proposition -> Maybe Proposition
+propositionById propositionId propositions =
+    propositions
+        |> List.filter (\item -> item.id == propositionId)
+        |> List.head
+
+
 selectedProposition : Model -> Maybe Proposition
 selectedProposition model =
     case model.expandedPropositionId of
@@ -922,9 +934,27 @@ selectedProposition model =
             Nothing
 
         Just propositionId ->
-            model.propositions
-                |> List.filter (\item -> item.id == propositionId)
-                |> List.head
+            propositionById propositionId model.propositions
+
+
+viewMissingOverlay : Int -> Html Msg
+viewMissingOverlay propositionId =
+    div
+        [ style "position" "fixed"
+        , style "top" "0"
+        , style "right" "0"
+        , style "bottom" "0"
+        , style "left" "0"
+        , style "z-index" "2147483647"
+        , style "background" "rgba(255,0,0,0.38)"
+        , style "display" "flex"
+        , style "align-items" "center"
+        , style "justify-content" "center"
+        , style "font-size" "28px"
+        , style "font-weight" "800"
+        , style "color" "#7f1d1d"
+        ]
+        [ text ("Overlay missing proposition id=" ++ String.fromInt propositionId) ]
 
 
 onMiniMouseDown : Int -> Html.Attribute Msg
