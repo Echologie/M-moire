@@ -5198,8 +5198,6 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Test$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
-			closing: false,
-			expanded: false,
 			zoomTimeline: $mdgriffith$elm_animator$Animator$init($author$project$Test$Mini)
 		},
 		$elm$core$Platform$Cmd$none);
@@ -6217,7 +6215,6 @@ var $mdgriffith$elm_animator$Animator$toSubscription = F3(
 var $author$project$Test$subscriptions = function (model) {
 	return A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Test$AnimatorTick, model, $author$project$Test$animator);
 };
-var $author$project$Test$FinishClose = {$: 'FinishClose'};
 var $author$project$Test$Maxi = {$: 'Maxi'};
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
@@ -6403,8 +6400,6 @@ var $author$project$Test$animateZoom = F2(
 			target,
 			timeline);
 	});
-var $elm$core$Basics$not = _Basics_not;
-var $elm$core$Process$sleep = _Process_sleep;
 var $mdgriffith$elm_animator$Animator$update = F3(
 	function (newTime, _v0, model) {
 		var updateModel = _v0.b;
@@ -6414,35 +6409,21 @@ var $author$project$Test$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'Open':
-				return (model.expanded && (!model.closing)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							closing: false,
-							expanded: true,
 							zoomTimeline: A2($author$project$Test$animateZoom, $author$project$Test$Maxi, model.zoomTimeline)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'Close':
-				return ((!model.expanded) || model.closing) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							closing: true,
 							zoomTimeline: A2($author$project$Test$animateZoom, $author$project$Test$Mini, model.zoomTimeline)
 						}),
-					A2(
-						$elm$core$Task$perform,
-						function (_v1) {
-							return $author$project$Test$FinishClose;
-						},
-						$elm$core$Process$sleep(220)));
-			case 'FinishClose':
-				return model.closing ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{closing: false, expanded: false}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none);
 			case 'AnimatorTick':
 				var now = msg.a;
 				return _Utils_Tuple2(
@@ -6452,13 +6433,28 @@ var $author$project$Test$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Test$Close = {$: 'Close'};
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Test$Close = {$: 'Close'};
-var $author$project$Test$NoOp = {$: 'NoOp'};
+var $author$project$Test$Open = {$: 'Open'};
 var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
 	return {$: 'Specified', a: a};
 };
@@ -6527,23 +6523,6 @@ var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
 var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
 var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
@@ -7640,193 +7619,110 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $author$project$Test$viewExpandedOverlay = function (model) {
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Test$viewCard = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'position', 'fixed'),
-				A2($elm$html$Html$Attributes$style, 'top', '0'),
-				A2($elm$html$Html$Attributes$style, 'right', '0'),
-				A2($elm$html$Html$Attributes$style, 'bottom', '0'),
-				A2($elm$html$Html$Attributes$style, 'left', '0'),
-				A2($elm$html$Html$Attributes$style, 'background', 'rgba(16,24,40,0.35)'),
-				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-				A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-				A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-				A2($elm$html$Html$Attributes$style, 'z-index', '9999'),
-				$elm$html$Html$Events$onClick($author$project$Test$Close)
+				A2(
+				$elm$html$Html$Events$stopPropagationOn,
+				'click',
+				$elm$json$Json$Decode$succeed(
+					_Utils_Tuple2($author$project$Test$Open, true))),
+				A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+				A2($elm$html$Html$Attributes$style, 'left', '50%'),
+				A2($elm$html$Html$Attributes$style, 'top', '50%'),
+				A2(
+				$mdgriffith$elm_animator$Animator$Inline$scale,
+				model.zoomTimeline,
+				function (zoom) {
+					if (zoom.$ === 'Mini') {
+						return A2(
+							$mdgriffith$elm_animator$Animator$arriveSmoothly,
+							0.75,
+							$mdgriffith$elm_animator$Animator$at(0.25));
+					} else {
+						return A2(
+							$mdgriffith$elm_animator$Animator$arriveSmoothly,
+							0.75,
+							$mdgriffith$elm_animator$Animator$at(1));
+					}
+				}),
+				A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),
+				A2($elm$html$Html$Attributes$style, 'width', 'min(1100px, 94vw)'),
+				A2($elm$html$Html$Attributes$style, 'max-height', '92vh'),
+				A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
+				A2($elm$html$Html$Attributes$style, 'padding', '24px'),
+				A2($elm$html$Html$Attributes$style, 'border', '1px solid #8ba7d6'),
+				A2($elm$html$Html$Attributes$style, 'border-radius', '14px'),
+				A2($elm$html$Html$Attributes$style, 'background', '#f9fbff'),
+				A2($elm$html$Html$Attributes$style, 'box-shadow', '0 24px 50px rgba(0,0,0,0.18)')
 			]),
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$div,
+				$elm$html$Html$h2,
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$Events$stopPropagationOn,
-						'click',
-						$elm$json$Json$Decode$succeed(
-							_Utils_Tuple2($author$project$Test$NoOp, true))),
-						A2(
-						$mdgriffith$elm_animator$Animator$Inline$scale,
-						model.zoomTimeline,
-						function (zoom) {
-							if (zoom.$ === 'Mini') {
-								return A2(
-									$mdgriffith$elm_animator$Animator$arriveSmoothly,
-									0.75,
-									$mdgriffith$elm_animator$Animator$at(0.25));
-							} else {
-								return A2(
-									$mdgriffith$elm_animator$Animator$arriveSmoothly,
-									0.75,
-									$mdgriffith$elm_animator$Animator$at(1));
-							}
-						}),
-						A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),
-						A2($elm$html$Html$Attributes$style, 'width', 'min(1100px, 94vw)'),
-						A2($elm$html$Html$Attributes$style, 'max-height', '92vh'),
-						A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
-						A2($elm$html$Html$Attributes$style, 'padding', '24px'),
-						A2($elm$html$Html$Attributes$style, 'border', '1px solid #8ba7d6'),
-						A2($elm$html$Html$Attributes$style, 'border-radius', '14px'),
-						A2($elm$html$Html$Attributes$style, 'background', 'white'),
-						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 24px 50px rgba(0,0,0,0.25)')
+						A2($elm$html$Html$Attributes$style, 'margin', '0 0 10px'),
+						A2($elm$html$Html$Attributes$style, 'font-size', '40px')
 					]),
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$h2,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'margin', '0 0 10px'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Proposition A')
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'margin', '0'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '30px'),
-								A2($elm$html$Html$Attributes$style, 'line-height', '1.5')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('On part de cos(2x) = sin(x), puis on ecrit 1 - 2sin^2(x) = sin(x).')
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'margin', '14px 0 0'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '30px'),
-								A2($elm$html$Html$Attributes$style, 'line-height', '1.5')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('On obtient 2sin^2(x) + sin(x) - 1 = 0, puis (2sin(x)-1)(sin(x)+1)=0.')
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'margin', '14px 0 0'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '26px'),
-								A2($elm$html$Html$Attributes$style, 'line-height', '1.5')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Solutions sur [0;2pi[: x = pi/6, 5pi/6, 3pi/2.')
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'margin', '16px 0 0'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
-								A2($elm$html$Html$Attributes$style, 'color', '#5a6785')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Cliquer en dehors pour refermer.')
-							]))
+						$elm$html$Html$text('Proposition A')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '0'),
+						A2($elm$html$Html$Attributes$style, 'font-size', '30px'),
+						A2($elm$html$Html$Attributes$style, 'line-height', '1.5')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('On part de cos(2x) = sin(x), puis on ecrit 1 - 2sin^2(x) = sin(x).')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '14px 0 0'),
+						A2($elm$html$Html$Attributes$style, 'font-size', '30px'),
+						A2($elm$html$Html$Attributes$style, 'line-height', '1.5')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('On obtient 2sin^2(x) + sin(x) - 1 = 0, puis (2sin(x)-1)(sin(x)+1)=0.')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '14px 0 0'),
+						A2($elm$html$Html$Attributes$style, 'font-size', '26px'),
+						A2($elm$html$Html$Attributes$style, 'line-height', '1.5')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Solutions sur [0;2pi[: x = pi/6, 5pi/6, 3pi/2.')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '16px 0 0'),
+						A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+						A2($elm$html$Html$Attributes$style, 'color', '#5a6785')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Cliquer sur la fiche pour agrandir. Cliquer ailleurs pour reduire.')
 					]))
 			]));
 };
-var $author$project$Test$Open = {$: 'Open'};
-var $author$project$Test$viewMiniCard = A2(
-	$elm$html$Html$div,
-	_List_fromArray(
-		[
-			A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-			A2($elm$html$Html$Attributes$style, 'left', '50%'),
-			A2($elm$html$Html$Attributes$style, 'top', '50%'),
-			A2($elm$html$Html$Attributes$style, 'transform', 'translate(-50%, -50%) scale(0.25)'),
-			A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),
-			A2($elm$html$Html$Attributes$style, 'width', '880px'),
-			A2($elm$html$Html$Attributes$style, 'padding', '20px'),
-			A2($elm$html$Html$Attributes$style, 'border', '1px solid #8ba7d6'),
-			A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-			A2($elm$html$Html$Attributes$style, 'background', '#f9fbff'),
-			A2($elm$html$Html$Attributes$style, 'box-shadow', '0 8px 20px rgba(0,0,0,0.12)'),
-			A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-			$elm$html$Html$Events$onClick($author$project$Test$Open)
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$h2,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'margin', '0 0 8px'),
-					A2($elm$html$Html$Attributes$style, 'font-size', '34px')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Proposition A')
-				])),
-			A2(
-			$elm$html$Html$p,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'margin', '0'),
-					A2($elm$html$Html$Attributes$style, 'font-size', '26px'),
-					A2($elm$html$Html$Attributes$style, 'line-height', '1.4')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('On part de cos(2x) = sin(x), puis on ecrit 1 - 2sin^2(x) = sin(x).')
-				])),
-			A2(
-			$elm$html$Html$p,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'margin', '10px 0 0'),
-					A2($elm$html$Html$Attributes$style, 'font-size', '26px'),
-					A2($elm$html$Html$Attributes$style, 'line-height', '1.4')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('On obtient 2sin^2(x) + sin(x) - 1 = 0, puis (2sin(x)-1)(sin(x)+1)=0.')
-				])),
-			A2(
-			$elm$html$Html$p,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'margin', '10px 0 0'),
-					A2($elm$html$Html$Attributes$style, 'font-size', '22px'),
-					A2($elm$html$Html$Attributes$style, 'color', '#43506d')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Cliquer pour agrandir')
-				]))
-		]));
 var $author$project$Test$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -7837,12 +7733,13 @@ var $author$project$Test$view = function (model) {
 				A2($elm$html$Html$Attributes$style, 'height', '100vh'),
 				A2($elm$html$Html$Attributes$style, 'background', 'white'),
 				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-				A2($elm$html$Html$Attributes$style, 'font-family', 'Georgia, serif')
+				A2($elm$html$Html$Attributes$style, 'overflow', 'hidden'),
+				A2($elm$html$Html$Attributes$style, 'font-family', 'Georgia, serif'),
+				$elm$html$Html$Events$onClick($author$project$Test$Close)
 			]),
 		_List_fromArray(
 			[
-				model.expanded ? $elm$html$Html$text('') : $author$project$Test$viewMiniCard,
-				model.expanded ? $author$project$Test$viewExpandedOverlay(model) : $elm$html$Html$text('')
+				$author$project$Test$viewCard(model)
 			]));
 };
 var $author$project$Test$main = $elm$browser$Browser$element(
