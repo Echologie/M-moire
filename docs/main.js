@@ -5424,6 +5424,7 @@ var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			boardRect: $elm$core$Maybe$Nothing,
+			clickSuppressedFor: $elm$core$Maybe$Nothing,
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
 			expandedPropositionId: $elm$core$Maybe$Nothing,
@@ -6973,6 +6974,22 @@ var $author$project$Main$distance = F4(
 	});
 var $elm$browser$Browser$Dom$getElement = _Browser_getElement;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$openExpanded = F2(
+	function (propositionId, model) {
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{
+					clickSuppressedFor: $elm$core$Maybe$Nothing,
+					expandedPropositionId: $elm$core$Maybe$Just(propositionId),
+					focusTimeline: A2(
+						$author$project$Main$animateFocusTo,
+						$elm$core$Maybe$Just(propositionId),
+						model.focusTimeline),
+					isClosingExpanded: false
+				}),
+			$author$project$Main$scheduleMathRender);
+	});
 var $author$project$Main$clamp = F3(
 	function (minVal, maxVal, value) {
 		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
@@ -7086,6 +7103,7 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
+							clickSuppressedFor: $elm$core$Maybe$Nothing,
 							dragging: $elm$core$Maybe$Just(
 								{moved: false, pointerOffsetX: offsetX, pointerOffsetY: offsetY, propositionId: propositionId, startX: clientX, startY: clientY}),
 							expandedPropositionId: $elm$core$Maybe$Nothing,
@@ -7096,6 +7114,15 @@ var $author$project$Main$update = F2(
 						$elm$core$Task$attempt,
 						$author$project$Main$GotBoardRect,
 						$elm$browser$Browser$Dom$getElement('board')));
+			case 'OpenExpanded':
+				var propositionId = msg.a;
+				return _Utils_eq(
+					model.clickSuppressedFor,
+					$elm$core$Maybe$Just(propositionId)) ? _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{clickSuppressedFor: $elm$core$Maybe$Nothing}),
+					$elm$core$Platform$Cmd$none) : A2($author$project$Main$openExpanded, propositionId, model);
 			case 'PointerMove':
 				var clientX = msg.a;
 				var clientY = msg.b;
@@ -7130,20 +7157,16 @@ var $author$project$Main$update = F2(
 					return dragState.moved ? _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{dragging: $elm$core$Maybe$Nothing}),
-						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+							{
+								clickSuppressedFor: $elm$core$Maybe$Just(dragState.propositionId),
+								dragging: $elm$core$Maybe$Nothing
+							}),
+						$elm$core$Platform$Cmd$none) : A2(
+						$author$project$Main$openExpanded,
+						dragState.propositionId,
 						_Utils_update(
 							model,
-							{
-								dragging: $elm$core$Maybe$Nothing,
-								expandedPropositionId: $elm$core$Maybe$Just(dragState.propositionId),
-								focusTimeline: A2(
-									$author$project$Main$animateFocusTo,
-									$elm$core$Maybe$Just(dragState.propositionId),
-									model.focusTimeline),
-								isClosingExpanded: false
-							}),
-						$author$project$Main$scheduleMathRender);
+							{dragging: $elm$core$Maybe$Nothing}));
 				}
 			case 'CloseExpanded':
 				var _v5 = model.expandedPropositionId;
@@ -7165,11 +7188,11 @@ var $author$project$Main$update = F2(
 							$elm$core$Process$sleep(190)));
 				}
 			case 'FinishCloseExpanded':
-				return _Utils_Tuple2(
+				return model.isClosingExpanded ? _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{expandedPropositionId: $elm$core$Maybe$Nothing, isClosingExpanded: false}),
-					$elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'UpdateExpandedComment':
 				var newComment = msg.a;
 				var _v7 = model.expandedPropositionId;
@@ -8867,6 +8890,9 @@ var $author$project$Main$viewExpandedOverlay = F2(
 						]))
 				]));
 	});
+var $author$project$Main$OpenExpanded = function (a) {
+	return {$: 'OpenExpanded', a: a};
+};
 var $author$project$Main$StartDrag = F3(
 	function (a, b, c) {
 		return {$: 'StartDrag', a: a, b: b, c: c};
@@ -8969,7 +8995,7 @@ var $author$project$Main$viewMiniature = F2(
 								A2(
 								$elm$html$Html$Attributes$style,
 								'border',
-								isExpanded ? '2px solid #0f62fe' : '1px solid #7a92c8'),
+								isExpanded ? '2px solid #0f62fe' : (isDragging ? '2px solid #3b82f6' : '1px solid #c7d3ea')),
 								A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
 								A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
 								A2(
@@ -8981,8 +9007,11 @@ var $author$project$Main$viewMiniature = F2(
 								A2($elm$html$Html$Attributes$style, 'cursor', cursorStyle),
 								A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
 								A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
+								A2($elm$html$Html$Attributes$style, 'outline', 'none'),
 								$author$project$Main$onMiniMouseDown(item.id),
-								$author$project$Main$onMiniTouchStart(item.id)
+								$author$project$Main$onMiniTouchStart(item.id),
+								$elm$html$Html$Events$onClick(
+								$author$project$Main$OpenExpanded(item.id))
 							]),
 						_List_fromArray(
 							[

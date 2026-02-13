@@ -64,6 +64,7 @@ type alias Model =
     , expandedPropositionId : Maybe Int
     , isClosingExpanded : Bool
     , dragging : Maybe DragState
+    , clickSuppressedFor : Maybe Int
     , focusTimeline : Animator.Timeline (Maybe Int)
     , boardRect : Maybe BoardRect
     , email : String
@@ -73,6 +74,7 @@ type alias Model =
 
 type Msg
     = StartDrag Int Float Float
+    | OpenExpanded Int
     | PointerMove Float Float
     | PointerUp
     | CloseExpanded
@@ -127,6 +129,7 @@ init _ =
       , expandedPropositionId = Nothing
       , isClosingExpanded = False
       , dragging = Nothing
+      , clickSuppressedFor = Nothing
       , focusTimeline = Animator.init Nothing
       , boardRect = Nothing
       , email = ""
@@ -264,10 +267,18 @@ update msg model =
                         }
                 , expandedPropositionId = Nothing
                 , isClosingExpanded = False
+                , clickSuppressedFor = Nothing
                 , focusTimeline = animateFocusTo Nothing model.focusTimeline
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
+
+        OpenExpanded propositionId ->
+            if model.clickSuppressedFor == Just propositionId then
+                ( { model | clickSuppressedFor = Nothing }, Cmd.none )
+
+            else
+                openExpanded propositionId model
 
         PointerMove clientX clientY ->
             case ( model.dragging, model.boardRect ) of
@@ -311,17 +322,15 @@ update msg model =
 
                 Just dragState ->
                     if dragState.moved then
-                        ( { model | dragging = Nothing }, Cmd.none )
-
-                    else
                         ( { model
                             | dragging = Nothing
-                            , expandedPropositionId = Just dragState.propositionId
-                            , isClosingExpanded = False
-                            , focusTimeline = animateFocusTo (Just dragState.propositionId) model.focusTimeline
+                            , clickSuppressedFor = Just dragState.propositionId
                           }
-                        , scheduleMathRender
+                        , Cmd.none
                         )
+
+                    else
+                        openExpanded dragState.propositionId { model | dragging = Nothing }
 
         CloseExpanded ->
             case model.expandedPropositionId of
@@ -341,12 +350,16 @@ update msg model =
                         )
 
         FinishCloseExpanded ->
-            ( { model
-                | expandedPropositionId = Nothing
-                , isClosingExpanded = False
-              }
-            , Cmd.none
-            )
+            if model.isClosingExpanded then
+                ( { model
+                    | expandedPropositionId = Nothing
+                    , isClosingExpanded = False
+                  }
+                , Cmd.none
+                )
+
+            else
+                ( model, Cmd.none )
 
         UpdateExpandedComment newComment ->
             case model.expandedPropositionId of
@@ -403,6 +416,18 @@ scheduleMathRender =
 animateFocusTo : Maybe Int -> Animator.Timeline (Maybe Int) -> Animator.Timeline (Maybe Int)
 animateFocusTo propositionId timeline =
     Animator.go (Animator.millis 240) propositionId timeline
+
+
+openExpanded : Int -> Model -> ( Model, Cmd Msg )
+openExpanded propositionId model =
+    ( { model
+        | expandedPropositionId = Just propositionId
+        , isClosingExpanded = False
+        , clickSuppressedFor = Nothing
+        , focusTimeline = animateFocusTo (Just propositionId) model.focusTimeline
+      }
+    , scheduleMathRender
+    )
 
 
 distance : Float -> Float -> Float -> Float -> Float
@@ -668,8 +693,11 @@ viewMiniature model item =
                         (if isExpanded then
                             "2px solid #0f62fe"
 
+                         else if isDragging then
+                            "2px solid #3b82f6"
+
                          else
-                            "1px solid #7a92c8"
+                            "1px solid #c7d3ea"
                         )
                     , style "border-radius" "12px"
                     , style "background" "#fbfdff"
@@ -685,8 +713,10 @@ viewMiniature model item =
                     , style "cursor" cursorStyle
                     , style "user-select" "none"
                     , style "touch-action" "none"
+                    , style "outline" "none"
                     , onMiniMouseDown item.id
                     , onMiniTouchStart item.id
+                    , onClick (OpenExpanded item.id)
                     ]
                     [ notchBadge item.badge
                     , div [ style "margin-left" "48px" ]
