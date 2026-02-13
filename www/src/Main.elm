@@ -62,6 +62,7 @@ type alias Viewport =
 type alias Model =
     { propositions : List Proposition
     , expandedPropositionId : Maybe Int
+    , isClosingExpanded : Bool
     , dragging : Maybe DragState
     , focusTimeline : Animator.Timeline (Maybe Int)
     , boardRect : Maybe BoardRect
@@ -75,6 +76,7 @@ type Msg
     | PointerMove Float Float
     | PointerUp
     | CloseExpanded
+    | FinishCloseExpanded
     | UpdateExpandedComment String
     | UpdateEmail String
     | RefreshBoardRect
@@ -123,6 +125,7 @@ init _ =
     in
     ( { propositions = seeded
       , expandedPropositionId = Nothing
+      , isClosingExpanded = False
       , dragging = Nothing
       , focusTimeline = Animator.init Nothing
       , boardRect = Nothing
@@ -260,6 +263,7 @@ update msg model =
                         , pointerOffsetY = offsetY
                         }
                 , expandedPropositionId = Nothing
+                , isClosingExpanded = False
                 , focusTimeline = animateFocusTo Nothing model.focusTimeline
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
@@ -273,7 +277,7 @@ update msg model =
                             distance dragState.startX dragState.startY clientX clientY
 
                         hasMoved =
-                            dragState.moved || (movedDistance > 4)
+                            dragState.moved || (movedDistance > 10)
 
                         nextPos =
                             positionFromClientWithOffsetBounded
@@ -282,9 +286,16 @@ update msg model =
                                 clientY
                                 dragState.pointerOffsetX
                                 dragState.pointerOffsetY
+
+                        updatedPropositions =
+                            if hasMoved then
+                                updatePropositionPosition dragState.propositionId nextPos model.propositions
+
+                            else
+                                model.propositions
                     in
                     ( { model
-                        | propositions = updatePropositionPosition dragState.propositionId nextPos model.propositions
+                        | propositions = updatedPropositions
                         , dragging = Just { dragState | moved = hasMoved }
                       }
                     , Cmd.none
@@ -306,15 +317,33 @@ update msg model =
                         ( { model
                             | dragging = Nothing
                             , expandedPropositionId = Just dragState.propositionId
+                            , isClosingExpanded = False
                             , focusTimeline = animateFocusTo (Just dragState.propositionId) model.focusTimeline
                           }
                         , scheduleMathRender
                         )
 
         CloseExpanded ->
+            case model.expandedPropositionId of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just _ ->
+                    if model.isClosingExpanded then
+                        ( model, Cmd.none )
+
+                    else
+                        ( { model
+                            | isClosingExpanded = True
+                            , focusTimeline = animateFocusTo Nothing model.focusTimeline
+                          }
+                        , Task.perform (\_ -> FinishCloseExpanded) (Process.sleep 190)
+                        )
+
+        FinishCloseExpanded ->
             ( { model
                 | expandedPropositionId = Nothing
-                , focusTimeline = animateFocusTo Nothing model.focusTimeline
+                , isClosingExpanded = False
               }
             , Cmd.none
             )
@@ -594,8 +623,14 @@ viewMiniature model item =
                         Nothing ->
                             False
 
-                isFocused =
-                    Animator.current model.focusTimeline == Just item.id
+                isExpanded =
+                    model.expandedPropositionId == Just item.id
+
+                scaledWidth =
+                    miniatureWidth * miniScale
+
+                scaledHeight =
+                    miniatureHeight * miniScale
 
                 cursorStyle =
                     if isDragging then
@@ -609,37 +644,28 @@ viewMiniature model item =
                 , style "left" (String.fromFloat (pos.x * 100) ++ "%")
                 , style "top" (String.fromFloat (pos.y * 100) ++ "%")
                 , style "transform" "translate(-50%, -50%)"
+                , style "width" (String.fromFloat scaledWidth ++ "px")
+                , style "height" (String.fromFloat scaledHeight ++ "px")
+                , style "overflow" "visible"
                 , style "z-index"
                     (if isDragging then
                         "70"
 
-                     else if isFocused then
+                     else if isExpanded then
                         "45"
 
                      else
                         "30"
                     )
-                , style "cursor" cursorStyle
-                , style "user-select" "none"
-                , style "touch-action" "none"
-                , onMiniMouseDown item.id
-                , onMiniTouchStart item.id
                 ]
                 [ div
-                    [ Animator.Inline.scale model.focusTimeline
-                        (\focusedId ->
-                            if focusedId == Just item.id then
-                                Animator.at focusedScale |> Animator.arriveSmoothly 0.65
-
-                            else
-                                Animator.at miniScale |> Animator.arriveSmoothly 0.65
-                        )
+                    [ style "transform" ("scale(" ++ String.fromFloat miniScale ++ ")")
                     , style "transform-origin" "top left"
                     , style "position" "relative"
                     , style "width" (String.fromFloat miniatureWidth ++ "px")
                     , style "height" (String.fromFloat miniatureHeight ++ "px")
                     , style "border"
-                        (if isFocused then
+                        (if isExpanded then
                             "2px solid #0f62fe"
 
                          else
@@ -656,6 +682,11 @@ viewMiniature model item =
                         )
                     , style "padding" "12px"
                     , style "overflow" "hidden"
+                    , style "cursor" cursorStyle
+                    , style "user-select" "none"
+                    , style "touch-action" "none"
+                    , onMiniMouseDown item.id
+                    , onMiniTouchStart item.id
                     ]
                     [ notchBadge item.badge
                     , div [ style "margin-left" "48px" ]
@@ -708,15 +739,18 @@ viewExpandedOverlay model item =
             [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
             , Animator.Inline.scale model.focusTimeline
                 (\focusedId ->
-                    if focusedId == Just item.id then
-                        Animator.at 1 |> Animator.arriveSmoothly 0.7
+                    if model.isClosingExpanded then
+                        Animator.at 0.34 |> Animator.arriveSmoothly 0.72
+
+                    else if focusedId == Just item.id then
+                        Animator.at 1 |> Animator.arriveSmoothly 0.72
 
                     else
-                        Animator.at 0.82 |> Animator.arriveSmoothly 0.7
+                        Animator.at 0.34 |> Animator.arriveSmoothly 0.72
                 )
             , style "position" "relative"
-            , style "width" "min(1040px, 96vw)"
-            , style "max-height" "90vh"
+            , style "width" "min(1380px, 98vw)"
+            , style "max-height" "92vh"
             , style "overflow" "auto"
             , style "background" "white"
             , style "border" "1px solid #c8d6ef"

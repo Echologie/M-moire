@@ -5428,6 +5428,7 @@ var $author$project$Main$init = function (_v0) {
 			email: '',
 			expandedPropositionId: $elm$core$Maybe$Nothing,
 			focusTimeline: $mdgriffith$elm_animator$Animator$init($elm$core$Maybe$Nothing),
+			isClosingExpanded: false,
 			propositions: seeded,
 			viewport: {height: 800, width: 1200}
 		},
@@ -6756,6 +6757,7 @@ var $author$project$Main$subscriptions = function (model) {
 				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Main$AnimatorTick, model, $author$project$Main$animator)
 			]));
 };
+var $author$project$Main$FinishCloseExpanded = {$: 'FinishCloseExpanded'};
 var $author$project$Main$GotBoardRect = function (a) {
 	return {$: 'GotBoardRect', a: a};
 };
@@ -7087,7 +7089,8 @@ var $author$project$Main$update = F2(
 							dragging: $elm$core$Maybe$Just(
 								{moved: false, pointerOffsetX: offsetX, pointerOffsetY: offsetY, propositionId: propositionId, startX: clientX, startY: clientY}),
 							expandedPropositionId: $elm$core$Maybe$Nothing,
-							focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, model.focusTimeline)
+							focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, model.focusTimeline),
+							isClosingExpanded: false
 						}),
 					A2(
 						$elm$core$Task$attempt,
@@ -7102,7 +7105,8 @@ var $author$project$Main$update = F2(
 					var rect = _v3.b.a;
 					var nextPos = A5($author$project$Main$positionFromClientWithOffsetBounded, rect, clientX, clientY, dragState.pointerOffsetX, dragState.pointerOffsetY);
 					var movedDistance = A4($author$project$Main$distance, dragState.startX, dragState.startY, clientX, clientY);
-					var hasMoved = dragState.moved || (movedDistance > 4);
+					var hasMoved = dragState.moved || (movedDistance > 10);
+					var updatedPropositions = hasMoved ? A3($author$project$Main$updatePropositionPosition, dragState.propositionId, nextPos, model.propositions) : model.propositions;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7111,7 +7115,7 @@ var $author$project$Main$update = F2(
 									_Utils_update(
 										dragState,
 										{moved: hasMoved})),
-								propositions: A3($author$project$Main$updatePropositionPosition, dragState.propositionId, nextPos, model.propositions)
+								propositions: updatedPropositions
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -7136,26 +7140,43 @@ var $author$project$Main$update = F2(
 								focusTimeline: A2(
 									$author$project$Main$animateFocusTo,
 									$elm$core$Maybe$Just(dragState.propositionId),
-									model.focusTimeline)
+									model.focusTimeline),
+								isClosingExpanded: false
 							}),
 						$author$project$Main$scheduleMathRender);
 				}
 			case 'CloseExpanded':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							expandedPropositionId: $elm$core$Maybe$Nothing,
-							focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, model.focusTimeline)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'UpdateExpandedComment':
-				var newComment = msg.a;
 				var _v5 = model.expandedPropositionId;
 				if (_v5.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var propositionId = _v5.a;
+					return model.isClosingExpanded ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, model.focusTimeline),
+								isClosingExpanded: true
+							}),
+						A2(
+							$elm$core$Task$perform,
+							function (_v6) {
+								return $author$project$Main$FinishCloseExpanded;
+							},
+							$elm$core$Process$sleep(190)));
+				}
+			case 'FinishCloseExpanded':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{expandedPropositionId: $elm$core$Maybe$Nothing, isClosingExpanded: false}),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateExpandedComment':
+				var newComment = msg.a;
+				var _v7 = model.expandedPropositionId;
+				if (_v7.$ === 'Nothing') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var propositionId = _v7.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7204,7 +7225,7 @@ var $author$project$Main$update = F2(
 						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v7) {
+						function (_v9) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(24)));
@@ -8688,19 +8709,22 @@ var $author$project$Main$viewExpandedOverlay = F2(
 							$mdgriffith$elm_animator$Animator$Inline$scale,
 							model.focusTimeline,
 							function (focusedId) {
-								return _Utils_eq(
+								return model.isClosingExpanded ? A2(
+									$mdgriffith$elm_animator$Animator$arriveSmoothly,
+									0.72,
+									$mdgriffith$elm_animator$Animator$at(0.34)) : (_Utils_eq(
 									focusedId,
 									$elm$core$Maybe$Just(item.id)) ? A2(
 									$mdgriffith$elm_animator$Animator$arriveSmoothly,
-									0.7,
+									0.72,
 									$mdgriffith$elm_animator$Animator$at(1)) : A2(
 									$mdgriffith$elm_animator$Animator$arriveSmoothly,
-									0.7,
-									$mdgriffith$elm_animator$Animator$at(0.82));
+									0.72,
+									$mdgriffith$elm_animator$Animator$at(0.34)));
 							}),
 							A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-							A2($elm$html$Html$Attributes$style, 'width', 'min(1040px, 96vw)'),
-							A2($elm$html$Html$Attributes$style, 'max-height', '90vh'),
+							A2($elm$html$Html$Attributes$style, 'width', 'min(1380px, 98vw)'),
+							A2($elm$html$Html$Attributes$style, 'max-height', '92vh'),
 							A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
 							A2($elm$html$Html$Attributes$style, 'background', 'white'),
 							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
@@ -8843,35 +8867,6 @@ var $author$project$Main$viewExpandedOverlay = F2(
 						]))
 				]));
 	});
-var $mdgriffith$elm_animator$Internal$Timeline$linearDefault = {arriveEarly: 0, arriveSlowly: 0, departLate: 0, departSlowly: 0, wobbliness: 0};
-var $mdgriffith$elm_animator$Internal$Timeline$current = function (timeline) {
-	var details = timeline.a;
-	return A3(
-		$mdgriffith$elm_animator$Internal$Timeline$foldp,
-		$elm$core$Basics$identity,
-		{
-			adjustor: function (_v0) {
-				return $mdgriffith$elm_animator$Internal$Timeline$linearDefault;
-			},
-			dwellPeriod: function (_v1) {
-				return $elm$core$Maybe$Nothing;
-			},
-			lerp: F7(
-				function (_v2, _v3, target, _v4, _v5, _v6, _v7) {
-					return target;
-				}),
-			start: function (_v8) {
-				return details.initial;
-			},
-			visit: F5(
-				function (lookup, target, targetTime, maybeLookAhead, state) {
-					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
-				})
-		},
-		timeline);
-};
-var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
-var $author$project$Main$focusedScale = 0.42;
 var $author$project$Main$StartDrag = F3(
 	function (a, b, c) {
 		return {$: 'StartDrag', a: a, b: b, c: c};
@@ -8908,8 +8903,10 @@ var $author$project$Main$viewMiniature = F2(
 			return $elm$html$Html$text('');
 		} else {
 			var pos = _v0.a;
-			var isFocused = _Utils_eq(
-				$mdgriffith$elm_animator$Animator$current(model.focusTimeline),
+			var scaledWidth = $author$project$Main$miniatureWidth * $author$project$Main$miniScale;
+			var scaledHeight = $author$project$Main$miniatureHeight * $author$project$Main$miniScale;
+			var isExpanded = _Utils_eq(
+				model.expandedPropositionId,
 				$elm$core$Maybe$Just(item.id));
 			var isDragging = function () {
 				var _v1 = model.dragging;
@@ -8937,13 +8934,17 @@ var $author$project$Main$viewMiniature = F2(
 						A2($elm$html$Html$Attributes$style, 'transform', 'translate(-50%, -50%)'),
 						A2(
 						$elm$html$Html$Attributes$style,
+						'width',
+						$elm$core$String$fromFloat(scaledWidth) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'height',
+						$elm$core$String$fromFloat(scaledHeight) + 'px'),
+						A2($elm$html$Html$Attributes$style, 'overflow', 'visible'),
+						A2(
+						$elm$html$Html$Attributes$style,
 						'z-index',
-						isDragging ? '70' : (isFocused ? '45' : '30')),
-						A2($elm$html$Html$Attributes$style, 'cursor', cursorStyle),
-						A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
-						A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
-						$author$project$Main$onMiniMouseDown(item.id),
-						$author$project$Main$onMiniTouchStart(item.id)
+						isDragging ? '70' : (isExpanded ? '45' : '30'))
 					]),
 				_List_fromArray(
 					[
@@ -8952,19 +8953,9 @@ var $author$project$Main$viewMiniature = F2(
 						_List_fromArray(
 							[
 								A2(
-								$mdgriffith$elm_animator$Animator$Inline$scale,
-								model.focusTimeline,
-								function (focusedId) {
-									return _Utils_eq(
-										focusedId,
-										$elm$core$Maybe$Just(item.id)) ? A2(
-										$mdgriffith$elm_animator$Animator$arriveSmoothly,
-										0.65,
-										$mdgriffith$elm_animator$Animator$at($author$project$Main$focusedScale)) : A2(
-										$mdgriffith$elm_animator$Animator$arriveSmoothly,
-										0.65,
-										$mdgriffith$elm_animator$Animator$at($author$project$Main$miniScale));
-								}),
+								$elm$html$Html$Attributes$style,
+								'transform',
+								'scale(' + ($elm$core$String$fromFloat($author$project$Main$miniScale) + ')')),
 								A2($elm$html$Html$Attributes$style, 'transform-origin', 'top left'),
 								A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 								A2(
@@ -8978,7 +8969,7 @@ var $author$project$Main$viewMiniature = F2(
 								A2(
 								$elm$html$Html$Attributes$style,
 								'border',
-								isFocused ? '2px solid #0f62fe' : '1px solid #7a92c8'),
+								isExpanded ? '2px solid #0f62fe' : '1px solid #7a92c8'),
 								A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
 								A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
 								A2(
@@ -8986,7 +8977,12 @@ var $author$project$Main$viewMiniature = F2(
 								'box-shadow',
 								isDragging ? '0 12px 24px rgba(15,34,80,0.25)' : '0 4px 12px rgba(0,0,0,0.14)'),
 								A2($elm$html$Html$Attributes$style, 'padding', '12px'),
-								A2($elm$html$Html$Attributes$style, 'overflow', 'hidden')
+								A2($elm$html$Html$Attributes$style, 'overflow', 'hidden'),
+								A2($elm$html$Html$Attributes$style, 'cursor', cursorStyle),
+								A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
+								A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
+								$author$project$Main$onMiniMouseDown(item.id),
+								$author$project$Main$onMiniTouchStart(item.id)
 							]),
 						_List_fromArray(
 							[
