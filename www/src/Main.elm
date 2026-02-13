@@ -1,6 +1,7 @@
 port module Main exposing (main)
 
 import Animator
+import Animator.Inline
 import Browser
 import Browser.Dom as Dom
 import Browser.Events
@@ -108,6 +109,11 @@ miniScale =
 focusedScale : Float
 focusedScale =
     0.42
+
+
+overlayClosedScale : Float
+overlayClosedScale =
+    0.1
 
 
 main : Program () Model Msg
@@ -804,24 +810,28 @@ viewExpandedOverlay model item =
         , style "bottom" "0"
         , style "left" "0"
         , style "z-index" "9999"
-        , style "background" "rgba(16,24,40,0.28)"
+        , style "background" "rgba(16,24,40,0.42)"
         , style "display" "flex"
         , style "align-items" "center"
         , style "justify-content" "center"
+        , style "opacity" "1"
         , onClick CloseExpanded
         ]
         [ div
             [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
-            , style "position" "relative"
-            , style "transform"
-                (if model.isClosingExpanded then
-                    "scale(0.34)"
+            , Animator.Inline.scale model.focusTimeline
+                (\focusedId ->
+                    if model.isClosingExpanded then
+                        Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
 
-                 else
-                    "scale(1)"
+                    else if focusedId == Just item.id then
+                        Animator.at 1 |> Animator.arriveSmoothly 0.68
+
+                    else
+                        Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
                 )
+            , style "position" "relative"
             , style "transform-origin" "center center"
-            , style "transition" "transform 190ms ease"
             , style "width" "min(1380px, 98vw)"
             , style "max-height" "92vh"
             , style "overflow" "auto"
@@ -877,6 +887,8 @@ viewExpandedOverlay model item =
                 []
             , small [ style "display" "block", style "margin-top" "8px", style "color" "#6b7892" ]
                 [ text "Cliquer hors de la fiche pour la reduire." ]
+            , div [ style "margin-top" "10px", style "font-size" "12px", style "color" "#4f6185" ]
+                [ text "Etat overlay: scale 0.1 -> 1" ]
             ]
         ]
 
