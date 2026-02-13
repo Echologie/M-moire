@@ -48,6 +48,8 @@ type alias DragState =
     , startX : Float
     , startY : Float
     , moved : Bool
+    , pointerOffsetX : Float
+    , pointerOffsetY : Float
     }
 
 
@@ -232,30 +234,33 @@ update msg model =
     case msg of
         StartDrag propositionId clientX clientY ->
             let
-                movedToPointer =
-                    case model.boardRect of
-                        Nothing ->
-                            model
+                ( offsetX, offsetY ) =
+                    case ( model.boardRect, propositionPosition propositionId model.propositions ) of
+                        ( Just rect, Just pos ) ->
+                            let
+                                centerX =
+                                    rect.x + (pos.x * rect.width)
 
-                        Just rect ->
-                            { model
-                                | propositions =
-                                    updatePropositionPosition
-                                        propositionId
-                                        (positionFromClientBounded rect clientX clientY)
-                                        model.propositions
-                            }
+                                centerY =
+                                    rect.y + (pos.y * rect.height)
+                            in
+                            ( clientX - centerX, clientY - centerY )
+
+                        _ ->
+                            ( 0, 0 )
             in
-            ( { movedToPointer
+            ( { model
                 | dragging =
                     Just
                         { propositionId = propositionId
                         , startX = clientX
                         , startY = clientY
                         , moved = False
+                        , pointerOffsetX = offsetX
+                        , pointerOffsetY = offsetY
                         }
                 , expandedPropositionId = Nothing
-                , focusTimeline = animateFocusTo Nothing movedToPointer.focusTimeline
+                , focusTimeline = animateFocusTo Nothing model.focusTimeline
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
@@ -271,7 +276,12 @@ update msg model =
                             dragState.moved || (movedDistance > 4)
 
                         nextPos =
-                            positionFromClientBounded rect clientX clientY
+                            positionFromClientWithOffsetBounded
+                                rect
+                                clientX
+                                clientY
+                                dragState.pointerOffsetX
+                                dragState.pointerOffsetY
                     in
                     ( { model
                         | propositions = updatePropositionPosition dragState.propositionId nextPos model.propositions
@@ -397,8 +407,16 @@ updatePropositionComment propositionId newComment propositions =
         propositions
 
 
-positionFromClientBounded : BoardRect -> Float -> Float -> Position
-positionFromClientBounded rect clientX clientY =
+propositionPosition : Int -> List Proposition -> Maybe Position
+propositionPosition propositionId propositions =
+    propositions
+        |> List.filter (\item -> item.id == propositionId)
+        |> List.head
+        |> Maybe.andThen .pos
+
+
+positionFromClientWithOffsetBounded : BoardRect -> Float -> Float -> Float -> Float -> Position
+positionFromClientWithOffsetBounded rect clientX clientY pointerOffsetX pointerOffsetY =
     let
         safeWidth =
             if rect.width <= 0 then
@@ -414,17 +432,23 @@ positionFromClientBounded rect clientX clientY =
             else
                 rect.height
 
+        centerX =
+            clientX - pointerOffsetX
+
+        centerY =
+            clientY - pointerOffsetY
+
         rawX =
-            (clientX - rect.x) / safeWidth
+            (centerX - rect.x) / safeWidth
 
         rawY =
-            (clientY - rect.y) / safeHeight
+            (centerY - rect.y) / safeHeight
 
         marginX =
-            ((miniatureWidth * focusedScale) / 2) / safeWidth
+            ((miniatureWidth * miniScale) / 2) / safeWidth
 
         marginY =
-            ((miniatureHeight * focusedScale) / 2) / safeHeight
+            ((miniatureHeight * miniScale) / 2) / safeHeight
     in
     { x = clamp marginX (1 - marginX) rawX
     , y = clamp marginY (1 - marginY) rawY
@@ -682,9 +706,17 @@ viewExpandedOverlay model item =
         ]
         [ div
             [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
+            , Animator.Inline.scale model.focusTimeline
+                (\focusedId ->
+                    if focusedId == Just item.id then
+                        Animator.at 1 |> Animator.arriveSmoothly 0.7
+
+                    else
+                        Animator.at 0.82 |> Animator.arriveSmoothly 0.7
+                )
             , style "position" "relative"
-            , style "width" "min(900px, 94vw)"
-            , style "max-height" "88vh"
+            , style "width" "min(1040px, 96vw)"
+            , style "max-height" "90vh"
             , style "overflow" "auto"
             , style "background" "white"
             , style "border" "1px solid #c8d6ef"
@@ -704,7 +736,7 @@ viewExpandedOverlay model item =
                 , style "cursor" "pointer"
                 , style "font-weight" "700"
                 ]
-                [ text "Reduire" ]
+                [ text "Fermer" ]
             , div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
             , div [ style "margin-left" "54px", style "margin-top" "2px" ]
                 [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]

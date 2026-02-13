@@ -6975,21 +6975,58 @@ var $author$project$Main$clamp = F3(
 	function (minVal, maxVal, value) {
 		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
 	});
-var $author$project$Main$focusedScale = 0.42;
+var $author$project$Main$miniScale = 0.34;
 var $author$project$Main$miniatureHeight = 206;
 var $author$project$Main$miniatureWidth = 320;
-var $author$project$Main$positionFromClientBounded = F3(
-	function (rect, clientX, clientY) {
+var $author$project$Main$positionFromClientWithOffsetBounded = F5(
+	function (rect, clientX, clientY, pointerOffsetX, pointerOffsetY) {
 		var safeWidth = (rect.width <= 0) ? 1 : rect.width;
 		var safeHeight = (rect.height <= 0) ? 1 : rect.height;
-		var rawY = (clientY - rect.y) / safeHeight;
-		var rawX = (clientX - rect.x) / safeWidth;
-		var marginY = (($author$project$Main$miniatureHeight * $author$project$Main$focusedScale) / 2) / safeHeight;
-		var marginX = (($author$project$Main$miniatureWidth * $author$project$Main$focusedScale) / 2) / safeWidth;
+		var marginY = (($author$project$Main$miniatureHeight * $author$project$Main$miniScale) / 2) / safeHeight;
+		var marginX = (($author$project$Main$miniatureWidth * $author$project$Main$miniScale) / 2) / safeWidth;
+		var centerY = clientY - pointerOffsetY;
+		var rawY = (centerY - rect.y) / safeHeight;
+		var centerX = clientX - pointerOffsetX;
+		var rawX = (centerX - rect.x) / safeWidth;
 		return {
 			x: A3($author$project$Main$clamp, marginX, 1 - marginX, rawX),
 			y: A3($author$project$Main$clamp, marginY, 1 - marginY, rawY)
 		};
+	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Main$propositionPosition = F2(
+	function (propositionId, propositions) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			function ($) {
+				return $.pos;
+			},
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$filter,
+					function (item) {
+						return _Utils_eq(item.id, propositionId);
+					},
+					propositions)));
 	});
 var $mdgriffith$elm_animator$Animator$update = F3(
 	function (newTime, _v0, model) {
@@ -7027,31 +7064,30 @@ var $author$project$Main$update = F2(
 				var propositionId = msg.a;
 				var clientX = msg.b;
 				var clientY = msg.c;
-				var movedToPointer = function () {
-					var _v1 = model.boardRect;
-					if (_v1.$ === 'Nothing') {
-						return model;
+				var _v1 = function () {
+					var _v2 = _Utils_Tuple2(
+						model.boardRect,
+						A2($author$project$Main$propositionPosition, propositionId, model.propositions));
+					if ((_v2.a.$ === 'Just') && (_v2.b.$ === 'Just')) {
+						var rect = _v2.a.a;
+						var pos = _v2.b.a;
+						var centerY = rect.y + (pos.y * rect.height);
+						var centerX = rect.x + (pos.x * rect.width);
+						return _Utils_Tuple2(clientX - centerX, clientY - centerY);
 					} else {
-						var rect = _v1.a;
-						return _Utils_update(
-							model,
-							{
-								propositions: A3(
-									$author$project$Main$updatePropositionPosition,
-									propositionId,
-									A3($author$project$Main$positionFromClientBounded, rect, clientX, clientY),
-									model.propositions)
-							});
+						return _Utils_Tuple2(0, 0);
 					}
 				}();
+				var offsetX = _v1.a;
+				var offsetY = _v1.b;
 				return _Utils_Tuple2(
 					_Utils_update(
-						movedToPointer,
+						model,
 						{
 							dragging: $elm$core$Maybe$Just(
-								{moved: false, propositionId: propositionId, startX: clientX, startY: clientY}),
+								{moved: false, pointerOffsetX: offsetX, pointerOffsetY: offsetY, propositionId: propositionId, startX: clientX, startY: clientY}),
 							expandedPropositionId: $elm$core$Maybe$Nothing,
-							focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, movedToPointer.focusTimeline)
+							focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, model.focusTimeline)
 						}),
 					A2(
 						$elm$core$Task$attempt,
@@ -7060,11 +7096,11 @@ var $author$project$Main$update = F2(
 			case 'PointerMove':
 				var clientX = msg.a;
 				var clientY = msg.b;
-				var _v2 = _Utils_Tuple2(model.dragging, model.boardRect);
-				if ((_v2.a.$ === 'Just') && (_v2.b.$ === 'Just')) {
-					var dragState = _v2.a.a;
-					var rect = _v2.b.a;
-					var nextPos = A3($author$project$Main$positionFromClientBounded, rect, clientX, clientY);
+				var _v3 = _Utils_Tuple2(model.dragging, model.boardRect);
+				if ((_v3.a.$ === 'Just') && (_v3.b.$ === 'Just')) {
+					var dragState = _v3.a.a;
+					var rect = _v3.b.a;
+					var nextPos = A5($author$project$Main$positionFromClientWithOffsetBounded, rect, clientX, clientY, dragState.pointerOffsetX, dragState.pointerOffsetY);
 					var movedDistance = A4($author$project$Main$distance, dragState.startX, dragState.startY, clientX, clientY);
 					var hasMoved = dragState.moved || (movedDistance > 4);
 					return _Utils_Tuple2(
@@ -7082,11 +7118,11 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
 			case 'PointerUp':
-				var _v3 = model.dragging;
-				if (_v3.$ === 'Nothing') {
+				var _v4 = model.dragging;
+				if (_v4.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var dragState = _v3.a;
+					var dragState = _v4.a;
 					return dragState.moved ? _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7115,11 +7151,11 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'UpdateExpandedComment':
 				var newComment = msg.a;
-				var _v4 = model.expandedPropositionId;
-				if (_v4.$ === 'Nothing') {
+				var _v5 = model.expandedPropositionId;
+				if (_v5.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var propositionId = _v4.a;
+					var propositionId = _v5.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7168,7 +7204,7 @@ var $author$project$Main$update = F2(
 						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v6) {
+						function (_v7) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(24)));
@@ -7358,17 +7394,6 @@ var $author$project$Main$onBoardTouchMove = A2(
 				true);
 		},
 		$author$project$Main$touchPointDecoder));
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $author$project$Main$selectedProposition = function (model) {
 	var _v0 = model.expandedPropositionId;
 	if (_v0.$ === 'Nothing') {
@@ -7392,6 +7417,73 @@ var $author$project$Main$UpdateEmail = function (a) {
 var $author$project$Main$UpdateExpandedComment = function (a) {
 	return {$: 'UpdateExpandedComment', a: a};
 };
+var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
+	return {$: 'Specified', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Oscillate = F3(
+	function (a, b, c) {
+		return {$: 'Oscillate', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
+	function (a, b) {
+		return {$: 'Position', a: a, b: b};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault = function (a) {
+	return {$: 'PartialDefault', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Default = {$: 'Default'};
+var $mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults = {arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Default, arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, departLate: $mdgriffith$elm_animator$Internal$Interpolate$Default, departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, wobbliness: $mdgriffith$elm_animator$Internal$Interpolate$Default};
+var $mdgriffith$elm_animator$Animator$withDefault = F2(
+	function (toDef, currentDefault) {
+		if (currentDefault.$ === 'FullDefault') {
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef($mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults));
+		} else {
+			var thing = currentDefault.a;
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef(thing));
+		}
+	});
+var $mdgriffith$elm_animator$Animator$applyOption = F2(
+	function (toOption, movement) {
+		if (movement.$ === 'Position') {
+			var personality = movement.a;
+			var pos = movement.b;
+			return A2(
+				$mdgriffith$elm_animator$Internal$Interpolate$Position,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				pos);
+		} else {
+			var personality = movement.a;
+			var dur = movement.b;
+			var fn = movement.c;
+			return A3(
+				$mdgriffith$elm_animator$Internal$Interpolate$Oscillate,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				dur,
+				fn);
+		}
+	});
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
+	function (s, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, s))
+					});
+			},
+			movement);
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
+var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
@@ -7464,262 +7556,7 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
-var $elm$html$Html$small = _VirtualDom_node('small');
-var $elm$html$Html$textarea = _VirtualDom_node('textarea');
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$viewStep = function (stepText) {
-	return A2(
-		$elm$html$Html$p,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'margin', '6px 0'),
-				A2($elm$html$Html$Attributes$style, 'line-height', '1.35'),
-				A2($elm$html$Html$Attributes$style, 'color', '#1f2a44')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text(stepText)
-			]));
-};
-var $author$project$Main$viewExpandedOverlay = F2(
-	function (model, item) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-					A2($elm$html$Html$Attributes$style, 'inset', '0'),
-					A2($elm$html$Html$Attributes$style, 'z-index', '90'),
-					A2($elm$html$Html$Attributes$style, 'background', 'rgba(16,24,40,0.28)'),
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-					A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-					$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded)
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$Events$stopPropagationOn,
-							'click',
-							$elm$json$Json$Decode$succeed(
-								_Utils_Tuple2($author$project$Main$NoOp, true))),
-							A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-							A2($elm$html$Html$Attributes$style, 'width', 'min(900px, 94vw)'),
-							A2($elm$html$Html$Attributes$style, 'max-height', '88vh'),
-							A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
-							A2($elm$html$Html$Attributes$style, 'background', 'white'),
-							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '14px'),
-							A2($elm$html$Html$Attributes$style, 'padding', '16px'),
-							A2($elm$html$Html$Attributes$style, 'box-shadow', '0 20px 48px rgba(0,0,0,0.24)')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
-									A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-									A2($elm$html$Html$Attributes$style, 'top', '10px'),
-									A2($elm$html$Html$Attributes$style, 'right', '10px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b7c7e6'),
-									A2($elm$html$Html$Attributes$style, 'background', 'white'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
-									A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Reduire')
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-									A2($elm$html$Html$Attributes$style, 'padding-top', '2px')
-								]),
-							_List_fromArray(
-								[
-									$author$project$Main$notchBadge(item.badge)
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin-left', '54px'),
-									A2($elm$html$Html$Attributes$style, 'margin-top', '2px')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$h2,
-									_List_fromArray(
-										[
-											A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(item.title)
-										])),
-									A2(
-									$elm$html$Html$p,
-									_List_fromArray(
-										[
-											A2($elm$html$Html$Attributes$style, 'margin', '0'),
-											A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
-											A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Version eleve')
-										]))
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin-top', '12px')
-								]),
-							A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
-							A2(
-							$elm$html$Html$h3,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Commentaire')
-								])),
-							A2(
-							$elm$html$Html$textarea,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$rows(5),
-									A2($elm$html$Html$Attributes$style, 'width', '100%'),
-									A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
-									A2($elm$html$Html$Attributes$style, 'padding', '8px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-									$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
-									$elm$html$Html$Attributes$value(item.comment),
-									$elm$html$Html$Events$onInput($author$project$Main$UpdateExpandedComment)
-								]),
-							_List_Nil),
-							A2(
-							$elm$html$Html$h3,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Email (optionnel)')
-								])),
-							A2(
-							$elm$html$Html$input,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$type_('email'),
-									$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
-									$elm$html$Html$Attributes$value(model.email),
-									$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
-									A2($elm$html$Html$Attributes$style, 'width', '100%'),
-									A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
-								]),
-							_List_Nil),
-							A2(
-							$elm$html$Html$small,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'display', 'block'),
-									A2($elm$html$Html$Attributes$style, 'margin-top', '8px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Cliquer hors de la fiche pour la reduire.')
-								]))
-						]))
-				]));
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
-	return {$: 'Specified', a: a};
-};
-var $mdgriffith$elm_animator$Internal$Interpolate$Oscillate = F3(
-	function (a, b, c) {
-		return {$: 'Oscillate', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
-	function (a, b) {
-		return {$: 'Position', a: a, b: b};
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault = function (a) {
-	return {$: 'PartialDefault', a: a};
-};
-var $mdgriffith$elm_animator$Internal$Interpolate$Default = {$: 'Default'};
-var $mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults = {arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Default, arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, departLate: $mdgriffith$elm_animator$Internal$Interpolate$Default, departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, wobbliness: $mdgriffith$elm_animator$Internal$Interpolate$Default};
-var $mdgriffith$elm_animator$Animator$withDefault = F2(
-	function (toDef, currentDefault) {
-		if (currentDefault.$ === 'FullDefault') {
-			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
-				toDef($mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults));
-		} else {
-			var thing = currentDefault.a;
-			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
-				toDef(thing));
-		}
-	});
-var $mdgriffith$elm_animator$Animator$applyOption = F2(
-	function (toOption, movement) {
-		if (movement.$ === 'Position') {
-			var personality = movement.a;
-			var pos = movement.b;
-			return A2(
-				$mdgriffith$elm_animator$Internal$Interpolate$Position,
-				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
-				pos);
-		} else {
-			var personality = movement.a;
-			var dur = movement.b;
-			var fn = movement.c;
-			return A3(
-				$mdgriffith$elm_animator$Internal$Interpolate$Oscillate,
-				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
-				dur,
-				fn);
-		}
-	});
-var $elm$core$Basics$clamp = F3(
-	function (low, high, number) {
-		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
-	});
-var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
-	function (s, movement) {
-		return A2(
-			$mdgriffith$elm_animator$Animator$applyOption,
-			function (def) {
-				return _Utils_update(
-					def,
-					{
-						arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
-							A3($elm$core$Basics$clamp, 0, 1, s))
-					});
-			},
-			movement);
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
-var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 	function (_v0, _v1) {
 		var y = _v0.a;
@@ -8076,65 +7913,6 @@ var $mdgriffith$elm_animator$Internal$Timeline$foldp = F3(
 			return A7($mdgriffith$elm_animator$Internal$Timeline$overLines, fn, lookup, timelineDetails, $elm$core$Maybe$Nothing, firstLine, remainingLines, start);
 		}
 	});
-var $mdgriffith$elm_animator$Internal$Timeline$linearDefault = {arriveEarly: 0, arriveSlowly: 0, departLate: 0, departSlowly: 0, wobbliness: 0};
-var $mdgriffith$elm_animator$Internal$Timeline$current = function (timeline) {
-	var details = timeline.a;
-	return A3(
-		$mdgriffith$elm_animator$Internal$Timeline$foldp,
-		$elm$core$Basics$identity,
-		{
-			adjustor: function (_v0) {
-				return $mdgriffith$elm_animator$Internal$Timeline$linearDefault;
-			},
-			dwellPeriod: function (_v1) {
-				return $elm$core$Maybe$Nothing;
-			},
-			lerp: F7(
-				function (_v2, _v3, target, _v4, _v5, _v6, _v7) {
-					return target;
-				}),
-			start: function (_v8) {
-				return details.initial;
-			},
-			visit: F5(
-				function (lookup, target, targetTime, maybeLookAhead, state) {
-					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
-				})
-		},
-		timeline);
-};
-var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $author$project$Main$miniScale = 0.34;
-var $author$project$Main$StartDrag = F3(
-	function (a, b, c) {
-		return {$: 'StartDrag', a: a, b: b, c: c};
-	});
-var $author$project$Main$onMiniMouseDown = function (propositionId) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'mousedown',
-		A3(
-			$elm$json$Json$Decode$map2,
-			$author$project$Main$StartDrag(propositionId),
-			A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
-			A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)));
-};
-var $author$project$Main$onMiniTouchStart = function (propositionId) {
-	return A2(
-		$elm$html$Html$Events$preventDefaultOn,
-		'touchstart',
-		A2(
-			$elm$json$Json$Decode$map,
-			function (_v0) {
-				var clientX = _v0.a;
-				var clientY = _v0.b;
-				return _Utils_Tuple2(
-					A3($author$project$Main$StartDrag, propositionId, clientX, clientY),
-					true);
-			},
-			$author$project$Main$touchPointDecoder));
-};
 var $mdgriffith$elm_animator$Internal$Interpolate$dwellPeriod = function (movement) {
 	if (movement.$ === 'Pos') {
 		return $elm$core$Maybe$Nothing;
@@ -8862,6 +8640,267 @@ var $mdgriffith$elm_animator$Animator$Inline$scale = F2(
 			},
 			lookup);
 	});
+var $elm$html$Html$small = _VirtualDom_node('small');
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$viewStep = function (stepText) {
+	return A2(
+		$elm$html$Html$p,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'margin', '6px 0'),
+				A2($elm$html$Html$Attributes$style, 'line-height', '1.35'),
+				A2($elm$html$Html$Attributes$style, 'color', '#1f2a44')
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(stepText)
+			]));
+};
+var $author$project$Main$viewExpandedOverlay = F2(
+	function (model, item) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+					A2($elm$html$Html$Attributes$style, 'inset', '0'),
+					A2($elm$html$Html$Attributes$style, 'z-index', '90'),
+					A2($elm$html$Html$Attributes$style, 'background', 'rgba(16,24,40,0.28)'),
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+					A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+					$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded)
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$Events$stopPropagationOn,
+							'click',
+							$elm$json$Json$Decode$succeed(
+								_Utils_Tuple2($author$project$Main$NoOp, true))),
+							A2(
+							$mdgriffith$elm_animator$Animator$Inline$scale,
+							model.focusTimeline,
+							function (focusedId) {
+								return _Utils_eq(
+									focusedId,
+									$elm$core$Maybe$Just(item.id)) ? A2(
+									$mdgriffith$elm_animator$Animator$arriveSmoothly,
+									0.7,
+									$mdgriffith$elm_animator$Animator$at(1)) : A2(
+									$mdgriffith$elm_animator$Animator$arriveSmoothly,
+									0.7,
+									$mdgriffith$elm_animator$Animator$at(0.82));
+							}),
+							A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+							A2($elm$html$Html$Attributes$style, 'width', 'min(1040px, 96vw)'),
+							A2($elm$html$Html$Attributes$style, 'max-height', '90vh'),
+							A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
+							A2($elm$html$Html$Attributes$style, 'background', 'white'),
+							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '14px'),
+							A2($elm$html$Html$Attributes$style, 'padding', '16px'),
+							A2($elm$html$Html$Attributes$style, 'box-shadow', '0 20px 48px rgba(0,0,0,0.24)')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
+									A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+									A2($elm$html$Html$Attributes$style, 'top', '10px'),
+									A2($elm$html$Html$Attributes$style, 'right', '10px'),
+									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b7c7e6'),
+									A2($elm$html$Html$Attributes$style, 'background', 'white'),
+									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+									A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
+									A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Fermer')
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+									A2($elm$html$Html$Attributes$style, 'padding-top', '2px')
+								]),
+							_List_fromArray(
+								[
+									$author$project$Main$notchBadge(item.badge)
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin-left', '54px'),
+									A2($elm$html$Html$Attributes$style, 'margin-top', '2px')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$h2,
+									_List_fromArray(
+										[
+											A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(item.title)
+										])),
+									A2(
+									$elm$html$Html$p,
+									_List_fromArray(
+										[
+											A2($elm$html$Html$Attributes$style, 'margin', '0'),
+											A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
+											A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Version eleve')
+										]))
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin-top', '12px')
+								]),
+							A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
+							A2(
+							$elm$html$Html$h3,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Commentaire')
+								])),
+							A2(
+							$elm$html$Html$textarea,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$rows(5),
+									A2($elm$html$Html$Attributes$style, 'width', '100%'),
+									A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
+									A2($elm$html$Html$Attributes$style, 'padding', '8px'),
+									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+									$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
+									$elm$html$Html$Attributes$value(item.comment),
+									$elm$html$Html$Events$onInput($author$project$Main$UpdateExpandedComment)
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$h3,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Email (optionnel)')
+								])),
+							A2(
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$type_('email'),
+									$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
+									$elm$html$Html$Attributes$value(model.email),
+									$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
+									A2($elm$html$Html$Attributes$style, 'width', '100%'),
+									A2($elm$html$Html$Attributes$style, 'padding', '10px'),
+									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+									A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$small,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'display', 'block'),
+									A2($elm$html$Html$Attributes$style, 'margin-top', '8px'),
+									A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Cliquer hors de la fiche pour la reduire.')
+								]))
+						]))
+				]));
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$linearDefault = {arriveEarly: 0, arriveSlowly: 0, departLate: 0, departSlowly: 0, wobbliness: 0};
+var $mdgriffith$elm_animator$Internal$Timeline$current = function (timeline) {
+	var details = timeline.a;
+	return A3(
+		$mdgriffith$elm_animator$Internal$Timeline$foldp,
+		$elm$core$Basics$identity,
+		{
+			adjustor: function (_v0) {
+				return $mdgriffith$elm_animator$Internal$Timeline$linearDefault;
+			},
+			dwellPeriod: function (_v1) {
+				return $elm$core$Maybe$Nothing;
+			},
+			lerp: F7(
+				function (_v2, _v3, target, _v4, _v5, _v6, _v7) {
+					return target;
+				}),
+			start: function (_v8) {
+				return details.initial;
+			},
+			visit: F5(
+				function (lookup, target, targetTime, maybeLookAhead, state) {
+					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
+				})
+		},
+		timeline);
+};
+var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
+var $author$project$Main$focusedScale = 0.42;
+var $author$project$Main$StartDrag = F3(
+	function (a, b, c) {
+		return {$: 'StartDrag', a: a, b: b, c: c};
+	});
+var $author$project$Main$onMiniMouseDown = function (propositionId) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'mousedown',
+		A3(
+			$elm$json$Json$Decode$map2,
+			$author$project$Main$StartDrag(propositionId),
+			A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
+			A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)));
+};
+var $author$project$Main$onMiniTouchStart = function (propositionId) {
+	return A2(
+		$elm$html$Html$Events$preventDefaultOn,
+		'touchstart',
+		A2(
+			$elm$json$Json$Decode$map,
+			function (_v0) {
+				var clientX = _v0.a;
+				var clientY = _v0.b;
+				return _Utils_Tuple2(
+					A3($author$project$Main$StartDrag, propositionId, clientX, clientY),
+					true);
+			},
+			$author$project$Main$touchPointDecoder));
+};
 var $author$project$Main$viewMiniature = F2(
 	function (model, item) {
 		var _v0 = item.pos;
