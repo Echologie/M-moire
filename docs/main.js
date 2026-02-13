@@ -5159,7 +5159,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$FocusClosed = {$: 'FocusClosed'};
+var $author$project$Main$Mini = {$: 'Mini'};
 var $author$project$Main$RefreshBoardRect = {$: 'RefreshBoardRect'};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
@@ -5398,16 +5398,16 @@ var $author$project$Main$withInitialPositions = function (propositions) {
 			[
 				_Utils_Tuple2(
 				1,
-				{x: 0.16, y: 0.14}),
+				{x: 0.18, y: 0.14}),
 				_Utils_Tuple2(
 				2,
-				{x: 0.36, y: 0.14}),
+				{x: 0.38, y: 0.14}),
 				_Utils_Tuple2(
 				3,
-				{x: 0.56, y: 0.14}),
+				{x: 0.58, y: 0.14}),
 				_Utils_Tuple2(
 				4,
-				{x: 0.76, y: 0.14})
+				{x: 0.78, y: 0.14})
 			]));
 	return A2(
 		$elm$core$List$map,
@@ -5425,14 +5425,14 @@ var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			boardRect: $elm$core$Maybe$Nothing,
+			closingPropositionId: $elm$core$Maybe$Nothing,
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
 			expandedPropositionId: $elm$core$Maybe$Nothing,
-			focusTimeline: $mdgriffith$elm_animator$Animator$init($author$project$Main$FocusClosed),
-			isClosingExpanded: false,
-			lastKeyEvent: 'aucune',
+			focusTimeline: $mdgriffith$elm_animator$Animator$init($author$project$Main$Mini),
 			propositions: seeded,
 			selectedPropositionId: $elm$core$Maybe$Just(1),
+			suppressNextOpen: false,
 			viewport: {height: 800, width: 1200}
 		},
 		$elm$core$Platform$Cmd$batch(
@@ -5450,6 +5450,7 @@ var $author$project$Main$init = function (_v0) {
 var $author$project$Main$AnimatorTick = function (a) {
 	return {$: 'AnimatorTick', a: a};
 };
+var $author$project$Main$PointerUp = {$: 'PointerUp'};
 var $author$project$Main$WindowResized = F2(
 	function (a, b) {
 		return {$: 'WindowResized', a: a, b: b};
@@ -6325,9 +6326,18 @@ var $author$project$Main$animator = A3(
 		}),
 	$mdgriffith$elm_animator$Animator$animator);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$browser$Browser$Events$Window = {$: 'Window'};
+var $author$project$Main$PointerMove = F2(
+	function (a, b) {
+		return {$: 'PointerMove', a: a, b: b};
+	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $author$project$Main$mouseMoveDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Main$PointerMove,
+	A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float));
+var $elm$browser$Browser$Events$Document = {$: 'Document'};
 var $elm$browser$Browser$Events$MySub = F3(
 	function (a, b, c) {
 		return {$: 'MySub', a: a, b: b, c: c};
@@ -6604,6 +6614,10 @@ var $elm$browser$Browser$Events$on = F3(
 		return $elm$browser$Browser$Events$subscription(
 			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
 	});
+var $elm$browser$Browser$Events$onMouseMove = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'mousemove');
+var $elm$browser$Browser$Events$onMouseUp = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'mouseup');
+var $elm$browser$Browser$Events$Window = {$: 'Window'};
+var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$browser$Browser$Events$onResize = function (func) {
 	return A3(
 		$elm$browser$Browser$Events$on,
@@ -6757,12 +6771,17 @@ var $author$project$Main$subscriptions = function (model) {
 		_List_fromArray(
 			[
 				$elm$browser$Browser$Events$onResize($author$project$Main$WindowResized),
+				$elm$browser$Browser$Events$onMouseMove($author$project$Main$mouseMoveDecoder),
+				$elm$browser$Browser$Events$onMouseUp(
+				$elm$json$Json$Decode$succeed($author$project$Main$PointerUp)),
 				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Main$AnimatorTick, model, $author$project$Main$animator)
 			]));
 };
+var $author$project$Main$FinishCloseExpanded = {$: 'FinishCloseExpanded'};
 var $author$project$Main$GotBoardRect = function (a) {
 	return {$: 'GotBoardRect', a: a};
 };
+var $author$project$Main$Maxi = {$: 'Maxi'};
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
 		return {$: 'TransitionTo', a: a, b: b};
@@ -6939,12 +6958,12 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 				]),
 			timeline);
 	});
-var $author$project$Main$animateFocusTo = F2(
-	function (focusState, timeline) {
+var $author$project$Main$animateZoomTo = F2(
+	function (zoomState, timeline) {
 		return A3(
 			$mdgriffith$elm_animator$Animator$go,
-			$mdgriffith$elm_animator$Animator$millis(240),
-			focusState,
+			$mdgriffith$elm_animator$Animator$millis(220),
+			zoomState,
 			timeline);
 	});
 var $elm$core$Task$onError = _Scheduler_onError;
@@ -6966,6 +6985,19 @@ var $elm$core$Task$attempt = F2(
 							$elm$core$Result$Ok),
 						task))));
 	});
+var $author$project$Main$clamp = F3(
+	function (minVal, maxVal, value) {
+		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
+	});
+var $author$project$Main$currentOverlayId = function (model) {
+	var _v0 = model.expandedPropositionId;
+	if (_v0.$ === 'Just') {
+		var propositionId = _v0.a;
+		return $elm$core$Maybe$Just(propositionId);
+	} else {
+		return model.closingPropositionId;
+	}
+};
 var $elm$core$Basics$pow = _Basics_pow;
 var $elm$core$Basics$sqrt = _Basics_sqrt;
 var $author$project$Main$distance = F4(
@@ -6974,93 +7006,11 @@ var $author$project$Main$distance = F4(
 			A2($elm$core$Basics$pow, x2 - x1, 2) + A2($elm$core$Basics$pow, y2 - y1, 2));
 	});
 var $elm$browser$Browser$Dom$getElement = _Browser_getElement;
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
-var $elm$core$String$toUpper = _String_toUpper;
-var $author$project$Main$isEditableTarget = function (targetTag) {
-	return A2(
-		$elm$core$List$member,
-		$elm$core$String$toUpper(targetTag),
-		_List_fromArray(
-			['INPUT', 'TEXTAREA', 'SELECT']));
-};
-var $elm$core$String$toLower = _String_toLower;
-var $author$project$Main$isShortcutA = F2(
-	function (key, code) {
-		return ($elm$core$String$toLower(key) === 'a') || (code === 'KeyA');
-	});
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $elm$core$Basics$not = _Basics_not;
-var $author$project$Main$Focused = function (a) {
-	return {$: 'Focused', a: a};
-};
-var $author$project$Main$openExpanded = F2(
-	function (propositionId, model) {
-		return _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{
-					expandedPropositionId: $elm$core$Maybe$Just(propositionId),
-					focusTimeline: A2(
-						$author$project$Main$animateFocusTo,
-						$author$project$Main$Focused(propositionId),
-						model.focusTimeline),
-					isClosingExpanded: false,
-					selectedPropositionId: $elm$core$Maybe$Just(propositionId)
-				}),
-			$author$project$Main$scheduleMathRender);
-	});
-var $author$project$Main$clamp = F3(
-	function (minVal, maxVal, value) {
-		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
-	});
 var $author$project$Main$miniScale = 0.68;
 var $author$project$Main$miniatureHeight = 206;
 var $author$project$Main$miniatureWidth = 320;
-var $author$project$Main$positionFromClientWithOffsetBounded = F5(
-	function (rect, clientX, clientY, pointerOffsetX, pointerOffsetY) {
-		var safeWidth = (rect.width <= 0) ? 1 : rect.width;
-		var safeHeight = (rect.height <= 0) ? 1 : rect.height;
-		var marginY = (($author$project$Main$miniatureHeight * $author$project$Main$miniScale) / 2) / safeHeight;
-		var marginX = (($author$project$Main$miniatureWidth * $author$project$Main$miniScale) / 2) / safeWidth;
-		var centerY = clientY - pointerOffsetY;
-		var rawY = (centerY - rect.y) / safeHeight;
-		var centerX = clientX - pointerOffsetX;
-		var rawX = (centerX - rect.x) / safeWidth;
-		return {
-			x: A3($author$project$Main$clamp, marginX, 1 - marginX, rawX),
-			y: A3($author$project$Main$clamp, marginY, 1 - marginY, rawY)
-		};
-	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -7132,92 +7082,44 @@ var $author$project$Main$update = F2(
 				var propositionId = msg.a;
 				var clientX = msg.b;
 				var clientY = msg.c;
-				var _v1 = function () {
-					var _v2 = _Utils_Tuple2(
-						model.boardRect,
-						A2($author$project$Main$propositionPosition, propositionId, model.propositions));
-					if ((_v2.a.$ === 'Just') && (_v2.b.$ === 'Just')) {
-						var rect = _v2.a.a;
-						var pos = _v2.b.a;
-						var centerY = rect.y + (pos.y * rect.height);
-						var centerX = rect.x + (pos.x * rect.width);
-						return _Utils_Tuple2(clientX - centerX, clientY - centerY);
-					} else {
-						return _Utils_Tuple2(0, 0);
-					}
-				}();
-				var offsetX = _v1.a;
-				var offsetY = _v1.b;
+				var startPosition = A2(
+					$elm$core$Maybe$withDefault,
+					{x: 0.5, y: 0.5},
+					A2($author$project$Main$propositionPosition, propositionId, model.propositions));
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
+							closingPropositionId: $elm$core$Maybe$Nothing,
 							dragging: $elm$core$Maybe$Just(
-								{moved: false, pointerOffsetX: offsetX, pointerOffsetY: offsetY, propositionId: propositionId, startX: clientX, startY: clientY}),
+								{moved: false, propositionId: propositionId, startCardX: startPosition.x, startCardY: startPosition.y, startMouseX: clientX, startMouseY: clientY}),
 							expandedPropositionId: $elm$core$Maybe$Nothing,
-							focusTimeline: A2($author$project$Main$animateFocusTo, $author$project$Main$FocusClosed, model.focusTimeline),
-							isClosingExpanded: false,
-							selectedPropositionId: $elm$core$Maybe$Just(propositionId)
+							focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Mini, model.focusTimeline),
+							selectedPropositionId: $elm$core$Maybe$Just(propositionId),
+							suppressNextOpen: false
 						}),
 					A2(
 						$elm$core$Task$attempt,
 						$author$project$Main$GotBoardRect,
 						$elm$browser$Browser$Dom$getElement('board')));
-			case 'MiniPointerUp':
-				var propositionId = msg.a;
-				var _v3 = model.dragging;
-				if (_v3.$ === 'Just') {
-					var dragState = _v3.a;
-					return (!_Utils_eq(dragState.propositionId, propositionId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : (dragState.moved ? _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{dragging: $elm$core$Maybe$Nothing}),
-						$elm$core$Platform$Cmd$none) : A2(
-						$author$project$Main$openExpanded,
-						propositionId,
-						_Utils_update(
-							model,
-							{dragging: $elm$core$Maybe$Nothing})));
-				} else {
-					return A2(
-						$author$project$Main$openExpanded,
-						propositionId,
-						_Utils_update(
-							model,
-							{
-								selectedPropositionId: $elm$core$Maybe$Just(propositionId)
-							}));
-				}
-			case 'KeyPressed':
-				var key = msg.a;
-				var code = msg.b;
-				var targetTag = msg.c;
-				var keyboardInfo = 'key=' + (key + (' code=' + (code + (' target=' + $elm$core$String$toUpper(targetTag)))));
-				var modelWithKey = _Utils_update(
-					model,
-					{lastKeyEvent: keyboardInfo});
-				if (A2($author$project$Main$isShortcutA, key, code) && (!$author$project$Main$isEditableTarget(targetTag))) {
-					var _v4 = model.selectedPropositionId;
-					if (_v4.$ === 'Just') {
-						var propositionId = _v4.a;
-						return A2($author$project$Main$openExpanded, propositionId, modelWithKey);
-					} else {
-						return _Utils_Tuple2(modelWithKey, $elm$core$Platform$Cmd$none);
-					}
-				} else {
-					return _Utils_Tuple2(modelWithKey, $elm$core$Platform$Cmd$none);
-				}
 			case 'PointerMove':
 				var clientX = msg.a;
 				var clientY = msg.b;
-				var _v5 = _Utils_Tuple2(model.dragging, model.boardRect);
-				if ((_v5.a.$ === 'Just') && (_v5.b.$ === 'Just')) {
-					var dragState = _v5.a.a;
-					var rect = _v5.b.a;
-					var nextPos = A5($author$project$Main$positionFromClientWithOffsetBounded, rect, clientX, clientY, dragState.pointerOffsetX, dragState.pointerOffsetY);
-					var movedDistance = A4($author$project$Main$distance, dragState.startX, dragState.startY, clientX, clientY);
-					var hasMoved = dragState.moved || (movedDistance > 10);
-					var updatedPropositions = hasMoved ? A3($author$project$Main$updatePropositionPosition, dragState.propositionId, nextPos, model.propositions) : model.propositions;
+				var _v1 = _Utils_Tuple2(model.dragging, model.boardRect);
+				if ((_v1.a.$ === 'Just') && (_v1.b.$ === 'Just')) {
+					var dragState = _v1.a.a;
+					var rect = _v1.b.a;
+					var safeWidth = (rect.width <= 0) ? 1 : rect.width;
+					var safeHeight = (rect.height <= 0) ? 1 : rect.height;
+					var movedNow = dragState.moved || (A4($author$project$Main$distance, dragState.startMouseX, dragState.startMouseY, clientX, clientY) > 4);
+					var marginY = (($author$project$Main$miniatureHeight * $author$project$Main$miniScale) / 2) / safeHeight;
+					var marginX = (($author$project$Main$miniatureWidth * $author$project$Main$miniScale) / 2) / safeWidth;
+					var deltaY = (clientY - dragState.startMouseY) / safeHeight;
+					var deltaX = (clientX - dragState.startMouseX) / safeWidth;
+					var nextPos = {
+						x: A3($author$project$Main$clamp, marginX, 1 - marginX, dragState.startCardX + deltaX),
+						y: A3($author$project$Main$clamp, marginY, 1 - marginY, dragState.startCardY + deltaY)
+					};
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7225,49 +7127,107 @@ var $author$project$Main$update = F2(
 								dragging: $elm$core$Maybe$Just(
 									_Utils_update(
 										dragState,
-										{moved: hasMoved})),
-								propositions: updatedPropositions
+										{moved: movedNow})),
+								propositions: A3($author$project$Main$updatePropositionPosition, dragState.propositionId, nextPos, model.propositions)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
 			case 'PointerUp':
-				var _v6 = model.dragging;
-				if (_v6.$ === 'Nothing') {
+				var _v2 = model.dragging;
+				if (_v2.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var dragState = _v6.a;
-					return dragState.moved ? _Utils_Tuple2(
+					var dragState = _v2.a;
+					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{dragging: $elm$core$Maybe$Nothing}),
-						$elm$core$Platform$Cmd$none) : A2(
-						$author$project$Main$openExpanded,
-						dragState.propositionId,
-						_Utils_update(
-							model,
-							{dragging: $elm$core$Maybe$Nothing}));
+							{dragging: $elm$core$Maybe$Nothing, suppressNextOpen: dragState.moved}),
+						$elm$core$Platform$Cmd$none);
 				}
-			case 'CloseExpanded':
-				return _Utils_Tuple2(
+			case 'OpenCard':
+				var propositionId = msg.a;
+				return model.suppressNextOpen ? _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{suppressNextOpen: false}),
+					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							expandedPropositionId: $elm$core$Maybe$Nothing,
-							focusTimeline: A2($author$project$Main$animateFocusTo, $author$project$Main$FocusClosed, model.focusTimeline),
-							isClosingExpanded: false
+							closingPropositionId: $elm$core$Maybe$Nothing,
+							expandedPropositionId: $elm$core$Maybe$Just(propositionId),
+							focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Maxi, model.focusTimeline),
+							selectedPropositionId: $elm$core$Maybe$Just(propositionId)
 						}),
-					$elm$core$Platform$Cmd$none);
-			case 'FinishCloseExpanded':
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'UpdateExpandedComment':
-				var newComment = msg.a;
-				var _v7 = model.expandedPropositionId;
-				if (_v7.$ === 'Nothing') {
+					$author$project$Main$scheduleMathRender);
+			case 'TouchEndOnMini':
+				var propositionId = msg.a;
+				var _v3 = model.dragging;
+				if (_v3.$ === 'Just') {
+					var dragState = _v3.a;
+					return (!_Utils_eq(dragState.propositionId, propositionId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : (dragState.moved ? _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{dragging: $elm$core$Maybe$Nothing, suppressNextOpen: false}),
+						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								closingPropositionId: $elm$core$Maybe$Nothing,
+								dragging: $elm$core$Maybe$Nothing,
+								expandedPropositionId: $elm$core$Maybe$Just(propositionId),
+								focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Maxi, model.focusTimeline),
+								selectedPropositionId: $elm$core$Maybe$Just(propositionId)
+							}),
+						$author$project$Main$scheduleMathRender));
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								closingPropositionId: $elm$core$Maybe$Nothing,
+								expandedPropositionId: $elm$core$Maybe$Just(propositionId),
+								focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Maxi, model.focusTimeline),
+								selectedPropositionId: $elm$core$Maybe$Just(propositionId)
+							}),
+						$author$project$Main$scheduleMathRender);
+				}
+			case 'CloseExpanded':
+				var _v4 = $author$project$Main$currentOverlayId(model);
+				if (_v4.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var propositionId = _v7.a;
+					var propositionId = _v4.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								closingPropositionId: $elm$core$Maybe$Just(propositionId),
+								expandedPropositionId: $elm$core$Maybe$Nothing,
+								focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Mini, model.focusTimeline)
+							}),
+						A2(
+							$elm$core$Task$perform,
+							function (_v5) {
+								return $author$project$Main$FinishCloseExpanded;
+							},
+							$elm$core$Process$sleep(240)));
+				}
+			case 'FinishCloseExpanded':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{closingPropositionId: $elm$core$Maybe$Nothing}),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateExpandedComment':
+				var newComment = msg.a;
+				var _v6 = $author$project$Main$currentOverlayId(model);
+				if (_v6.$ === 'Nothing') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var propositionId = _v6.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7316,7 +7276,7 @@ var $author$project$Main$update = F2(
 						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v9) {
+						function (_v8) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(24)));
@@ -7325,14 +7285,15 @@ var $author$project$Main$update = F2(
 					model,
 					$author$project$Main$renderMath('refresh'));
 			case 'AnimatorTick':
-				var newTime = msg.a;
+				var now = msg.a;
 				return _Utils_Tuple2(
-					A3($mdgriffith$elm_animator$Animator$update, newTime, $author$project$Main$animator, model),
+					A3($mdgriffith$elm_animator$Animator$update, now, $author$project$Main$animator, model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$CloseExpanded = {$: 'CloseExpanded'};
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
@@ -7407,7 +7368,6 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $author$project$Main$PointerUp = {$: 'PointerUp'};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -7419,26 +7379,9 @@ var $elm$html$Html$Events$on = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
-var $author$project$Main$onBoardMouseLeave = A2(
+var $author$project$Main$onBoardTouchCancel = A2(
 	$elm$html$Html$Events$on,
-	'mouseleave',
-	$elm$json$Json$Decode$succeed($author$project$Main$PointerUp));
-var $author$project$Main$PointerMove = F2(
-	function (a, b) {
-		return {$: 'PointerMove', a: a, b: b};
-	});
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $author$project$Main$onBoardMouseMove = A2(
-	$elm$html$Html$Events$on,
-	'mousemove',
-	A3(
-		$elm$json$Json$Decode$map2,
-		$author$project$Main$PointerMove,
-		A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
-		A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)));
-var $author$project$Main$onBoardMouseUp = A2(
-	$elm$html$Html$Events$on,
-	'mouseup',
+	'touchcancel',
 	$elm$json$Json$Decode$succeed($author$project$Main$PointerUp));
 var $author$project$Main$onBoardTouchEnd = A2(
 	$elm$html$Html$Events$on,
@@ -7506,8 +7449,26 @@ var $author$project$Main$onBoardTouchMove = A2(
 				true);
 		},
 		$author$project$Main$touchPointDecoder));
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $author$project$Main$OpenCard = function (a) {
+	return {$: 'OpenCard', a: a};
+};
+var $author$project$Main$StartDrag = F3(
+	function (a, b, c) {
+		return {$: 'StartDrag', a: a, b: b, c: c};
+	});
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $author$project$Main$mousePointDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$elm$core$Tuple$pair,
+	A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float));
 var $author$project$Main$notchBadge = function (badge) {
 	return A2(
 		$elm$html$Html$div,
@@ -7534,22 +7495,8 @@ var $author$project$Main$notchBadge = function (badge) {
 				$elm$html$Html$text(badge)
 			]));
 };
-var $author$project$Main$StartDrag = F3(
-	function (a, b, c) {
-		return {$: 'StartDrag', a: a, b: b, c: c};
-	});
-var $author$project$Main$onMiniMouseDown = function (propositionId) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'mousedown',
-		A3(
-			$elm$json$Json$Decode$map2,
-			$author$project$Main$StartDrag(propositionId),
-			A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
-			A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)));
-};
-var $author$project$Main$MiniPointerUp = function (a) {
-	return {$: 'MiniPointerUp', a: a};
+var $author$project$Main$TouchEndOnMini = function (a) {
+	return {$: 'TouchEndOnMini', a: a};
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
@@ -7561,22 +7508,13 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $author$project$Main$onMiniMouseUp = function (propositionId) {
-	return A2(
-		$elm$html$Html$Events$stopPropagationOn,
-		'mouseup',
-		$elm$json$Json$Decode$succeed(
-			_Utils_Tuple2(
-				$author$project$Main$MiniPointerUp(propositionId),
-				true)));
-};
 var $author$project$Main$onMiniTouchEnd = function (propositionId) {
 	return A2(
 		$elm$html$Html$Events$stopPropagationOn,
 		'touchend',
 		$elm$json$Json$Decode$succeed(
 			_Utils_Tuple2(
-				$author$project$Main$MiniPointerUp(propositionId),
+				$author$project$Main$TouchEndOnMini(propositionId),
 				true)));
 };
 var $author$project$Main$onMiniTouchStart = function (propositionId) {
@@ -7604,16 +7542,10 @@ var $author$project$Main$viewMiniature = F2(
 			var pos = _v0.a;
 			var scaledWidth = $author$project$Main$miniatureWidth * $author$project$Main$miniScale;
 			var scaledHeight = $author$project$Main$miniatureHeight * $author$project$Main$miniScale;
-			var isSelected = _Utils_eq(
-				model.selectedPropositionId,
-				$elm$core$Maybe$Just(item.id));
-			var isExpanded = _Utils_eq(
-				model.expandedPropositionId,
-				$elm$core$Maybe$Just(item.id));
 			var isDragging = function () {
-				var _v1 = model.dragging;
-				if (_v1.$ === 'Just') {
-					var dragState = _v1.a;
+				var _v2 = model.dragging;
+				if (_v2.$ === 'Just') {
+					var dragState = _v2.a;
 					return _Utils_eq(dragState.propositionId, item.id);
 				} else {
 					return false;
@@ -7646,7 +7578,7 @@ var $author$project$Main$viewMiniature = F2(
 						A2(
 						$elm$html$Html$Attributes$style,
 						'z-index',
-						isDragging ? '70' : (isExpanded ? '45' : '30'))
+						isDragging ? '80' : '30')
 					]),
 				_List_fromArray(
 					[
@@ -7654,6 +7586,28 @@ var $author$project$Main$viewMiniature = F2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
+								A2(
+								$elm$html$Html$Events$preventDefaultOn,
+								'mousedown',
+								A2(
+									$elm$json$Json$Decode$map,
+									function (_v1) {
+										var x = _v1.a;
+										var y = _v1.b;
+										return _Utils_Tuple2(
+											A3($author$project$Main$StartDrag, item.id, x, y),
+											true);
+									},
+									$author$project$Main$mousePointDecoder)),
+								$author$project$Main$onMiniTouchStart(item.id),
+								$author$project$Main$onMiniTouchEnd(item.id),
+								A2(
+								$elm$html$Html$Events$stopPropagationOn,
+								'click',
+								$elm$json$Json$Decode$succeed(
+									_Utils_Tuple2(
+										$author$project$Main$OpenCard(item.id),
+										true))),
 								A2(
 								$elm$html$Html$Attributes$style,
 								'transform',
@@ -7671,7 +7625,7 @@ var $author$project$Main$viewMiniature = F2(
 								A2(
 								$elm$html$Html$Attributes$style,
 								'border',
-								isExpanded ? '2px solid #0f62fe' : (isDragging ? '2px solid #3b82f6' : (isSelected ? '2px solid #93c5fd' : '1px solid #c7d3ea'))),
+								isDragging ? '2px solid #2563eb' : '1px solid #c7d3ea'),
 								A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
 								A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
 								A2(
@@ -7683,11 +7637,7 @@ var $author$project$Main$viewMiniature = F2(
 								A2($elm$html$Html$Attributes$style, 'cursor', cursorStyle),
 								A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
 								A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
-								A2($elm$html$Html$Attributes$style, 'outline', 'none'),
-								$author$project$Main$onMiniMouseDown(item.id),
-								$author$project$Main$onMiniTouchStart(item.id),
-								$author$project$Main$onMiniMouseUp(item.id),
-								$author$project$Main$onMiniTouchEnd(item.id)
+								A2($elm$html$Html$Attributes$style, 'outline', 'none')
 							]),
 						_List_fromArray(
 							[
@@ -7763,16 +7713,29 @@ var $author$project$Main$viewMiniature = F2(
 		}
 	});
 var $author$project$Main$boardView = function (model) {
+	var hiddenId = $author$project$Main$currentOverlayId(model);
+	var visiblePropositions = function () {
+		if (hiddenId.$ === 'Nothing') {
+			return model.propositions;
+		} else {
+			var propositionId = hiddenId.a;
+			return A2(
+				$elm$core$List$filter,
+				function (item) {
+					return !_Utils_eq(item.id, propositionId);
+				},
+				model.propositions);
+		}
+	}();
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
 				$elm$html$Html$Attributes$id('board'),
-				$author$project$Main$onBoardMouseMove,
-				$author$project$Main$onBoardMouseUp,
-				$author$project$Main$onBoardMouseLeave,
 				$author$project$Main$onBoardTouchMove,
 				$author$project$Main$onBoardTouchEnd,
+				$author$project$Main$onBoardTouchCancel,
+				$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
 				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 				A2($elm$html$Html$Attributes$style, 'flex', '1'),
 				A2($elm$html$Html$Attributes$style, 'width', '100%'),
@@ -7789,21 +7752,20 @@ var $author$project$Main$boardView = function (model) {
 				A2(
 					$elm$core$List$map,
 					$author$project$Main$viewMiniature(model),
-					model.propositions),
+					visiblePropositions),
 				_List_fromArray(
 					[$author$project$Main$boardLegend]))));
 };
-var $author$project$Main$propositionById = F2(
-	function (propositionId, propositions) {
-		return $elm$core$List$head(
-			A2(
-				$elm$core$List$filter,
-				function (item) {
-					return _Utils_eq(item.id, propositionId);
-				},
-				propositions));
-	});
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $author$project$Main$placedCount = function (propositions) {
+	return $elm$core$List$length(
+		A2(
+			$elm$core$List$filter,
+			function (item) {
+				return !_Utils_eq(item.pos, $elm$core$Maybe$Nothing);
+			},
+			propositions));
+};
 var $author$project$Main$selectedBadgeLabel = function (maybeId) {
 	if (maybeId.$ === 'Just') {
 		var propositionId = maybeId.a;
@@ -7891,11 +7853,22 @@ var $author$project$Main$topHeader = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						'Selection : ' + ($author$project$Main$selectedBadgeLabel(model.selectedPropositionId) + (' | Expanded : ' + ($author$project$Main$selectedBadgeLabel(model.expandedPropositionId) + ' | ouverture par clic'))))
+						'Selection : ' + ($author$project$Main$selectedBadgeLabel(model.selectedPropositionId) + (' | Placees : ' + ($elm$core$String$fromInt(
+							$author$project$Main$placedCount(model.propositions)) + ('/' + $elm$core$String$fromInt(
+							$elm$core$List$length(model.propositions)))))))
 					]))
 			]));
 };
-var $author$project$Main$CloseExpanded = {$: 'CloseExpanded'};
+var $author$project$Main$propositionById = F2(
+	function (propositionId, propositions) {
+		return $elm$core$List$head(
+			A2(
+				$elm$core$List$filter,
+				function (item) {
+					return _Utils_eq(item.id, propositionId);
+				},
+				propositions));
+	});
 var $author$project$Main$NoOp = {$: 'NoOp'};
 var $author$project$Main$UpdateEmail = function (a) {
 	return {$: 'UpdateEmail', a: a};
@@ -7903,15 +7876,76 @@ var $author$project$Main$UpdateEmail = function (a) {
 var $author$project$Main$UpdateExpandedComment = function (a) {
 	return {$: 'UpdateExpandedComment', a: a};
 };
+var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
+	return {$: 'Specified', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Oscillate = F3(
+	function (a, b, c) {
+		return {$: 'Oscillate', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
+	function (a, b) {
+		return {$: 'Position', a: a, b: b};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault = function (a) {
+	return {$: 'PartialDefault', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Default = {$: 'Default'};
+var $mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults = {arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Default, arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, departLate: $mdgriffith$elm_animator$Internal$Interpolate$Default, departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, wobbliness: $mdgriffith$elm_animator$Internal$Interpolate$Default};
+var $mdgriffith$elm_animator$Animator$withDefault = F2(
+	function (toDef, currentDefault) {
+		if (currentDefault.$ === 'FullDefault') {
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef($mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults));
+		} else {
+			var thing = currentDefault.a;
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef(thing));
+		}
+	});
+var $mdgriffith$elm_animator$Animator$applyOption = F2(
+	function (toOption, movement) {
+		if (movement.$ === 'Position') {
+			var personality = movement.a;
+			var pos = movement.b;
+			return A2(
+				$mdgriffith$elm_animator$Internal$Interpolate$Position,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				pos);
+		} else {
+			var personality = movement.a;
+			var dur = movement.b;
+			var fn = movement.c;
+			return A3(
+				$mdgriffith$elm_animator$Internal$Interpolate$Oscillate,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				dur,
+				fn);
+		}
+	});
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
+	function (s, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, s))
+					});
+			},
+			movement);
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
+var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -7930,6 +7964,7 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $author$project$Main$overlayStartScale = 0.18;
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$Attributes$rows = function (n) {
 	return A2(
@@ -7937,6 +7972,1088 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
+var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
+	function (_v0, _v1) {
+		var y = _v0.a;
+		var x = _v1.a;
+		return _Utils_cmp(x, y) > 0;
+	});
+var $mdgriffith$elm_animator$Internal$Time$inMilliseconds = function (_v0) {
+	var ms = _v0.a;
+	return ms;
+};
+var $mdgriffith$elm_animator$Internal$Time$duration = F2(
+	function (one, two) {
+		return A2($ianmackenzie$elm_units$Quantity$greaterThan, two, one) ? $ianmackenzie$elm_units$Duration$milliseconds(
+			A2(
+				$elm$core$Basics$max,
+				0,
+				$mdgriffith$elm_animator$Internal$Time$inMilliseconds(one) - $mdgriffith$elm_animator$Internal$Time$inMilliseconds(two))) : $ianmackenzie$elm_units$Duration$milliseconds(
+			A2(
+				$elm$core$Basics$max,
+				0,
+				$mdgriffith$elm_animator$Internal$Time$inMilliseconds(two) - $mdgriffith$elm_animator$Internal$Time$inMilliseconds(one)));
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$adjustTime = F4(
+	function (lookup, getPersonality, unmodified, upcomingOccurring) {
+		var event = unmodified.a;
+		var start = unmodified.b;
+		var eventEnd = unmodified.c;
+		if (!upcomingOccurring.b) {
+			return unmodified;
+		} else {
+			var _v1 = upcomingOccurring.a;
+			var next = _v1.a;
+			var nextStartTime = _v1.b;
+			var personality = getPersonality(
+				lookup(event));
+			if (!(!personality.departLate)) {
+				var totalDuration = A2($mdgriffith$elm_animator$Internal$Time$duration, eventEnd, nextStartTime);
+				var nextPersonality = getPersonality(
+					lookup(next));
+				var totalPortions = A2($elm$core$Basics$max, personality.departLate + nextPersonality.arriveEarly, 1);
+				var lateBy = A2($ianmackenzie$elm_units$Quantity$multiplyBy, personality.departLate / totalPortions, totalDuration);
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Occurring,
+					event,
+					start,
+					A2($mdgriffith$elm_animator$Internal$Time$advanceBy, lateBy, eventEnd));
+			} else {
+				return unmodified;
+			}
+		}
+	});
+var $ianmackenzie$elm_units$Quantity$minus = F2(
+	function (_v0, _v1) {
+		var y = _v0.a;
+		var x = _v1.a;
+		return $ianmackenzie$elm_units$Quantity$Quantity(x - y);
+	});
+var $mdgriffith$elm_animator$Internal$Time$rollbackBy = F2(
+	function (dur, time) {
+		return A2(
+			$ianmackenzie$elm_units$Quantity$minus,
+			$ianmackenzie$elm_units$Quantity$Quantity(
+				$ianmackenzie$elm_units$Duration$inMilliseconds(dur)),
+			time);
+	});
+var $mdgriffith$elm_animator$Internal$Time$zeroDuration = function (_v0) {
+	var dur = _v0.a;
+	return !dur;
+};
+var $mdgriffith$elm_animator$Internal$Timeline$adjustTimeWithPrevious = F5(
+	function (lookup, getPersonality, _v0, unmodified, upcomingOccurring) {
+		var prev = _v0.a;
+		var prevStart = _v0.b;
+		var prevEnd = _v0.c;
+		var event = unmodified.a;
+		var start = unmodified.b;
+		var eventEnd = unmodified.c;
+		var totalPrevDuration = A2($mdgriffith$elm_animator$Internal$Time$duration, prevEnd, start);
+		var prevPersonality = getPersonality(
+			lookup(prev));
+		var personality = getPersonality(
+			lookup(event));
+		var totalPrevPortions = A2($elm$core$Basics$max, prevPersonality.departLate + personality.arriveEarly, 1);
+		var earlyBy = A2($ianmackenzie$elm_units$Quantity$multiplyBy, personality.arriveEarly / totalPrevPortions, totalPrevDuration);
+		if (!upcomingOccurring.b) {
+			return $mdgriffith$elm_animator$Internal$Time$zeroDuration(earlyBy) ? unmodified : A3(
+				$mdgriffith$elm_animator$Internal$Timeline$Occurring,
+				event,
+				A2($mdgriffith$elm_animator$Internal$Time$rollbackBy, earlyBy, start),
+				eventEnd);
+		} else {
+			var _v2 = upcomingOccurring.a;
+			var next = _v2.a;
+			var nextStartTime = _v2.b;
+			if (!(!personality.departLate)) {
+				var totalDuration = A2($mdgriffith$elm_animator$Internal$Time$duration, eventEnd, nextStartTime);
+				var nextPersonality = getPersonality(
+					lookup(next));
+				var totalPortions = A2($elm$core$Basics$max, personality.departLate + nextPersonality.arriveEarly, 1);
+				var lateBy = A2($ianmackenzie$elm_units$Quantity$multiplyBy, personality.departLate / totalPortions, totalDuration);
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Occurring,
+					event,
+					A2($mdgriffith$elm_animator$Internal$Time$rollbackBy, earlyBy, start),
+					A2($mdgriffith$elm_animator$Internal$Time$advanceBy, lateBy, eventEnd));
+			} else {
+				if ($mdgriffith$elm_animator$Internal$Time$zeroDuration(earlyBy)) {
+					return unmodified;
+				} else {
+					return A3(
+						$mdgriffith$elm_animator$Internal$Timeline$Occurring,
+						event,
+						A2($mdgriffith$elm_animator$Internal$Time$rollbackBy, earlyBy, start),
+						eventEnd);
+				}
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$hasDwell = function (_v0) {
+	var start = _v0.b.a;
+	var end = _v0.c.a;
+	return !(!(start - end));
+};
+var $mdgriffith$elm_animator$Internal$Timeline$createLookAhead = F4(
+	function (fn, lookup, currentEvent, upcomingEvents) {
+		if (!upcomingEvents.b) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var unadjustedUpcoming = upcomingEvents.a;
+			var remain = upcomingEvents.b;
+			var upcomingOccurring = A5($mdgriffith$elm_animator$Internal$Timeline$adjustTimeWithPrevious, lookup, fn.adjustor, currentEvent, unadjustedUpcoming, remain);
+			return $elm$core$Maybe$Just(
+				{
+					anchor: lookup(
+						$mdgriffith$elm_animator$Internal$Timeline$getEvent(upcomingOccurring)),
+					resting: $mdgriffith$elm_animator$Internal$Timeline$hasDwell(upcomingOccurring),
+					time: $mdgriffith$elm_animator$Internal$Time$inMilliseconds(
+						$mdgriffith$elm_animator$Internal$Timeline$startTime(upcomingOccurring))
+				});
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$overLines = F7(
+	function (fn, lookup, details, maybePreviousEvent, _v0, futureLines, state) {
+		overLines:
+		while (true) {
+			var lineStart = _v0.a;
+			var unadjustedStartEvent = _v0.b;
+			var lineRemain = _v0.c;
+			var transition = function (newState) {
+				if (!futureLines.b) {
+					return newState;
+				} else {
+					var future = futureLines.a;
+					var futureStart = future.a;
+					var futureStartEv = future.b;
+					var futureRemain = future.c;
+					var restOfFuture = futureLines.b;
+					return A2($mdgriffith$elm_animator$Internal$Time$thisBeforeOrEqualThat, futureStart, details.now) ? A7($mdgriffith$elm_animator$Internal$Timeline$overLines, fn, lookup, details, $elm$core$Maybe$Nothing, future, restOfFuture, newState) : newState;
+				}
+			};
+			var now = function () {
+				if (!futureLines.b) {
+					return details.now;
+				} else {
+					var _v5 = futureLines.a;
+					var futureStart = _v5.a;
+					var futureStartEv = _v5.b;
+					var futureRemain = _v5.c;
+					var restOfFuture = futureLines.b;
+					return A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, futureStart, details.now) ? futureStart : details.now;
+				}
+			}();
+			var lineStartEv = function () {
+				if (maybePreviousEvent.$ === 'Nothing') {
+					return A4($mdgriffith$elm_animator$Internal$Timeline$adjustTime, lookup, fn.adjustor, unadjustedStartEvent, lineRemain);
+				} else {
+					var prev = maybePreviousEvent.a;
+					return A5($mdgriffith$elm_animator$Internal$Timeline$adjustTimeWithPrevious, lookup, fn.adjustor, prev, unadjustedStartEvent, lineRemain);
+				}
+			}();
+			if (A2(
+				$mdgriffith$elm_animator$Internal$Time$thisBeforeThat,
+				now,
+				$mdgriffith$elm_animator$Internal$Timeline$startTime(lineStartEv))) {
+				return transition(
+					A7(
+						fn.lerp,
+						$mdgriffith$elm_animator$Internal$Time$inMilliseconds(lineStart),
+						$elm$core$Maybe$Just(
+							lookup(details.initial)),
+						lookup(
+							$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv)),
+						$mdgriffith$elm_animator$Internal$Time$inMilliseconds(
+							$mdgriffith$elm_animator$Internal$Timeline$startTime(lineStartEv)),
+						$mdgriffith$elm_animator$Internal$Time$inMilliseconds(now),
+						A4($mdgriffith$elm_animator$Internal$Timeline$createLookAhead, fn, lookup, unadjustedStartEvent, lineRemain),
+						state));
+			} else {
+				if (A2(
+					$mdgriffith$elm_animator$Internal$Time$thisBeforeThat,
+					now,
+					$mdgriffith$elm_animator$Internal$Timeline$endTime(lineStartEv))) {
+					return transition(
+						A5(
+							fn.visit,
+							lookup,
+							lineStartEv,
+							now,
+							A4($mdgriffith$elm_animator$Internal$Timeline$createLookAhead, fn, lookup, unadjustedStartEvent, lineRemain),
+							state));
+				} else {
+					if (!lineRemain.b) {
+						return transition(
+							A5(fn.visit, lookup, lineStartEv, now, $elm$core$Maybe$Nothing, state));
+					} else {
+						var unadjustedNext = lineRemain.a;
+						var lineRemain2 = lineRemain.b;
+						var next = A5($mdgriffith$elm_animator$Internal$Timeline$adjustTimeWithPrevious, lookup, fn.adjustor, unadjustedStartEvent, unadjustedNext, lineRemain2);
+						if (A2(
+							$mdgriffith$elm_animator$Internal$Time$thisBeforeThat,
+							now,
+							$mdgriffith$elm_animator$Internal$Timeline$startTime(next))) {
+							return transition(
+								A7(
+									fn.lerp,
+									$mdgriffith$elm_animator$Internal$Time$inMilliseconds(
+										$mdgriffith$elm_animator$Internal$Timeline$endTime(lineStartEv)),
+									$elm$core$Maybe$Just(
+										lookup(
+											$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv))),
+									lookup(
+										$mdgriffith$elm_animator$Internal$Timeline$getEvent(next)),
+									$mdgriffith$elm_animator$Internal$Time$inMilliseconds(
+										$mdgriffith$elm_animator$Internal$Timeline$startTime(next)),
+									$mdgriffith$elm_animator$Internal$Time$inMilliseconds(now),
+									A4($mdgriffith$elm_animator$Internal$Timeline$createLookAhead, fn, lookup, unadjustedNext, lineRemain2),
+									A5(
+										fn.visit,
+										lookup,
+										lineStartEv,
+										now,
+										A4($mdgriffith$elm_animator$Internal$Timeline$createLookAhead, fn, lookup, unadjustedStartEvent, lineRemain),
+										state)));
+						} else {
+							if (A2(
+								$mdgriffith$elm_animator$Internal$Time$thisBeforeThat,
+								now,
+								$mdgriffith$elm_animator$Internal$Timeline$endTime(next))) {
+								return transition(
+									A5(
+										fn.visit,
+										lookup,
+										next,
+										now,
+										A4($mdgriffith$elm_animator$Internal$Timeline$createLookAhead, fn, lookup, unadjustedNext, lineRemain2),
+										state));
+							} else {
+								if (!lineRemain2.b) {
+									return transition(
+										A5(fn.visit, lookup, next, now, $elm$core$Maybe$Nothing, state));
+								} else {
+									var unadjustedNext2 = lineRemain2.a;
+									var lineRemain3 = lineRemain2.b;
+									var next2 = A5($mdgriffith$elm_animator$Internal$Timeline$adjustTimeWithPrevious, lookup, fn.adjustor, unadjustedNext, unadjustedNext2, lineRemain3);
+									if (A2(
+										$mdgriffith$elm_animator$Internal$Time$thisBeforeThat,
+										now,
+										$mdgriffith$elm_animator$Internal$Timeline$startTime(next2))) {
+										var after = A5(
+											fn.visit,
+											lookup,
+											next,
+											now,
+											A4($mdgriffith$elm_animator$Internal$Timeline$createLookAhead, fn, lookup, unadjustedNext, lineRemain2),
+											state);
+										return transition(
+											A7(
+												fn.lerp,
+												$mdgriffith$elm_animator$Internal$Time$inMilliseconds(
+													$mdgriffith$elm_animator$Internal$Timeline$endTime(next)),
+												$elm$core$Maybe$Just(
+													lookup(
+														$mdgriffith$elm_animator$Internal$Timeline$getEvent(next))),
+												lookup(
+													$mdgriffith$elm_animator$Internal$Timeline$getEvent(next2)),
+												$mdgriffith$elm_animator$Internal$Time$inMilliseconds(
+													$mdgriffith$elm_animator$Internal$Timeline$startTime(next2)),
+												$mdgriffith$elm_animator$Internal$Time$inMilliseconds(now),
+												A4($mdgriffith$elm_animator$Internal$Timeline$createLookAhead, fn, lookup, unadjustedNext2, lineRemain3),
+												after));
+									} else {
+										if (A2(
+											$mdgriffith$elm_animator$Internal$Time$thisBeforeThat,
+											now,
+											$mdgriffith$elm_animator$Internal$Timeline$endTime(next2))) {
+											return transition(
+												A5(
+													fn.visit,
+													lookup,
+													next2,
+													now,
+													A4($mdgriffith$elm_animator$Internal$Timeline$createLookAhead, fn, lookup, unadjustedNext2, lineRemain3),
+													state));
+										} else {
+											var after = A5(
+												fn.visit,
+												lookup,
+												next2,
+												now,
+												A4($mdgriffith$elm_animator$Internal$Timeline$createLookAhead, fn, lookup, unadjustedNext2, lineRemain3),
+												state);
+											var $temp$fn = fn,
+												$temp$lookup = lookup,
+												$temp$details = details,
+												$temp$maybePreviousEvent = $elm$core$Maybe$Just(next),
+												$temp$_v0 = A3(
+												$mdgriffith$elm_animator$Internal$Timeline$Line,
+												$mdgriffith$elm_animator$Internal$Timeline$endTime(next),
+												unadjustedNext2,
+												lineRemain3),
+												$temp$futureLines = futureLines,
+												$temp$state = after;
+											fn = $temp$fn;
+											lookup = $temp$lookup;
+											details = $temp$details;
+											maybePreviousEvent = $temp$maybePreviousEvent;
+											_v0 = $temp$_v0;
+											futureLines = $temp$futureLines;
+											state = $temp$state;
+											continue overLines;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$foldp = F3(
+	function (lookup, fn, _v0) {
+		var timelineDetails = _v0.a;
+		var _v1 = timelineDetails.events;
+		var timetable = _v1.a;
+		var start = fn.start(
+			lookup(timelineDetails.initial));
+		if (!timetable.b) {
+			return start;
+		} else {
+			var firstLine = timetable.a;
+			var remainingLines = timetable.b;
+			return A7($mdgriffith$elm_animator$Internal$Timeline$overLines, fn, lookup, timelineDetails, $elm$core$Maybe$Nothing, firstLine, remainingLines, start);
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$dwellPeriod = function (movement) {
+	if (movement.$ === 'Pos') {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var period = movement.b;
+		return $elm$core$Maybe$Just(period);
+	}
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$getPersonality = function (m) {
+	if (m.$ === 'Osc') {
+		var personality = m.a;
+		return personality;
+	} else {
+		var personality = m.a;
+		return personality;
+	}
+};
+var $ianmackenzie$elm_units$Pixels$inPixels = function (_v0) {
+	var numPixels = _v0.a;
+	return numPixels;
+};
+var $ianmackenzie$elm_units$Pixels$inPixelsPerSecond = function (_v0) {
+	var numPixelsPerSecond = _v0.a;
+	return numPixelsPerSecond;
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Spline = F4(
+	function (a, b, c, d) {
+		return {$: 'Spline', a: a, b: b, c: c, d: d};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$zeroPoint = {x: 0, y: 0};
+var $mdgriffith$elm_animator$Internal$Interpolate$createSpline = function (config) {
+	var totalX = config.end.x - config.start.x;
+	var startVelScale = 1 / (config.startVelocity.x / totalX);
+	var startVelocity = (!config.departure.departSlowly) ? {x: 0, y: 0} : (((!(config.startVelocity.x - $mdgriffith$elm_animator$Internal$Interpolate$zeroPoint.x)) && (!(config.startVelocity.y - $mdgriffith$elm_animator$Internal$Interpolate$zeroPoint.y))) ? {x: totalX * (config.departure.departSlowly * 3), y: 0} : {x: (startVelScale * config.startVelocity.x) * (config.departure.departSlowly * 3), y: (startVelScale * config.startVelocity.y) * (config.departure.departSlowly * 3)});
+	var endVelScale = 1 / (config.endVelocity.x / totalX);
+	var endVelocity = (!config.arrival.arriveSlowly) ? {x: 0, y: 0} : (((!(config.endVelocity.x - $mdgriffith$elm_animator$Internal$Interpolate$zeroPoint.x)) && (!(config.endVelocity.y - $mdgriffith$elm_animator$Internal$Interpolate$zeroPoint.y))) ? {x: totalX * (config.arrival.arriveSlowly * 3), y: 0} : {x: (endVelScale * config.endVelocity.x) * (config.arrival.arriveSlowly * 3), y: (endVelScale * config.endVelocity.y) * (config.arrival.arriveSlowly * 3)});
+	return A4(
+		$mdgriffith$elm_animator$Internal$Interpolate$Spline,
+		config.start,
+		{x: config.start.x + ((1 / 3) * startVelocity.x), y: config.start.y + ((1 / 3) * startVelocity.y)},
+		{x: config.end.x + (((-1) / 3) * endVelocity.x), y: config.end.y + (((-1) / 3) * endVelocity.y)},
+		config.end);
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$findAtXOnSpline = F6(
+	function (spline, desiredX, tolerance, jumpSize, t, depth) {
+		findAtXOnSpline:
+		while (true) {
+			var p1 = spline.a;
+			var p2 = spline.b;
+			var p3 = spline.c;
+			var p4 = spline.d;
+			var point = function () {
+				if (t <= 0.5) {
+					var q3 = {x: p3.x + (t * (p4.x - p3.x)), y: p3.y + (t * (p4.y - p3.y))};
+					var q2 = {x: p2.x + (t * (p3.x - p2.x)), y: p2.y + (t * (p3.y - p2.y))};
+					var r2 = {x: q2.x + (t * (q3.x - q2.x)), y: q2.y + (t * (q3.y - q2.y))};
+					var q1 = {x: p1.x + (t * (p2.x - p1.x)), y: p1.y + (t * (p2.y - p1.y))};
+					var r1 = {x: q1.x + (t * (q2.x - q1.x)), y: q1.y + (t * (q2.y - q1.y))};
+					return {x: r1.x + (t * (r2.x - r1.x)), y: r1.y + (t * (r2.y - r1.y))};
+				} else {
+					var q3 = {x: p4.x + ((1 - t) * (p3.x - p4.x)), y: p4.y + ((1 - t) * (p3.y - p4.y))};
+					var q2 = {x: p3.x + ((1 - t) * (p2.x - p3.x)), y: p3.y + ((1 - t) * (p2.y - p3.y))};
+					var r2 = {x: q3.x + ((1 - t) * (q2.x - q3.x)), y: q3.y + ((1 - t) * (q2.y - q3.y))};
+					var q1 = {x: p2.x + ((1 - t) * (p1.x - p2.x)), y: p2.y + ((1 - t) * (p1.y - p2.y))};
+					var r1 = {x: q2.x + ((1 - t) * (q1.x - q2.x)), y: q2.y + ((1 - t) * (q1.y - q2.y))};
+					return {x: r2.x + ((1 - t) * (r1.x - r2.x)), y: r2.y + ((1 - t) * (r1.y - r2.y))};
+				}
+			}();
+			if (depth === 10) {
+				return {point: point, t: t};
+			} else {
+				if (($elm$core$Basics$abs(point.x - desiredX) < 1) && ($elm$core$Basics$abs(point.x - desiredX) >= 0)) {
+					return {point: point, t: t};
+				} else {
+					if ((point.x - desiredX) > 0) {
+						var $temp$spline = spline,
+							$temp$desiredX = desiredX,
+							$temp$tolerance = tolerance,
+							$temp$jumpSize = jumpSize / 2,
+							$temp$t = t - jumpSize,
+							$temp$depth = depth + 1;
+						spline = $temp$spline;
+						desiredX = $temp$desiredX;
+						tolerance = $temp$tolerance;
+						jumpSize = $temp$jumpSize;
+						t = $temp$t;
+						depth = $temp$depth;
+						continue findAtXOnSpline;
+					} else {
+						var $temp$spline = spline,
+							$temp$desiredX = desiredX,
+							$temp$tolerance = tolerance,
+							$temp$jumpSize = jumpSize / 2,
+							$temp$t = t + jumpSize,
+							$temp$depth = depth + 1;
+						spline = $temp$spline;
+						desiredX = $temp$desiredX;
+						tolerance = $temp$tolerance;
+						jumpSize = $temp$jumpSize;
+						t = $temp$t;
+						depth = $temp$depth;
+						continue findAtXOnSpline;
+					}
+				}
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$interpolateValue = F3(
+	function (start, end, t) {
+		return (t <= 0.5) ? (start + (t * (end - start))) : (end + ((1 - t) * (start - end)));
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$firstDerivativeOnSpline = F2(
+	function (_v0, proportion) {
+		var p1 = _v0.a;
+		var p2 = _v0.b;
+		var p3 = _v0.c;
+		var p4 = _v0.d;
+		var vy3 = p4.y - p3.y;
+		var vy2 = p3.y - p2.y;
+		var wy2 = A3($mdgriffith$elm_animator$Internal$Interpolate$interpolateValue, vy2, vy3, proportion);
+		var vy1 = p2.y - p1.y;
+		var wy1 = A3($mdgriffith$elm_animator$Internal$Interpolate$interpolateValue, vy1, vy2, proportion);
+		var vx3 = p4.x - p3.x;
+		var vx2 = p3.x - p2.x;
+		var wx2 = A3($mdgriffith$elm_animator$Internal$Interpolate$interpolateValue, vx2, vx3, proportion);
+		var vx1 = p2.x - p1.x;
+		var wx1 = A3($mdgriffith$elm_animator$Internal$Interpolate$interpolateValue, vx1, vx2, proportion);
+		return {
+			x: 3 * A3($mdgriffith$elm_animator$Internal$Interpolate$interpolateValue, wx1, wx2, proportion),
+			y: 3 * A3($mdgriffith$elm_animator$Internal$Interpolate$interpolateValue, wy1, wy2, proportion)
+		};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$guessTime = F2(
+	function (now, _v0) {
+		var one = _v0.a;
+		var two = _v0.b;
+		var three = _v0.c;
+		var four = _v0.d;
+		return (!(four.x - one.x)) ? 0.5 : ((now - one.x) / (four.x - one.x));
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$linearDefault = {arriveEarly: 0, arriveSlowly: 0, departLate: 0, departSlowly: 0, wobbliness: 0};
+var $ianmackenzie$elm_units$Quantity$divideBy = F2(
+	function (divisor, _v0) {
+		var value = _v0.a;
+		return $ianmackenzie$elm_units$Quantity$Quantity(value / divisor);
+	});
+var $ianmackenzie$elm_units$Quantity$per = F2(
+	function (_v0, _v1) {
+		var independentValue = _v0.a;
+		var dependentValue = _v1.a;
+		return $ianmackenzie$elm_units$Quantity$Quantity(dependentValue / independentValue);
+	});
+var $ianmackenzie$elm_units$Pixels$pixels = function (numPixels) {
+	return $ianmackenzie$elm_units$Quantity$Quantity(numPixels);
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$derivativeOfEasing = F3(
+	function (ease, period, target) {
+		var targetPixels = $ianmackenzie$elm_units$Pixels$pixels(
+			ease(target));
+		var sampleSize = 16;
+		var deltaSample = sampleSize / $ianmackenzie$elm_units$Duration$inMilliseconds(period);
+		var next = $ianmackenzie$elm_units$Pixels$pixels(
+			ease(target + deltaSample));
+		var dx2 = A2($ianmackenzie$elm_units$Quantity$minus, targetPixels, next);
+		var prev = $ianmackenzie$elm_units$Pixels$pixels(
+			ease(target - deltaSample));
+		var dx1 = A2($ianmackenzie$elm_units$Quantity$minus, prev, targetPixels);
+		var dx = A2(
+			$ianmackenzie$elm_units$Quantity$divideBy,
+			2,
+			A2($ianmackenzie$elm_units$Quantity$plus, dx1, dx2));
+		return A2(
+			$ianmackenzie$elm_units$Quantity$per,
+			$ianmackenzie$elm_units$Duration$milliseconds(sampleSize),
+			dx);
+	});
+var $mdgriffith$elm_animator$Internal$Time$millis = function (ms) {
+	return $ianmackenzie$elm_units$Quantity$Quantity(ms);
+};
+var $ianmackenzie$elm_units$Pixels$pixelsPerSecond = function (numPixelsPerSecond) {
+	return $ianmackenzie$elm_units$Quantity$Quantity(numPixelsPerSecond);
+};
+var $elm$core$Basics$isInfinite = _Basics_isInfinite;
+var $ianmackenzie$elm_units$Quantity$isInfinite = function (_v0) {
+	var value = _v0.a;
+	return $elm$core$Basics$isInfinite(value);
+};
+var $elm$core$Basics$isNaN = _Basics_isNaN;
+var $ianmackenzie$elm_units$Quantity$isNaN = function (_v0) {
+	var value = _v0.a;
+	return $elm$core$Basics$isNaN(value);
+};
+var $ianmackenzie$elm_units$Quantity$zero = $ianmackenzie$elm_units$Quantity$Quantity(0);
+var $mdgriffith$elm_animator$Internal$Interpolate$velocityBetween = F4(
+	function (one, oneTime, two, twoTime) {
+		var duration = A2($mdgriffith$elm_animator$Internal$Time$duration, oneTime, twoTime);
+		var distance = A2($ianmackenzie$elm_units$Quantity$minus, one, two);
+		var vel = A2($ianmackenzie$elm_units$Quantity$per, duration, distance);
+		return ($ianmackenzie$elm_units$Quantity$isNaN(vel) || $ianmackenzie$elm_units$Quantity$isInfinite(vel)) ? $ianmackenzie$elm_units$Quantity$zero : vel;
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$newVelocityAtTarget = F3(
+	function (target, targetTime, maybeLookAhead) {
+		if (maybeLookAhead.$ === 'Nothing') {
+			if (target.$ === 'Pos') {
+				return $ianmackenzie$elm_units$Pixels$pixelsPerSecond(0);
+			} else {
+				var period = target.b;
+				var toX = target.c;
+				if (period.$ === 'Loop') {
+					var periodDuration = period.a;
+					return A3($mdgriffith$elm_animator$Internal$Interpolate$derivativeOfEasing, toX, periodDuration, 0);
+				} else {
+					var n = period.a;
+					var periodDuration = period.b;
+					return A3($mdgriffith$elm_animator$Internal$Interpolate$derivativeOfEasing, toX, periodDuration, 0);
+				}
+			}
+		} else {
+			var lookAhead = maybeLookAhead.a;
+			var targetPosition = function () {
+				if (target.$ === 'Osc') {
+					var toX = target.c;
+					return $ianmackenzie$elm_units$Pixels$pixels(
+						toX(0));
+				} else {
+					var x = target.b;
+					return $ianmackenzie$elm_units$Pixels$pixels(x);
+				}
+			}();
+			var _v3 = lookAhead.anchor;
+			if (_v3.$ === 'Pos') {
+				var aheadPosition = _v3.b;
+				return A4(
+					$mdgriffith$elm_animator$Internal$Interpolate$velocityBetween,
+					targetPosition,
+					$mdgriffith$elm_animator$Internal$Time$millis(targetTime),
+					$ianmackenzie$elm_units$Pixels$pixels(aheadPosition),
+					$mdgriffith$elm_animator$Internal$Time$millis(lookAhead.time));
+			} else {
+				var period = _v3.b;
+				var toX = _v3.c;
+				if (lookAhead.resting) {
+					if (period.$ === 'Loop') {
+						var periodDuration = period.a;
+						return A3($mdgriffith$elm_animator$Internal$Interpolate$derivativeOfEasing, toX, periodDuration, 0);
+					} else {
+						var n = period.a;
+						var periodDuration = period.b;
+						return A3($mdgriffith$elm_animator$Internal$Interpolate$derivativeOfEasing, toX, periodDuration, 0);
+					}
+				} else {
+					return A4(
+						$mdgriffith$elm_animator$Internal$Interpolate$velocityBetween,
+						targetPosition,
+						$mdgriffith$elm_animator$Internal$Time$millis(targetTime),
+						$ianmackenzie$elm_units$Pixels$pixels(
+							toX(0)),
+						$mdgriffith$elm_animator$Internal$Time$millis(lookAhead.time));
+				}
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$interpolateBetween = F7(
+	function (startTimeInMs, maybePrevious, target, targetTimeInMs, now, maybeLookAhead, state) {
+		var targetVelocity = $ianmackenzie$elm_units$Pixels$inPixelsPerSecond(
+			A3($mdgriffith$elm_animator$Internal$Interpolate$newVelocityAtTarget, target, targetTimeInMs, maybeLookAhead));
+		var targetPosition = function () {
+			if (target.$ === 'Osc') {
+				var toX = target.c;
+				return $ianmackenzie$elm_units$Pixels$pixels(
+					toX(0));
+			} else {
+				var x = target.b;
+				return $ianmackenzie$elm_units$Pixels$pixels(x);
+			}
+		}();
+		var curve = $mdgriffith$elm_animator$Internal$Interpolate$createSpline(
+			{
+				arrival: function () {
+					if (target.$ === 'Pos') {
+						var personality = target.a;
+						return personality;
+					} else {
+						var personality = target.a;
+						return personality;
+					}
+				}(),
+				departure: function () {
+					if (maybePrevious.$ === 'Nothing') {
+						return $mdgriffith$elm_animator$Internal$Interpolate$linearDefault;
+					} else {
+						if (maybePrevious.a.$ === 'Pos') {
+							var _v2 = maybePrevious.a;
+							var personality = _v2.a;
+							return personality;
+						} else {
+							var _v3 = maybePrevious.a;
+							var personality = _v3.a;
+							return personality;
+						}
+					}
+				}(),
+				end: {
+					x: targetTimeInMs,
+					y: $ianmackenzie$elm_units$Pixels$inPixels(targetPosition)
+				},
+				endVelocity: {x: 1000, y: targetVelocity},
+				start: {
+					x: startTimeInMs,
+					y: $ianmackenzie$elm_units$Pixels$inPixels(state.position)
+				},
+				startVelocity: {
+					x: 1000,
+					y: $ianmackenzie$elm_units$Pixels$inPixelsPerSecond(state.velocity)
+				}
+			});
+		var current = A6(
+			$mdgriffith$elm_animator$Internal$Interpolate$findAtXOnSpline,
+			curve,
+			now,
+			1,
+			0.25,
+			A2($mdgriffith$elm_animator$Internal$Interpolate$guessTime, now, curve),
+			0);
+		var firstDerivative = A2($mdgriffith$elm_animator$Internal$Interpolate$firstDerivativeOnSpline, curve, current.t);
+		return {
+			position: $ianmackenzie$elm_units$Pixels$pixels(current.point.y),
+			velocity: $ianmackenzie$elm_units$Pixels$pixelsPerSecond(1000 * (firstDerivative.y / firstDerivative.x))
+		};
+	});
+var $mdgriffith$elm_animator$Internal$Spring$criticalDamping = F2(
+	function (k, m) {
+		return 2 * $elm$core$Basics$sqrt(k * m);
+	});
+var $elm$core$Basics$round = _Basics_round;
+var $elm$core$Basics$e = _Basics_e;
+var $mdgriffith$elm_animator$Internal$Spring$toleranceForSpringSettleTimeCalculation = (-1) * A2($elm$core$Basics$logBase, $elm$core$Basics$e, 0.005);
+var $mdgriffith$elm_animator$Internal$Spring$settlesAt = function (_v0) {
+	var stiffness = _v0.stiffness;
+	var damping = _v0.damping;
+	var mass = _v0.mass;
+	var m = mass;
+	var k = stiffness;
+	var springAspect = $elm$core$Basics$sqrt(k / m);
+	var cCritical = A2($mdgriffith$elm_animator$Internal$Spring$criticalDamping, k, m);
+	var c = damping;
+	if (_Utils_eq(
+		$elm$core$Basics$round(c),
+		$elm$core$Basics$round(cCritical))) {
+		return 1000 * (8.5 / springAspect);
+	} else {
+		if ((c - cCritical) > 0) {
+			var dampingAspect = c / cCritical;
+			return 1000 * ($mdgriffith$elm_animator$Internal$Spring$toleranceForSpringSettleTimeCalculation / (dampingAspect * springAspect));
+		} else {
+			var dampingAspect = c / cCritical;
+			return 1000 * ($mdgriffith$elm_animator$Internal$Spring$toleranceForSpringSettleTimeCalculation / (dampingAspect * springAspect));
+		}
+	}
+};
+var $mdgriffith$elm_animator$Internal$Spring$mapToRange = F3(
+	function (minimum, maximum, x) {
+		var total = maximum - minimum;
+		return minimum + (x * total);
+	});
+var $mdgriffith$elm_animator$Internal$Spring$wobble2Ratio = F2(
+	function (wobble, duration) {
+		var ms = $ianmackenzie$elm_units$Duration$inMilliseconds(duration);
+		var scalingBelowDur = ms / 350;
+		var top = A2(
+			$elm$core$Basics$max,
+			0.43,
+			0.8 * A2($elm$core$Basics$min, 1, scalingBelowDur));
+		var bounded = A2(
+			$elm$core$Basics$min,
+			1,
+			A2($elm$core$Basics$max, 0, wobble));
+		return A3($mdgriffith$elm_animator$Internal$Spring$mapToRange, 0.43, top, 1 - bounded);
+	});
+var $mdgriffith$elm_animator$Internal$Spring$wobble2Damping = F4(
+	function (wobble, k, m, duration) {
+		return A2($mdgriffith$elm_animator$Internal$Spring$wobble2Ratio, wobble, duration) * A2($mdgriffith$elm_animator$Internal$Spring$criticalDamping, k, m);
+	});
+var $mdgriffith$elm_animator$Internal$Spring$select = F2(
+	function (wobbliness, duration) {
+		var k = 150;
+		var durMS = $ianmackenzie$elm_units$Duration$inMilliseconds(duration);
+		var damping = A4($mdgriffith$elm_animator$Internal$Spring$wobble2Damping, wobbliness, k, 1, duration);
+		var initiallySettlesAt = $mdgriffith$elm_animator$Internal$Spring$settlesAt(
+			{damping: damping, mass: 1, stiffness: k});
+		var newCritical = A2($mdgriffith$elm_animator$Internal$Spring$criticalDamping, k, durMS / initiallySettlesAt);
+		return {damping: damping, mass: durMS / initiallySettlesAt, stiffness: k};
+	});
+var $elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
+			} else {
+				var $temp$result = A2($elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
+			}
+		}
+	});
+var $elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
+var $mdgriffith$elm_animator$Internal$Spring$step = F4(
+	function (target, _v0, dtms, motion) {
+		var stiffness = _v0.stiffness;
+		var damping = _v0.damping;
+		var mass = _v0.mass;
+		var fspring = stiffness * (target - motion.position);
+		var fdamper = ((-1) * damping) * motion.velocity;
+		var dt = dtms / 1000;
+		var a = (fspring + fdamper) / mass;
+		var newVelocity = motion.velocity + (a * dt);
+		var newPos = motion.position + (newVelocity * dt);
+		return {position: newPos, velocity: newVelocity};
+	});
+var $mdgriffith$elm_animator$Internal$Spring$stepOver = F4(
+	function (duration, params, target, state) {
+		var durMS = $ianmackenzie$elm_units$Duration$inMilliseconds(duration);
+		var frames = durMS / 16;
+		var remainder = 16 * (frames - $elm$core$Basics$floor(frames));
+		var steps = (remainder > 0) ? A2(
+			$elm$core$List$cons,
+			remainder,
+			A2(
+				$elm$core$List$repeat,
+				($elm$core$Basics$floor(durMS) / 16) | 0,
+				16)) : A2(
+			$elm$core$List$repeat,
+			($elm$core$Basics$floor(durMS) / 16) | 0,
+			16);
+		return A3(
+			$elm$core$List$foldl,
+			A2($mdgriffith$elm_animator$Internal$Spring$step, target, params),
+			state,
+			steps);
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$springInterpolation = F7(
+	function (prevEndTime, _v0, target, targetTime, now, _v1, state) {
+		var wobble = function () {
+			if (target.$ === 'Osc') {
+				var personality = target.a;
+				return personality.wobbliness;
+			} else {
+				var personality = target.a;
+				return personality.wobbliness;
+			}
+		}();
+		var targetPos = function () {
+			if (target.$ === 'Osc') {
+				var toX = target.c;
+				return toX(0);
+			} else {
+				var x = target.b;
+				return x;
+			}
+		}();
+		var duration = A2(
+			$mdgriffith$elm_animator$Internal$Time$duration,
+			$mdgriffith$elm_animator$Internal$Time$millis(prevEndTime),
+			$mdgriffith$elm_animator$Internal$Time$millis(targetTime));
+		var params = A2($mdgriffith$elm_animator$Internal$Spring$select, wobble, duration);
+		var _new = A4(
+			$mdgriffith$elm_animator$Internal$Spring$stepOver,
+			A2(
+				$mdgriffith$elm_animator$Internal$Time$duration,
+				$mdgriffith$elm_animator$Internal$Time$millis(prevEndTime),
+				$mdgriffith$elm_animator$Internal$Time$millis(now)),
+			params,
+			targetPos,
+			{
+				position: $ianmackenzie$elm_units$Pixels$inPixels(state.position),
+				velocity: $ianmackenzie$elm_units$Pixels$inPixelsPerSecond(state.velocity)
+			});
+		return {
+			position: $ianmackenzie$elm_units$Pixels$pixels(_new.position),
+			velocity: $ianmackenzie$elm_units$Pixels$pixelsPerSecond(_new.velocity)
+		};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$lerp = F7(
+	function (prevEndTime, maybePrev, target, targetTime, now, maybeLookAhead, state) {
+		var wobble = function () {
+			if (target.$ === 'Osc') {
+				var personality = target.a;
+				return personality.wobbliness;
+			} else {
+				var personality = target.a;
+				return personality.wobbliness;
+			}
+		}();
+		var nothingHappened = function () {
+			if (target.$ === 'Osc') {
+				return false;
+			} else {
+				var x = target.b;
+				return _Utils_eq(
+					x,
+					$ianmackenzie$elm_units$Pixels$inPixels(state.position)) && (!$ianmackenzie$elm_units$Pixels$inPixelsPerSecond(state.velocity));
+			}
+		}();
+		if (nothingHappened) {
+			return state;
+		} else {
+			if (maybeLookAhead.$ === 'Nothing') {
+				return (!(!wobble)) ? A7($mdgriffith$elm_animator$Internal$Interpolate$springInterpolation, prevEndTime, maybePrev, target, targetTime, now, maybeLookAhead, state) : A7($mdgriffith$elm_animator$Internal$Interpolate$interpolateBetween, prevEndTime, maybePrev, target, targetTime, now, maybeLookAhead, state);
+			} else {
+				return A7($mdgriffith$elm_animator$Internal$Interpolate$interpolateBetween, prevEndTime, maybePrev, target, targetTime, now, maybeLookAhead, state);
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$startMoving = function (movement) {
+	return {
+		position: function () {
+			if (movement.$ === 'Osc') {
+				var toX = movement.c;
+				return $ianmackenzie$elm_units$Pixels$pixels(
+					toX(0));
+			} else {
+				var x = movement.b;
+				return $ianmackenzie$elm_units$Pixels$pixels(x);
+			}
+		}(),
+		velocity: $ianmackenzie$elm_units$Pixels$pixelsPerSecond(0)
+	};
+};
+var $mdgriffith$elm_animator$Internal$Time$earliest = F2(
+	function (oneQty, twoQty) {
+		var one = oneQty.a;
+		var two = twoQty.a;
+		return ((one - two) >= 0) ? twoQty : oneQty;
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $mdgriffith$elm_animator$Internal$Interpolate$wrapUnitAfter = F2(
+	function (dur, total) {
+		var totalDuration = $elm$core$Basics$round(
+			$ianmackenzie$elm_units$Duration$inMilliseconds(total));
+		var periodDuration = $elm$core$Basics$round(
+			$ianmackenzie$elm_units$Duration$inMilliseconds(dur));
+		if ((!periodDuration) || (!totalDuration)) {
+			return 0;
+		} else {
+			var remaining = A2($elm$core$Basics$modBy, periodDuration, totalDuration);
+			return (!remaining) ? 1 : (remaining / periodDuration);
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$visit = F5(
+	function (lookup, occurring, now, maybeLookAhead, state) {
+		var event = occurring.a;
+		var start = occurring.b;
+		var eventEnd = occurring.c;
+		var dwellTime = function () {
+			if (maybeLookAhead.$ === 'Nothing') {
+				return A2($mdgriffith$elm_animator$Internal$Time$duration, start, now);
+			} else {
+				return A2(
+					$mdgriffith$elm_animator$Internal$Time$duration,
+					start,
+					A2($mdgriffith$elm_animator$Internal$Time$earliest, now, eventEnd));
+			}
+		}();
+		if ($mdgriffith$elm_animator$Internal$Time$zeroDuration(dwellTime)) {
+			return {
+				position: function () {
+					var _v0 = lookup(event);
+					if (_v0.$ === 'Osc') {
+						var period = _v0.b;
+						var toX = _v0.c;
+						return $ianmackenzie$elm_units$Pixels$pixels(
+							toX(0));
+					} else {
+						var x = _v0.b;
+						return $ianmackenzie$elm_units$Pixels$pixels(x);
+					}
+				}(),
+				velocity: A3(
+					$mdgriffith$elm_animator$Internal$Interpolate$newVelocityAtTarget,
+					lookup(event),
+					$mdgriffith$elm_animator$Internal$Time$inMilliseconds(start),
+					maybeLookAhead)
+			};
+		} else {
+			var _v1 = lookup(event);
+			if (_v1.$ === 'Pos') {
+				var pos = _v1.b;
+				return {
+					position: $ianmackenzie$elm_units$Pixels$pixels(pos),
+					velocity: $ianmackenzie$elm_units$Pixels$pixelsPerSecond(0)
+				};
+			} else {
+				var period = _v1.b;
+				var toX = _v1.c;
+				if (period.$ === 'Loop') {
+					var periodDuration = period.a;
+					var progress = A2($mdgriffith$elm_animator$Internal$Interpolate$wrapUnitAfter, periodDuration, dwellTime);
+					return {
+						position: $ianmackenzie$elm_units$Pixels$pixels(
+							toX(progress)),
+						velocity: A3($mdgriffith$elm_animator$Internal$Interpolate$derivativeOfEasing, toX, periodDuration, progress)
+					};
+				} else {
+					var n = period.a;
+					var periodDuration = period.b;
+					var totalMS = $ianmackenzie$elm_units$Duration$inMilliseconds(dwellTime);
+					var iterationTimeMS = $ianmackenzie$elm_units$Duration$inMilliseconds(periodDuration);
+					var iteration = $elm$core$Basics$floor(totalMS / iterationTimeMS);
+					if (_Utils_cmp(iteration, n) > -1) {
+						return {
+							position: $ianmackenzie$elm_units$Pixels$pixels(
+								toX(1)),
+							velocity: $ianmackenzie$elm_units$Pixels$pixelsPerSecond(0)
+						};
+					} else {
+						var progress = A2($mdgriffith$elm_animator$Internal$Interpolate$wrapUnitAfter, periodDuration, dwellTime);
+						return {
+							position: $ianmackenzie$elm_units$Pixels$pixels(
+								toX(progress)),
+							velocity: A3($mdgriffith$elm_animator$Internal$Interpolate$derivativeOfEasing, toX, periodDuration, progress)
+						};
+					}
+				}
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$moving = {adjustor: $mdgriffith$elm_animator$Internal$Interpolate$getPersonality, dwellPeriod: $mdgriffith$elm_animator$Internal$Interpolate$dwellPeriod, lerp: $mdgriffith$elm_animator$Internal$Interpolate$lerp, start: $mdgriffith$elm_animator$Internal$Interpolate$startMoving, visit: $mdgriffith$elm_animator$Internal$Interpolate$visit};
+var $mdgriffith$elm_animator$Internal$Interpolate$unwrapUnits = function (_v0) {
+	var position = _v0.position;
+	var velocity = _v0.velocity;
+	return {
+		position: function () {
+			var val = position.a;
+			return val;
+		}(),
+		velocity: function () {
+			var val = velocity.a;
+			return val;
+		}()
+	};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$details = F2(
+	function (timeline, lookup) {
+		return $mdgriffith$elm_animator$Internal$Interpolate$unwrapUnits(
+			A3($mdgriffith$elm_animator$Internal$Timeline$foldp, lookup, $mdgriffith$elm_animator$Internal$Interpolate$moving, timeline));
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$Osc = F3(
+	function (a, b, c) {
+		return {$: 'Osc', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$Pos = F2(
+	function (a, b) {
+		return {$: 'Pos', a: a, b: b};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$withDefault = F2(
+	function (def, defaultOr) {
+		if (defaultOr.$ === 'Default') {
+			return def;
+		} else {
+			var specified = defaultOr.a;
+			return specified;
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$fillDefaults = F2(
+	function (builtInDefault, specified) {
+		if (specified.$ === 'FullDefault') {
+			return builtInDefault;
+		} else {
+			var partial = specified.a;
+			return {
+				arriveEarly: A2($mdgriffith$elm_animator$Internal$Interpolate$withDefault, builtInDefault.arriveEarly, partial.arriveEarly),
+				arriveSlowly: A2($mdgriffith$elm_animator$Internal$Interpolate$withDefault, builtInDefault.arriveSlowly, partial.arriveSlowly),
+				departLate: A2($mdgriffith$elm_animator$Internal$Interpolate$withDefault, builtInDefault.departLate, partial.departLate),
+				departSlowly: A2($mdgriffith$elm_animator$Internal$Interpolate$withDefault, builtInDefault.departSlowly, partial.departSlowly),
+				wobbliness: A2($mdgriffith$elm_animator$Internal$Interpolate$withDefault, builtInDefault.wobbliness, partial.wobbliness)
+			};
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$standardDefault = {arriveEarly: 0, arriveSlowly: 0.8, departLate: 0, departSlowly: 0.4, wobbliness: 0};
+var $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault = function (defMovement) {
+	if (defMovement.$ === 'Oscillate') {
+		var specifiedPersonality = defMovement.a;
+		var period = defMovement.b;
+		var fn = defMovement.c;
+		var personality = A2($mdgriffith$elm_animator$Internal$Interpolate$fillDefaults, $mdgriffith$elm_animator$Internal$Interpolate$standardDefault, specifiedPersonality);
+		return A3($mdgriffith$elm_animator$Internal$Interpolate$Osc, personality, period, fn);
+	} else {
+		var specifiedPersonality = defMovement.a;
+		var p = defMovement.b;
+		var personality = A2($mdgriffith$elm_animator$Internal$Interpolate$fillDefaults, $mdgriffith$elm_animator$Internal$Interpolate$standardDefault, specifiedPersonality);
+		return A2($mdgriffith$elm_animator$Internal$Interpolate$Pos, personality, p);
+	}
+};
+var $mdgriffith$elm_animator$Animator$move = F2(
+	function (timeline, lookup) {
+		return A2(
+			$mdgriffith$elm_animator$Internal$Interpolate$details,
+			timeline,
+			A2($elm$core$Basics$composeL, $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault, lookup)).position;
+	});
+var $mdgriffith$elm_animator$Animator$Inline$style = F4(
+	function (timeline, name, toString, lookup) {
+		return A2(
+			$elm$html$Html$Attributes$style,
+			name,
+			toString(
+				A2($mdgriffith$elm_animator$Animator$move, timeline, lookup)));
+	});
+var $mdgriffith$elm_animator$Animator$Inline$scale = F2(
+	function (timeline, lookup) {
+		return A4(
+			$mdgriffith$elm_animator$Animator$Inline$style,
+			timeline,
+			'transform',
+			function (s) {
+				return 'scale(' + ($elm$core$String$fromFloat(s) + ')');
+			},
+			lookup);
+	});
 var $elm$html$Html$small = _VirtualDom_node('small');
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -7955,224 +9072,210 @@ var $author$project$Main$viewStep = function (stepText) {
 				$elm$html$Html$text(stepText)
 			]));
 };
-var $author$project$Main$viewExpandedOverlay = F2(
+var $author$project$Main$viewExpandedCard = F2(
 	function (model, item) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					A2($elm$html$Html$Attributes$style, 'position', 'fixed'),
-					A2($elm$html$Html$Attributes$style, 'top', '0'),
-					A2($elm$html$Html$Attributes$style, 'right', '0'),
-					A2($elm$html$Html$Attributes$style, 'bottom', '0'),
-					A2($elm$html$Html$Attributes$style, 'left', '0'),
-					A2($elm$html$Html$Attributes$style, 'z-index', '9999'),
-					A2($elm$html$Html$Attributes$style, 'background', 'rgba(16,24,40,0.42)'),
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-					A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-					A2($elm$html$Html$Attributes$style, 'opacity', '1'),
-					$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded)
+					A2(
+					$elm$html$Html$Events$stopPropagationOn,
+					'click',
+					$elm$json$Json$Decode$succeed(
+						_Utils_Tuple2($author$project$Main$NoOp, true))),
+					A2(
+					$mdgriffith$elm_animator$Animator$Inline$scale,
+					model.focusTimeline,
+					function (zoom) {
+						if (zoom.$ === 'Mini') {
+							return A2(
+								$mdgriffith$elm_animator$Animator$arriveSmoothly,
+								0.75,
+								$mdgriffith$elm_animator$Animator$at($author$project$Main$overlayStartScale));
+						} else {
+							return A2(
+								$mdgriffith$elm_animator$Animator$arriveSmoothly,
+								0.75,
+								$mdgriffith$elm_animator$Animator$at(1));
+						}
+					}),
+					A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),
+					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+					A2($elm$html$Html$Attributes$style, 'width', 'min(1240px, 95vw)'),
+					A2($elm$html$Html$Attributes$style, 'max-height', '92vh'),
+					A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
+					A2($elm$html$Html$Attributes$style, 'background', 'white'),
+					A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '14px'),
+					A2($elm$html$Html$Attributes$style, 'padding', '16px'),
+					A2($elm$html$Html$Attributes$style, 'box-shadow', '0 24px 56px rgba(0,0,0,0.24)')
 				]),
 			_List_fromArray(
 				[
 					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
+							A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+							A2($elm$html$Html$Attributes$style, 'top', '10px'),
+							A2($elm$html$Html$Attributes$style, 'right', '10px'),
+							A2($elm$html$Html$Attributes$style, 'border', '1px solid #b7c7e6'),
+							A2($elm$html$Html$Attributes$style, 'background', 'white'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+							A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
+							A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+							A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Fermer')
+						])),
+					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							A2(
-							$elm$html$Html$Events$stopPropagationOn,
-							'click',
-							$elm$json$Json$Decode$succeed(
-								_Utils_Tuple2($author$project$Main$NoOp, true))),
 							A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-							A2($elm$html$Html$Attributes$style, 'transform', 'scale(1)'),
-							A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),
-							A2($elm$html$Html$Attributes$style, 'width', 'min(1380px, 98vw)'),
-							A2($elm$html$Html$Attributes$style, 'max-height', '92vh'),
-							A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
-							A2($elm$html$Html$Attributes$style, 'background', 'white'),
-							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '14px'),
-							A2($elm$html$Html$Attributes$style, 'padding', '16px'),
-							A2($elm$html$Html$Attributes$style, 'box-shadow', '0 20px 48px rgba(0,0,0,0.24)')
+							A2($elm$html$Html$Attributes$style, 'padding-top', '2px')
+						]),
+					_List_fromArray(
+						[
+							$author$project$Main$notchBadge(item.badge)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin-left', '54px'),
+							A2($elm$html$Html$Attributes$style, 'margin-top', '2px')
 						]),
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$button,
+							$elm$html$Html$h2,
 							_List_fromArray(
 								[
-									$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
-									A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-									A2($elm$html$Html$Attributes$style, 'top', '10px'),
-									A2($elm$html$Html$Attributes$style, 'right', '10px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b7c7e6'),
-									A2($elm$html$Html$Attributes$style, 'background', 'white'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
-									A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+									A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Fermer')
+									$elm$html$Html$text(item.title)
 								])),
 							A2(
-							$elm$html$Html$div,
+							$elm$html$Html$p,
 							_List_fromArray(
 								[
-									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-									A2($elm$html$Html$Attributes$style, 'padding-top', '2px')
+									A2($elm$html$Html$Attributes$style, 'margin', '0'),
+									A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
+									A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
 								]),
 							_List_fromArray(
 								[
-									$author$project$Main$notchBadge(item.badge)
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin-left', '54px'),
-									A2($elm$html$Html$Attributes$style, 'margin-top', '2px')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$h2,
-									_List_fromArray(
-										[
-											A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(item.title)
-										])),
-									A2(
-									$elm$html$Html$p,
-									_List_fromArray(
-										[
-											A2($elm$html$Html$Attributes$style, 'margin', '0'),
-											A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
-											A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Version eleve')
-										]))
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin-top', '12px')
-								]),
-							A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
-							A2(
-							$elm$html$Html$h3,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Commentaire')
-								])),
-							A2(
-							$elm$html$Html$textarea,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$rows(5),
-									A2($elm$html$Html$Attributes$style, 'width', '100%'),
-									A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
-									A2($elm$html$Html$Attributes$style, 'padding', '8px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-									$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
-									$elm$html$Html$Attributes$value(item.comment),
-									$elm$html$Html$Events$onInput($author$project$Main$UpdateExpandedComment)
-								]),
-							_List_Nil),
-							A2(
-							$elm$html$Html$h3,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Email (optionnel)')
-								])),
-							A2(
-							$elm$html$Html$input,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$type_('email'),
-									$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
-									$elm$html$Html$Attributes$value(model.email),
-									$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
-									A2($elm$html$Html$Attributes$style, 'width', '100%'),
-									A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
-								]),
-							_List_Nil),
-							A2(
-							$elm$html$Html$small,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'display', 'block'),
-									A2($elm$html$Html$Attributes$style, 'margin-top', '8px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Cliquer hors de la fiche pour la reduire.')
+									$elm$html$Html$text('Version eleve')
 								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin-top', '12px')
+						]),
+					A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
+					A2(
+					$elm$html$Html$h3,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Commentaire')
+						])),
+					A2(
+					$elm$html$Html$textarea,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$rows(5),
+							A2($elm$html$Html$Attributes$style, 'width', '100%'),
+							A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
+							A2($elm$html$Html$Attributes$style, 'padding', '8px'),
+							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+							$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
+							$elm$html$Html$Attributes$value(item.comment),
+							$elm$html$Html$Events$onInput($author$project$Main$UpdateExpandedComment)
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$h3,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Email (optionnel)')
+						])),
+					A2(
+					$elm$html$Html$input,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('email'),
+							$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
+							$elm$html$Html$Attributes$value(model.email),
+							$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
+							A2($elm$html$Html$Attributes$style, 'width', '100%'),
+							A2($elm$html$Html$Attributes$style, 'padding', '10px'),
+							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$small,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'display', 'block'),
+							A2($elm$html$Html$Attributes$style, 'margin-top', '8px'),
+							A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Cliquer hors de la fiche pour la reduire.')
 						]))
 				]));
 	});
-var $author$project$Main$viewMissingOverlay = function (propositionId) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'position', 'fixed'),
-				A2($elm$html$Html$Attributes$style, 'top', '0'),
-				A2($elm$html$Html$Attributes$style, 'right', '0'),
-				A2($elm$html$Html$Attributes$style, 'bottom', '0'),
-				A2($elm$html$Html$Attributes$style, 'left', '0'),
-				A2($elm$html$Html$Attributes$style, 'z-index', '2147483647'),
-				A2($elm$html$Html$Attributes$style, 'background', 'rgba(255,0,0,0.38)'),
-				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-				A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-				A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-				A2($elm$html$Html$Attributes$style, 'font-size', '28px'),
-				A2($elm$html$Html$Attributes$style, 'font-weight', '800'),
-				A2($elm$html$Html$Attributes$style, 'color', '#7f1d1d')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text(
-				'Overlay missing proposition id=' + $elm$core$String$fromInt(propositionId))
-			]));
-};
-var $author$project$Main$view = function (model) {
-	var overlay = function () {
-		var _v0 = model.expandedPropositionId;
-		if (_v0.$ === 'Nothing') {
+var $author$project$Main$viewExpandedLayer = function (model) {
+	var _v0 = $author$project$Main$currentOverlayId(model);
+	if (_v0.$ === 'Nothing') {
+		return $elm$html$Html$text('');
+	} else {
+		var propositionId = _v0.a;
+		var _v1 = A2($author$project$Main$propositionById, propositionId, model.propositions);
+		if (_v1.$ === 'Nothing') {
 			return $elm$html$Html$text('');
 		} else {
-			var propositionId = _v0.a;
-			var _v1 = A2($author$project$Main$propositionById, propositionId, model.propositions);
-			if (_v1.$ === 'Just') {
-				var item = _v1.a;
-				return A2($author$project$Main$viewExpandedOverlay, model, item);
-			} else {
-				return $author$project$Main$viewMissingOverlay(propositionId);
-			}
+			var item = _v1.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'position', 'fixed'),
+						A2($elm$html$Html$Attributes$style, 'inset', '0'),
+						A2($elm$html$Html$Attributes$style, 'z-index', '9999'),
+						A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+						A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+						A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+						A2($elm$html$Html$Attributes$style, 'pointer-events', 'auto'),
+						$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded)
+					]),
+				_List_fromArray(
+					[
+						A2($author$project$Main$viewExpandedCard, model, item)
+					]));
 		}
-	}();
+	}
+};
+var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -8190,7 +9293,7 @@ var $author$project$Main$view = function (model) {
 			[
 				$author$project$Main$topHeader(model),
 				$author$project$Main$boardView(model),
-				overlay
+				$author$project$Main$viewExpandedLayer(model)
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
