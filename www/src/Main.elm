@@ -1,7 +1,6 @@
 port module Main exposing (main)
 
 import Animator
-import Animator.Inline
 import Browser
 import Browser.Dom as Dom
 import Browser.Events
@@ -235,7 +234,6 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Browser.Events.onResize WindowResized
-        , Browser.Events.onKeyDown keyDownDecoder
         , Animator.toSubscription AnimatorTick model animator
         ]
 
@@ -369,33 +367,16 @@ update msg model =
                         openExpanded dragState.propositionId { model | dragging = Nothing }
 
         CloseExpanded ->
-            case model.expandedPropositionId of
-                Nothing ->
-                    ( model, Cmd.none )
-
-                Just _ ->
-                    if model.isClosingExpanded then
-                        ( model, Cmd.none )
-
-                    else
-                        ( { model
-                            | isClosingExpanded = True
-                            , focusTimeline = animateFocusTo FocusClosed model.focusTimeline
-                          }
-                        , Task.perform (\_ -> FinishCloseExpanded) (Process.sleep 190)
-                        )
+            ( { model
+                | expandedPropositionId = Nothing
+                , isClosingExpanded = False
+                , focusTimeline = animateFocusTo FocusClosed model.focusTimeline
+              }
+            , Cmd.none
+            )
 
         FinishCloseExpanded ->
-            if model.isClosingExpanded then
-                ( { model
-                    | expandedPropositionId = Nothing
-                    , isClosingExpanded = False
-                  }
-                , Cmd.none
-                )
-
-            else
-                ( model, Cmd.none )
+            ( model, Cmd.none )
 
         UpdateExpandedComment newComment ->
             case model.expandedPropositionId of
@@ -607,9 +588,7 @@ topHeader model =
             , text "."
             ]
         , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
-            [ text ("Selection : " ++ selectedBadgeLabel model.selectedPropositionId ++ " | Expanded : " ++ selectedBadgeLabel model.expandedPropositionId ++ " | touche A = agrandir") ]
-        , p [ style "margin" "2px 0 0", style "font-size" "12px", style "color" "#6b7892" ]
-            [ text ("Derniere touche: " ++ model.lastKeyEvent) ]
+            [ text ("Selection : " ++ selectedBadgeLabel model.selectedPropositionId ++ " | Expanded : " ++ selectedBadgeLabel model.expandedPropositionId ++ " | ouverture par clic") ]
         ]
 
 
@@ -824,23 +803,8 @@ viewExpandedOverlay model item =
         ]
         [ div
             [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
-            , Animator.Inline.scale model.focusTimeline
-                (\focusState ->
-                    case focusState of
-                        Focused focusedId ->
-                            if model.isClosingExpanded then
-                                Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
-
-                            else if focusedId == item.id then
-                                Animator.at 1 |> Animator.arriveSmoothly 0.68
-
-                            else
-                                Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
-
-                        FocusClosed ->
-                            Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
-                )
             , style "position" "relative"
+            , style "transform" "scale(1)"
             , style "transform-origin" "center center"
             , style "width" "min(1380px, 98vw)"
             , style "max-height" "92vh"
@@ -897,8 +861,6 @@ viewExpandedOverlay model item =
                 []
             , small [ style "display" "block", style "margin-top" "8px", style "color" "#6b7892" ]
                 [ text "Cliquer hors de la fiche pour la reduire." ]
-            , div [ style "margin-top" "10px", style "font-size" "12px", style "color" "#4f6185" ]
-                [ text "Etat overlay: scale 0.1 -> 1" ]
             ]
         ]
 
