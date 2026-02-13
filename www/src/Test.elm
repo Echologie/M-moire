@@ -3,9 +3,10 @@ module Test exposing (main)
 import Animator
 import Animator.Inline
 import Browser
+import Browser.Events
 import Html exposing (Html, div, h2, p, text)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick, stopPropagationOn)
+import Html.Events exposing (onClick, preventDefaultOn, stopPropagationOn)
 import Json.Decode as Decode
 import Time
 
@@ -15,16 +16,34 @@ type ZoomState
     | Maxi
 
 
+type alias DragState =
+    { startMouseX : Float
+    , startMouseY : Float
+    , startCardX : Float
+    , startCardY : Float
+    , moved : Bool
+    }
+
+
 type alias Model =
     { zoomTimeline : Animator.Timeline ZoomState
+    , cardX : Float
+    , cardY : Float
+    , dragging : Maybe DragState
+    , viewportWidth : Int
+    , viewportHeight : Int
+    , suppressNextOpen : Bool
     }
 
 
 type Msg
     = Open
     | Close
+    | StartDrag Float Float
+    | GlobalMouseMove Float Float
+    | GlobalMouseUp
+    | WindowResized Int Int
     | AnimatorTick Time.Posix
-    | NoOp
 
 
 main : Program () Model Msg
@@ -39,14 +58,26 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { zoomTimeline = Animator.init Mini }
+    ( { zoomTimeline = Animator.init Mini
+      , cardX = 0.5
+      , cardY = 0.5
+      , dragging = Nothing
+      , viewportWidth = 1200
+      , viewportHeight = 800
+      , suppressNextOpen = False
+      }
     , Cmd.none
     )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Animator.toSubscription AnimatorTick model animator
+    Sub.batch
+        [ Animator.toSubscription AnimatorTick model animator
+        , Browser.Events.onMouseMove mouseMoveDecoder
+        , Browser.Events.onMouseUp (Decode.succeed GlobalMouseUp)
+        , Browser.Events.onResize WindowResized
+        ]
 
 
 animator : Animator.Animator Model
@@ -62,16 +93,84 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Open ->
-            ( { model | zoomTimeline = animateZoom Maxi model.zoomTimeline }, Cmd.none )
+            if model.suppressNextOpen then
+                ( { model | suppressNextOpen = False }, Cmd.none )
+
+            else
+                ( { model | zoomTimeline = animateZoom Maxi model.zoomTimeline }, Cmd.none )
 
         Close ->
             ( { model | zoomTimeline = animateZoom Mini model.zoomTimeline }, Cmd.none )
 
+        StartDrag mouseX mouseY ->
+            ( { model
+                | dragging =
+                    Just
+                        { startMouseX = mouseX
+                        , startMouseY = mouseY
+                        , startCardX = model.cardX
+                        , startCardY = model.cardY
+                        , moved = False
+                        }
+                , suppressNextOpen = False
+              }
+            , Cmd.none
+            )
+
+        GlobalMouseMove mouseX mouseY ->
+            case model.dragging of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just dragState ->
+                    let
+                        widthFloat =
+                            max 1 (toFloat model.viewportWidth)
+
+                        heightFloat =
+                            max 1 (toFloat model.viewportHeight)
+
+                        deltaX =
+                            (mouseX - dragState.startMouseX) / widthFloat
+
+                        deltaY =
+                            (mouseY - dragState.startMouseY) / heightFloat
+
+                        nextX =
+                            clamp 0.08 0.92 (dragState.startCardX + deltaX)
+
+                        nextY =
+                            clamp 0.08 0.92 (dragState.startCardY + deltaY)
+
+                        movedNow =
+                            dragState.moved || distance dragState.startMouseX dragState.startMouseY mouseX mouseY > 4
+                    in
+                    ( { model
+                        | cardX = nextX
+                        , cardY = nextY
+                        , dragging = Just { dragState | moved = movedNow }
+                      }
+                    , Cmd.none
+                    )
+
+        GlobalMouseUp ->
+            case model.dragging of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just dragState ->
+                    ( { model
+                        | dragging = Nothing
+                        , suppressNextOpen = dragState.moved
+                      }
+                    , Cmd.none
+                    )
+
+        WindowResized width height ->
+            ( { model | viewportWidth = width, viewportHeight = height }, Cmd.none )
+
         AnimatorTick now ->
             ( Animator.update now animator model, Cmd.none )
-
-        NoOp ->
-            ( model, Cmd.none )
 
 
 animateZoom : ZoomState -> Animator.Timeline ZoomState -> Animator.Timeline ZoomState
@@ -96,11 +195,24 @@ view model =
 
 viewCard : Model -> Html Msg
 viewCard model =
+    let
+        cursorStyle =
+            if model.dragging /= Nothing then
+                "grabbing"
+
+            else
+                "grab"
+    in
     div
-        [ stopPropagationOn "click" (Decode.succeed ( Open, True ))
+        [ preventDefaultOn "mousedown"
+            (Decode.map
+                (\( x, y ) -> ( StartDrag x y, True ))
+                mousePointDecoder
+            )
+        , stopPropagationOn "click" (Decode.succeed ( Open, True ))
         , style "position" "absolute"
-        , style "left" "50%"
-        , style "top" "50%"
+        , style "left" (String.fromFloat (model.cardX * 100) ++ "%")
+        , style "top" (String.fromFloat (model.cardY * 100) ++ "%")
         , Animator.Inline.scale model.zoomTimeline
             (\zoom ->
                 case zoom of
@@ -119,10 +231,43 @@ viewCard model =
         , style "border-radius" "14px"
         , style "background" "#f9fbff"
         , style "box-shadow" "0 24px 50px rgba(0,0,0,0.18)"
+        , style "cursor" cursorStyle
+        , style "user-select" "none"
         ]
         [ h2 [ style "margin" "0 0 10px", style "font-size" "40px" ] [ text "Proposition A" ]
         , p [ style "margin" "0", style "font-size" "30px", style "line-height" "1.5" ] [ text "On part de cos(2x) = sin(x), puis on ecrit 1 - 2sin^2(x) = sin(x)." ]
         , p [ style "margin" "14px 0 0", style "font-size" "30px", style "line-height" "1.5" ] [ text "On obtient 2sin^2(x) + sin(x) - 1 = 0, puis (2sin(x)-1)(sin(x)+1)=0." ]
         , p [ style "margin" "14px 0 0", style "font-size" "26px", style "line-height" "1.5" ] [ text "Solutions sur [0;2pi[: x = pi/6, 5pi/6, 3pi/2." ]
-        , p [ style "margin" "16px 0 0", style "font-size" "20px", style "color" "#5a6785" ] [ text "Cliquer sur la fiche pour agrandir. Cliquer ailleurs pour reduire." ]
+        , p [ style "margin" "16px 0 0", style "font-size" "20px", style "color" "#5a6785" ] [ text "Cliquer sur la fiche pour agrandir. Cliquer ailleurs pour reduire. Maintenir + glisser pour deplacer." ]
         ]
+
+
+mouseMoveDecoder : Decode.Decoder Msg
+mouseMoveDecoder =
+    Decode.map2 GlobalMouseMove
+        (Decode.field "clientX" Decode.float)
+        (Decode.field "clientY" Decode.float)
+
+
+mousePointDecoder : Decode.Decoder ( Float, Float )
+mousePointDecoder =
+    Decode.map2 Tuple.pair
+        (Decode.field "clientX" Decode.float)
+        (Decode.field "clientY" Decode.float)
+
+
+distance : Float -> Float -> Float -> Float -> Float
+distance x1 y1 x2 y2 =
+    sqrt (((x2 - x1) ^ 2) + ((y2 - y1) ^ 2))
+
+
+clamp : Float -> Float -> Float -> Float
+clamp minVal maxVal value =
+    if value < minVal then
+        minVal
+
+    else if value > maxVal then
+        maxVal
+
+    else
+        value
