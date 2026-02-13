@@ -5429,6 +5429,7 @@ var $author$project$Main$init = function (_v0) {
 			expandedPropositionId: $elm$core$Maybe$Nothing,
 			focusTimeline: $mdgriffith$elm_animator$Animator$init($elm$core$Maybe$Nothing),
 			isClosingExpanded: false,
+			lastKeyEvent: 'aucune',
 			propositions: seeded,
 			selectedPropositionId: $elm$core$Maybe$Just(1),
 			viewport: {height: 800, width: 1200}
@@ -6323,25 +6324,43 @@ var $author$project$Main$animator = A3(
 		}),
 	$mdgriffith$elm_animator$Animator$animator);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $author$project$Main$KeyPressed = F2(
-	function (a, b) {
-		return {$: 'KeyPressed', a: a, b: b};
+var $author$project$Main$KeyPressed = F3(
+	function (a, b, c) {
+		return {$: 'KeyPressed', a: a, b: b, c: c};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
 	});
+var $elm$json$Json$Decode$map3 = _Json_map3;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$keyDownDecoder = A3(
-	$elm$json$Json$Decode$map2,
+var $author$project$Main$keyDownDecoder = A4(
+	$elm$json$Json$Decode$map3,
 	$author$project$Main$KeyPressed,
-	A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string),
-	A2(
-		$elm$json$Json$Decode$at,
+	$elm$json$Json$Decode$oneOf(
 		_List_fromArray(
-			['target', 'tagName']),
-		$elm$json$Json$Decode$string));
+			[
+				A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string),
+				$elm$json$Json$Decode$succeed('')
+			])),
+	$elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2($elm$json$Json$Decode$field, 'code', $elm$json$Json$Decode$string),
+				$elm$json$Json$Decode$succeed('')
+			])),
+	$elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['target', 'tagName']),
+				$elm$json$Json$Decode$string),
+				$elm$json$Json$Decode$succeed('')
+			])));
 var $elm$browser$Browser$Events$Document = {$: 'Document'};
 var $elm$browser$Browser$Events$MySub = F3(
 	function (a, b, c) {
@@ -7033,9 +7052,10 @@ var $author$project$Main$isEditableTarget = function (targetTag) {
 			['INPUT', 'TEXTAREA', 'SELECT']));
 };
 var $elm$core$String$toLower = _String_toLower;
-var $author$project$Main$isShortcutA = function (key) {
-	return $elm$core$String$toLower(key) === 'a';
-};
+var $author$project$Main$isShortcutA = F2(
+	function (key, code) {
+		return ($elm$core$String$toLower(key) === 'a') || (code === 'KeyA');
+	});
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Basics$not = _Basics_not;
@@ -7206,17 +7226,22 @@ var $author$project$Main$update = F2(
 				}
 			case 'KeyPressed':
 				var key = msg.a;
-				var targetTag = msg.b;
-				if ($author$project$Main$isShortcutA(key) && (!$author$project$Main$isEditableTarget(targetTag))) {
+				var code = msg.b;
+				var targetTag = msg.c;
+				var keyboardInfo = 'key=' + (key + (' code=' + (code + (' target=' + $elm$core$String$toUpper(targetTag)))));
+				var modelWithKey = _Utils_update(
+					model,
+					{lastKeyEvent: keyboardInfo});
+				if (A2($author$project$Main$isShortcutA, key, code) && (!$author$project$Main$isEditableTarget(targetTag))) {
 					var _v4 = model.selectedPropositionId;
 					if (_v4.$ === 'Just') {
 						var propositionId = _v4.a;
-						return A2($author$project$Main$openExpanded, propositionId, model);
+						return A2($author$project$Main$openExpanded, propositionId, modelWithKey);
 					} else {
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+						return _Utils_Tuple2(modelWithKey, $elm$core$Platform$Cmd$none);
 					}
 				} else {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					return _Utils_Tuple2(modelWithKey, $elm$core$Platform$Cmd$none);
 				}
 			case 'PointerMove':
 				var clientX = msg.a;
@@ -7478,7 +7503,6 @@ var $elm$html$Html$Events$preventDefaultOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
 	});
-var $elm$json$Json$Decode$oneOf = _Json_oneOf;
 var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
@@ -8162,6 +8186,18 @@ var $author$project$Main$topHeader = function (model) {
 					[
 						$elm$html$Html$text(
 						'Selection : ' + ($author$project$Main$selectedBadgeLabel(model.selectedPropositionId) + ' | touche A = agrandir'))
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '2px 0 0'),
+						A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+						A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Derniere touche: ' + model.lastKeyEvent)
 					]))
 			]));
 };

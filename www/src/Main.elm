@@ -66,6 +66,7 @@ type alias Model =
     , dragging : Maybe DragState
     , focusTimeline : Animator.Timeline (Maybe Int)
     , boardRect : Maybe BoardRect
+    , lastKeyEvent : String
     , email : String
     , viewport : Viewport
     }
@@ -74,7 +75,7 @@ type alias Model =
 type Msg
     = StartDrag Int Float Float
     | MiniPointerUp Int
-    | KeyPressed String String
+    | KeyPressed String String String
     | PointerMove Float Float
     | PointerUp
     | CloseExpanded
@@ -132,6 +133,7 @@ init _ =
       , dragging = Nothing
       , focusTimeline = Animator.init Nothing
       , boardRect = Nothing
+      , lastKeyEvent = "aucune"
       , email = ""
       , viewport = { width = 1200, height = 800 }
       }
@@ -289,17 +291,24 @@ update msg model =
                 Nothing ->
                     openExpanded propositionId { model | selectedPropositionId = Just propositionId }
 
-        KeyPressed key targetTag ->
-            if isShortcutA key && not (isEditableTarget targetTag) then
+        KeyPressed key code targetTag ->
+            let
+                keyboardInfo =
+                    "key=" ++ key ++ " code=" ++ code ++ " target=" ++ String.toUpper targetTag
+
+                modelWithKey =
+                    { model | lastKeyEvent = keyboardInfo }
+            in
+            if isShortcutA key code && not (isEditableTarget targetTag) then
                 case model.selectedPropositionId of
                     Just propositionId ->
-                        openExpanded propositionId model
+                        openExpanded propositionId modelWithKey
 
                     Nothing ->
-                        ( model, Cmd.none )
+                        ( modelWithKey, Cmd.none )
 
             else
-                ( model, Cmd.none )
+                ( modelWithKey, Cmd.none )
 
         PointerMove clientX clientY ->
             case ( model.dragging, model.boardRect ) of
@@ -573,6 +582,8 @@ topHeader model =
             ]
         , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
             [ text ("Selection : " ++ selectedBadgeLabel model.selectedPropositionId ++ " | touche A = agrandir") ]
+        , p [ style "margin" "2px 0 0", style "font-size" "12px", style "color" "#6b7892" ]
+            [ text ("Derniere touche: " ++ model.lastKeyEvent) ]
         ]
 
 
@@ -890,9 +901,9 @@ selectedBadgeLabel maybeId =
             "aucune"
 
 
-isShortcutA : String -> Bool
-isShortcutA key =
-    String.toLower key == "a"
+isShortcutA : String -> String -> Bool
+isShortcutA key code =
+    String.toLower key == "a" || code == "KeyA"
 
 
 isEditableTarget : String -> Bool
@@ -976,9 +987,10 @@ onBoardTouchEnd =
 
 keyDownDecoder : Decode.Decoder Msg
 keyDownDecoder =
-    Decode.map2 KeyPressed
-        (Decode.field "key" Decode.string)
-        (Decode.at [ "target", "tagName" ] Decode.string)
+    Decode.map3 KeyPressed
+        (Decode.oneOf [ Decode.field "key" Decode.string, Decode.succeed "" ])
+        (Decode.oneOf [ Decode.field "code" Decode.string, Decode.succeed "" ])
+        (Decode.oneOf [ Decode.at [ "target", "tagName" ] Decode.string, Decode.succeed "" ])
 
 
 touchPointDecoder : Decode.Decoder ( Float, Float )
