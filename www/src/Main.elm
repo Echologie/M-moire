@@ -61,6 +61,7 @@ type alias Viewport =
 type alias Model =
     { propositions : List Proposition
     , expandedPropositionId : Maybe Int
+    , selectedPropositionId : Maybe Int
     , isClosingExpanded : Bool
     , dragging : Maybe DragState
     , focusTimeline : Animator.Timeline (Maybe Int)
@@ -73,6 +74,7 @@ type alias Model =
 type Msg
     = StartDrag Int Float Float
     | MiniPointerUp Int
+    | KeyPressed String String
     | PointerMove Float Float
     | PointerUp
     | CloseExpanded
@@ -125,6 +127,7 @@ init _ =
     in
     ( { propositions = seeded
       , expandedPropositionId = Nothing
+      , selectedPropositionId = Just 1
       , isClosingExpanded = False
       , dragging = Nothing
       , focusTimeline = Animator.init Nothing
@@ -219,6 +222,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Browser.Events.onResize WindowResized
+        , Browser.Events.onKeyDown keyDownDecoder
         , Animator.toSubscription AnimatorTick model animator
         ]
 
@@ -263,6 +267,7 @@ update msg model =
                         , pointerOffsetY = offsetY
                         }
                 , expandedPropositionId = Nothing
+                , selectedPropositionId = Just propositionId
                 , isClosingExpanded = False
                 , focusTimeline = animateFocusTo Nothing model.focusTimeline
               }
@@ -282,7 +287,19 @@ update msg model =
                         openExpanded propositionId { model | dragging = Nothing }
 
                 Nothing ->
-                    openExpanded propositionId model
+                    openExpanded propositionId { model | selectedPropositionId = Just propositionId }
+
+        KeyPressed key targetTag ->
+            if isShortcutA key && not (isEditableTarget targetTag) then
+                case model.selectedPropositionId of
+                    Just propositionId ->
+                        openExpanded propositionId model
+
+                    Nothing ->
+                        ( model, Cmd.none )
+
+            else
+                ( model, Cmd.none )
 
         PointerMove clientX clientY ->
             case ( model.dragging, model.boardRect ) of
@@ -421,6 +438,7 @@ openExpanded : Int -> Model -> ( Model, Cmd Msg )
 openExpanded propositionId model =
     ( { model
         | expandedPropositionId = Just propositionId
+        , selectedPropositionId = Just propositionId
         , isClosingExpanded = False
         , focusTimeline = animateFocusTo (Just propositionId) model.focusTimeline
       }
@@ -531,13 +549,13 @@ view model =
         , style "background" "#eaf0fb"
         , style "font-family" "system-ui, sans-serif"
         ]
-        [ topHeader
+        [ topHeader model
         , boardView model
         ]
 
 
-topHeader : Html msg
-topHeader =
+topHeader : Model -> Html msg
+topHeader model =
     div
         [ style "padding" "10px 12px"
         , style "border" "1px solid #d5deef"
@@ -553,6 +571,8 @@ topHeader =
             , span [ style "font-weight" "700" ] [ text "$[0;2\\pi[$" ]
             , text "."
             ]
+        , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
+            [ text ("Selection : " ++ selectedBadgeLabel model.selectedPropositionId ++ " | touche A = agrandir") ]
         ]
 
 
@@ -649,6 +669,9 @@ viewMiniature model item =
                 isExpanded =
                     model.expandedPropositionId == Just item.id
 
+                isSelected =
+                    model.selectedPropositionId == Just item.id
+
                 scaledWidth =
                     miniatureWidth * miniScale
 
@@ -693,6 +716,9 @@ viewMiniature model item =
 
                          else if isDragging then
                             "2px solid #3b82f6"
+
+                         else if isSelected then
+                            "2px solid #93c5fd"
 
                          else
                             "1px solid #c7d3ea"
@@ -840,6 +866,40 @@ viewStep stepText =
     p [ style "margin" "6px 0", style "line-height" "1.35", style "color" "#1f2a44" ] [ text stepText ]
 
 
+selectedBadgeLabel : Maybe Int -> String
+selectedBadgeLabel maybeId =
+    case maybeId of
+        Just propositionId ->
+            case propositionId of
+                1 ->
+                    "A"
+
+                2 ->
+                    "B"
+
+                3 ->
+                    "C"
+
+                4 ->
+                    "D"
+
+                _ ->
+                    "?"
+
+        Nothing ->
+            "aucune"
+
+
+isShortcutA : String -> Bool
+isShortcutA key =
+    String.toLower key == "a"
+
+
+isEditableTarget : String -> Bool
+isEditableTarget targetTag =
+    List.member (String.toUpper targetTag) [ "INPUT", "TEXTAREA", "SELECT" ]
+
+
 selectedProposition : Model -> Maybe Proposition
 selectedProposition model =
     case model.expandedPropositionId of
@@ -912,6 +972,13 @@ onBoardTouchMove =
 onBoardTouchEnd : Html.Attribute Msg
 onBoardTouchEnd =
     on "touchend" (Decode.succeed PointerUp)
+
+
+keyDownDecoder : Decode.Decoder Msg
+keyDownDecoder =
+    Decode.map2 KeyPressed
+        (Decode.field "key" Decode.string)
+        (Decode.at [ "target", "tagName" ] Decode.string)
 
 
 touchPointDecoder : Decode.Decoder ( Float, Float )

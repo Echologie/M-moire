@@ -5430,6 +5430,7 @@ var $author$project$Main$init = function (_v0) {
 			focusTimeline: $mdgriffith$elm_animator$Animator$init($elm$core$Maybe$Nothing),
 			isClosingExpanded: false,
 			propositions: seeded,
+			selectedPropositionId: $elm$core$Maybe$Just(1),
 			viewport: {height: 800, width: 1200}
 		},
 		$elm$core$Platform$Cmd$batch(
@@ -6322,9 +6323,26 @@ var $author$project$Main$animator = A3(
 		}),
 	$mdgriffith$elm_animator$Animator$animator);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$browser$Browser$Events$Window = {$: 'Window'};
+var $author$project$Main$KeyPressed = F2(
+	function (a, b) {
+		return {$: 'KeyPressed', a: a, b: b};
+	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$keyDownDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Main$KeyPressed,
+	A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string),
+	A2(
+		$elm$json$Json$Decode$at,
+		_List_fromArray(
+			['target', 'tagName']),
+		$elm$json$Json$Decode$string));
+var $elm$browser$Browser$Events$Document = {$: 'Document'};
 var $elm$browser$Browser$Events$MySub = F3(
 	function (a, b, c) {
 		return {$: 'MySub', a: a, b: b, c: c};
@@ -6601,6 +6619,9 @@ var $elm$browser$Browser$Events$on = F3(
 		return $elm$browser$Browser$Events$subscription(
 			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
 	});
+var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keydown');
+var $elm$browser$Browser$Events$Window = {$: 'Window'};
+var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$browser$Browser$Events$onResize = function (func) {
 	return A3(
 		$elm$browser$Browser$Events$on,
@@ -6754,6 +6775,7 @@ var $author$project$Main$subscriptions = function (model) {
 		_List_fromArray(
 			[
 				$elm$browser$Browser$Events$onResize($author$project$Main$WindowResized),
+				$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDownDecoder),
 				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Main$AnimatorTick, model, $author$project$Main$animator)
 			]));
 };
@@ -6972,8 +6994,51 @@ var $author$project$Main$distance = F4(
 			A2($elm$core$Basics$pow, x2 - x1, 2) + A2($elm$core$Basics$pow, y2 - y1, 2));
 	});
 var $elm$browser$Browser$Dom$getElement = _Browser_getElement;
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $elm$core$String$toUpper = _String_toUpper;
+var $author$project$Main$isEditableTarget = function (targetTag) {
+	return A2(
+		$elm$core$List$member,
+		$elm$core$String$toUpper(targetTag),
+		_List_fromArray(
+			['INPUT', 'TEXTAREA', 'SELECT']));
+};
+var $elm$core$String$toLower = _String_toLower;
+var $author$project$Main$isShortcutA = function (key) {
+	return $elm$core$String$toLower(key) === 'a';
+};
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$openExpanded = F2(
 	function (propositionId, model) {
 		return _Utils_Tuple2(
@@ -6985,7 +7050,8 @@ var $author$project$Main$openExpanded = F2(
 						$author$project$Main$animateFocusTo,
 						$elm$core$Maybe$Just(propositionId),
 						model.focusTimeline),
-					isClosingExpanded: false
+					isClosingExpanded: false,
+					selectedPropositionId: $elm$core$Maybe$Just(propositionId)
 				}),
 			$author$project$Main$scheduleMathRender);
 	});
@@ -7106,7 +7172,8 @@ var $author$project$Main$update = F2(
 								{moved: false, pointerOffsetX: offsetX, pointerOffsetY: offsetY, propositionId: propositionId, startX: clientX, startY: clientY}),
 							expandedPropositionId: $elm$core$Maybe$Nothing,
 							focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, model.focusTimeline),
-							isClosingExpanded: false
+							isClosingExpanded: false,
+							selectedPropositionId: $elm$core$Maybe$Just(propositionId)
 						}),
 					A2(
 						$elm$core$Task$attempt,
@@ -7128,15 +7195,36 @@ var $author$project$Main$update = F2(
 							model,
 							{dragging: $elm$core$Maybe$Nothing})));
 				} else {
-					return A2($author$project$Main$openExpanded, propositionId, model);
+					return A2(
+						$author$project$Main$openExpanded,
+						propositionId,
+						_Utils_update(
+							model,
+							{
+								selectedPropositionId: $elm$core$Maybe$Just(propositionId)
+							}));
+				}
+			case 'KeyPressed':
+				var key = msg.a;
+				var targetTag = msg.b;
+				if ($author$project$Main$isShortcutA(key) && (!$author$project$Main$isEditableTarget(targetTag))) {
+					var _v4 = model.selectedPropositionId;
+					if (_v4.$ === 'Just') {
+						var propositionId = _v4.a;
+						return A2($author$project$Main$openExpanded, propositionId, model);
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
 			case 'PointerMove':
 				var clientX = msg.a;
 				var clientY = msg.b;
-				var _v4 = _Utils_Tuple2(model.dragging, model.boardRect);
-				if ((_v4.a.$ === 'Just') && (_v4.b.$ === 'Just')) {
-					var dragState = _v4.a.a;
-					var rect = _v4.b.a;
+				var _v5 = _Utils_Tuple2(model.dragging, model.boardRect);
+				if ((_v5.a.$ === 'Just') && (_v5.b.$ === 'Just')) {
+					var dragState = _v5.a.a;
+					var rect = _v5.b.a;
 					var nextPos = A5($author$project$Main$positionFromClientWithOffsetBounded, rect, clientX, clientY, dragState.pointerOffsetX, dragState.pointerOffsetY);
 					var movedDistance = A4($author$project$Main$distance, dragState.startX, dragState.startY, clientX, clientY);
 					var hasMoved = dragState.moved || (movedDistance > 10);
@@ -7156,11 +7244,11 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
 			case 'PointerUp':
-				var _v5 = model.dragging;
-				if (_v5.$ === 'Nothing') {
+				var _v6 = model.dragging;
+				if (_v6.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var dragState = _v5.a;
+					var dragState = _v6.a;
 					return dragState.moved ? _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7173,8 +7261,8 @@ var $author$project$Main$update = F2(
 							{dragging: $elm$core$Maybe$Nothing}));
 				}
 			case 'CloseExpanded':
-				var _v6 = model.expandedPropositionId;
-				if (_v6.$ === 'Nothing') {
+				var _v7 = model.expandedPropositionId;
+				if (_v7.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					return model.isClosingExpanded ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
@@ -7186,7 +7274,7 @@ var $author$project$Main$update = F2(
 							}),
 						A2(
 							$elm$core$Task$perform,
-							function (_v7) {
+							function (_v8) {
 								return $author$project$Main$FinishCloseExpanded;
 							},
 							$elm$core$Process$sleep(190)));
@@ -7199,11 +7287,11 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'UpdateExpandedComment':
 				var newComment = msg.a;
-				var _v8 = model.expandedPropositionId;
-				if (_v8.$ === 'Nothing') {
+				var _v9 = model.expandedPropositionId;
+				if (_v9.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var propositionId = _v8.a;
+					var propositionId = _v9.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7252,7 +7340,7 @@ var $author$project$Main$update = F2(
 						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v10) {
+						function (_v11) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(24)));
@@ -7390,10 +7478,6 @@ var $elm$html$Html$Events$preventDefaultOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
 	});
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
 var $elm$json$Json$Decode$oneOf = _Json_oneOf;
 var $elm$core$Tuple$pair = F2(
 	function (a, b) {
@@ -7514,7 +7598,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $elm$html$Html$Events$targetValue = A2(
 	$elm$json$Json$Decode$at,
 	_List_fromArray(
@@ -7792,6 +7875,9 @@ var $author$project$Main$viewMiniature = F2(
 			var pos = _v0.a;
 			var scaledWidth = $author$project$Main$miniatureWidth * $author$project$Main$miniScale;
 			var scaledHeight = $author$project$Main$miniatureHeight * $author$project$Main$miniScale;
+			var isSelected = _Utils_eq(
+				model.selectedPropositionId,
+				$elm$core$Maybe$Just(item.id));
 			var isExpanded = _Utils_eq(
 				model.expandedPropositionId,
 				$elm$core$Maybe$Just(item.id));
@@ -7856,7 +7942,7 @@ var $author$project$Main$viewMiniature = F2(
 								A2(
 								$elm$html$Html$Attributes$style,
 								'border',
-								isExpanded ? '2px solid #0f62fe' : (isDragging ? '2px solid #3b82f6' : '1px solid #c7d3ea')),
+								isExpanded ? '2px solid #0f62fe' : (isDragging ? '2px solid #3b82f6' : (isSelected ? '2px solid #93c5fd' : '1px solid #c7d3ea'))),
 								A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
 								A2($elm$html$Html$Attributes$style, 'background', '#fbfdff'),
 								A2(
@@ -7988,63 +8074,97 @@ var $author$project$Main$boardView = function (model) {
 					[$author$project$Main$boardLegend, overlay]))));
 };
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $author$project$Main$topHeader = A2(
-	$elm$html$Html$div,
-	_List_fromArray(
-		[
-			A2($elm$html$Html$Attributes$style, 'padding', '10px 12px'),
-			A2($elm$html$Html$Attributes$style, 'border', '1px solid #d5deef'),
-			A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
-			A2($elm$html$Html$Attributes$style, 'background', 'white'),
-			A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$h1,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'margin', '0'),
-					A2($elm$html$Html$Attributes$style, 'font-size', '24px')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Evaluation de productions d\'eleves')
-				])),
-			A2(
-			$elm$html$Html$p,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'margin', '6px 0 0'),
-					A2($elm$html$Html$Attributes$style, 'color', '#33425f')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Exercice : resoudre '),
-					A2(
-					$elm$html$Html$span,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('$\\cos(2x)=\\sin(x)$')
-						])),
-					$elm$html$Html$text(' sur '),
-					A2(
-					$elm$html$Html$span,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('$[0;2\\pi[$')
-						])),
-					$elm$html$Html$text('.')
-				]))
-		]));
+var $author$project$Main$selectedBadgeLabel = function (maybeId) {
+	if (maybeId.$ === 'Just') {
+		var propositionId = maybeId.a;
+		switch (propositionId) {
+			case 1:
+				return 'A';
+			case 2:
+				return 'B';
+			case 3:
+				return 'C';
+			case 4:
+				return 'D';
+			default:
+				return '?';
+		}
+	} else {
+		return 'aucune';
+	}
+};
+var $author$project$Main$topHeader = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'padding', '10px 12px'),
+				A2($elm$html$Html$Attributes$style, 'border', '1px solid #d5deef'),
+				A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
+				A2($elm$html$Html$Attributes$style, 'background', 'white'),
+				A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h1,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '0'),
+						A2($elm$html$Html$Attributes$style, 'font-size', '24px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Evaluation de productions d\'eleves')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '6px 0 0'),
+						A2($elm$html$Html$Attributes$style, 'color', '#33425f')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Exercice : resoudre '),
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('$\\cos(2x)=\\sin(x)$')
+							])),
+						$elm$html$Html$text(' sur '),
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'font-weight', '700')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('$[0;2\\pi[$')
+							])),
+						$elm$html$Html$text('.')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin', '4px 0 0'),
+						A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
+						A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						'Selection : ' + ($author$project$Main$selectedBadgeLabel(model.selectedPropositionId) + ' | touche A = agrandir'))
+					]))
+			]));
+};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -8061,7 +8181,7 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$topHeader,
+				$author$project$Main$topHeader(model),
 				$author$project$Main$boardView(model)
 			]));
 };
