@@ -1,7 +1,6 @@
 port module Main exposing (main)
 
 import Animator
-import Animator.Inline
 import Browser
 import Browser.Dom as Dom
 import Browser.Events
@@ -64,7 +63,6 @@ type alias Model =
     , expandedPropositionId : Maybe Int
     , isClosingExpanded : Bool
     , dragging : Maybe DragState
-    , clickSuppressedFor : Maybe Int
     , focusTimeline : Animator.Timeline (Maybe Int)
     , boardRect : Maybe BoardRect
     , email : String
@@ -74,7 +72,7 @@ type alias Model =
 
 type Msg
     = StartDrag Int Float Float
-    | OpenExpanded Int
+    | MiniPointerUp Int
     | PointerMove Float Float
     | PointerUp
     | CloseExpanded
@@ -129,7 +127,6 @@ init _ =
       , expandedPropositionId = Nothing
       , isClosingExpanded = False
       , dragging = Nothing
-      , clickSuppressedFor = Nothing
       , focusTimeline = Animator.init Nothing
       , boardRect = Nothing
       , email = ""
@@ -267,18 +264,25 @@ update msg model =
                         }
                 , expandedPropositionId = Nothing
                 , isClosingExpanded = False
-                , clickSuppressedFor = Nothing
                 , focusTimeline = animateFocusTo Nothing model.focusTimeline
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
 
-        OpenExpanded propositionId ->
-            if model.clickSuppressedFor == Just propositionId then
-                ( { model | clickSuppressedFor = Nothing }, Cmd.none )
+        MiniPointerUp propositionId ->
+            case model.dragging of
+                Just dragState ->
+                    if dragState.propositionId /= propositionId then
+                        ( model, Cmd.none )
 
-            else
-                openExpanded propositionId model
+                    else if dragState.moved then
+                        ( { model | dragging = Nothing }, Cmd.none )
+
+                    else
+                        openExpanded propositionId { model | dragging = Nothing }
+
+                Nothing ->
+                    openExpanded propositionId model
 
         PointerMove clientX clientY ->
             case ( model.dragging, model.boardRect ) of
@@ -322,12 +326,7 @@ update msg model =
 
                 Just dragState ->
                     if dragState.moved then
-                        ( { model
-                            | dragging = Nothing
-                            , clickSuppressedFor = Just dragState.propositionId
-                          }
-                        , Cmd.none
-                        )
+                        ( { model | dragging = Nothing }, Cmd.none )
 
                     else
                         openExpanded dragState.propositionId { model | dragging = Nothing }
@@ -423,7 +422,6 @@ openExpanded propositionId model =
     ( { model
         | expandedPropositionId = Just propositionId
         , isClosingExpanded = False
-        , clickSuppressedFor = Nothing
         , focusTimeline = animateFocusTo (Just propositionId) model.focusTimeline
       }
     , scheduleMathRender
@@ -716,7 +714,8 @@ viewMiniature model item =
                     , style "outline" "none"
                     , onMiniMouseDown item.id
                     , onMiniTouchStart item.id
-                    , onClick (OpenExpanded item.id)
+                    , onMiniMouseUp item.id
+                    , onMiniTouchEnd item.id
                     ]
                     [ notchBadge item.badge
                     , div [ style "margin-left" "48px" ]
@@ -767,18 +766,16 @@ viewExpandedOverlay model item =
         ]
         [ div
             [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
-            , Animator.Inline.scale model.focusTimeline
-                (\focusedId ->
-                    if model.isClosingExpanded then
-                        Animator.at 0.34 |> Animator.arriveSmoothly 0.72
-
-                    else if focusedId == Just item.id then
-                        Animator.at 1 |> Animator.arriveSmoothly 0.72
-
-                    else
-                        Animator.at 0.34 |> Animator.arriveSmoothly 0.72
-                )
             , style "position" "relative"
+            , style "transform"
+                (if model.isClosingExpanded then
+                    "scale(0.34)"
+
+                 else
+                    "scale(1)"
+                )
+            , style "transform-origin" "center center"
+            , style "transition" "transform 190ms ease"
             , style "width" "min(1380px, 98vw)"
             , style "max-height" "92vh"
             , style "overflow" "auto"
@@ -872,6 +869,16 @@ onMiniTouchStart propositionId =
             (\( clientX, clientY ) -> ( StartDrag propositionId clientX clientY, True ))
             touchPointDecoder
         )
+
+
+onMiniMouseUp : Int -> Html.Attribute Msg
+onMiniMouseUp propositionId =
+    stopPropagationOn "mouseup" (Decode.succeed ( MiniPointerUp propositionId, True ))
+
+
+onMiniTouchEnd : Int -> Html.Attribute Msg
+onMiniTouchEnd propositionId =
+    stopPropagationOn "touchend" (Decode.succeed ( MiniPointerUp propositionId, True ))
 
 
 onBoardMouseMove : Html.Attribute Msg
