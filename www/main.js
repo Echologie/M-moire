@@ -5159,6 +5159,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$FocusClosed = {$: 'FocusClosed'};
 var $author$project$Main$RefreshBoardRect = {$: 'RefreshBoardRect'};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
@@ -5427,7 +5428,7 @@ var $author$project$Main$init = function (_v0) {
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
 			expandedPropositionId: $elm$core$Maybe$Nothing,
-			focusTimeline: $mdgriffith$elm_animator$Animator$init($elm$core$Maybe$Nothing),
+			focusTimeline: $mdgriffith$elm_animator$Animator$init($author$project$Main$FocusClosed),
 			isClosingExpanded: false,
 			lastKeyEvent: 'aucune',
 			propositions: seeded,
@@ -6979,11 +6980,11 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 			timeline);
 	});
 var $author$project$Main$animateFocusTo = F2(
-	function (propositionId, timeline) {
+	function (focusState, timeline) {
 		return A3(
 			$mdgriffith$elm_animator$Animator$go,
 			$mdgriffith$elm_animator$Animator$millis(240),
-			propositionId,
+			focusState,
 			timeline);
 	});
 var $elm$core$Task$onError = _Scheduler_onError;
@@ -7059,6 +7060,9 @@ var $author$project$Main$isShortcutA = F2(
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$Focused = function (a) {
+	return {$: 'Focused', a: a};
+};
 var $author$project$Main$openExpanded = F2(
 	function (propositionId, model) {
 		return _Utils_Tuple2(
@@ -7068,7 +7072,7 @@ var $author$project$Main$openExpanded = F2(
 					expandedPropositionId: $elm$core$Maybe$Just(propositionId),
 					focusTimeline: A2(
 						$author$project$Main$animateFocusTo,
-						$elm$core$Maybe$Just(propositionId),
+						$author$project$Main$Focused(propositionId),
 						model.focusTimeline),
 					isClosingExpanded: false,
 					selectedPropositionId: $elm$core$Maybe$Just(propositionId)
@@ -7191,7 +7195,7 @@ var $author$project$Main$update = F2(
 							dragging: $elm$core$Maybe$Just(
 								{moved: false, pointerOffsetX: offsetX, pointerOffsetY: offsetY, propositionId: propositionId, startX: clientX, startY: clientY}),
 							expandedPropositionId: $elm$core$Maybe$Nothing,
-							focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, model.focusTimeline),
+							focusTimeline: A2($author$project$Main$animateFocusTo, $author$project$Main$FocusClosed, model.focusTimeline),
 							isClosingExpanded: false,
 							selectedPropositionId: $elm$core$Maybe$Just(propositionId)
 						}),
@@ -7294,7 +7298,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								focusTimeline: A2($author$project$Main$animateFocusTo, $elm$core$Maybe$Nothing, model.focusTimeline),
+								focusTimeline: A2($author$project$Main$animateFocusTo, $author$project$Main$FocusClosed, model.focusTimeline),
 								isClosingExpanded: true
 							}),
 						A2(
@@ -9193,19 +9197,25 @@ var $author$project$Main$viewExpandedOverlay = F2(
 							A2(
 							$mdgriffith$elm_animator$Animator$Inline$scale,
 							model.focusTimeline,
-							function (focusedId) {
-								return model.isClosingExpanded ? A2(
-									$mdgriffith$elm_animator$Animator$arriveSmoothly,
-									0.68,
-									$mdgriffith$elm_animator$Animator$at($author$project$Main$overlayClosedScale)) : (_Utils_eq(
-									focusedId,
-									$elm$core$Maybe$Just(item.id)) ? A2(
-									$mdgriffith$elm_animator$Animator$arriveSmoothly,
-									0.68,
-									$mdgriffith$elm_animator$Animator$at(1)) : A2(
-									$mdgriffith$elm_animator$Animator$arriveSmoothly,
-									0.68,
-									$mdgriffith$elm_animator$Animator$at($author$project$Main$overlayClosedScale)));
+							function (focusState) {
+								if (focusState.$ === 'Focused') {
+									var focusedId = focusState.a;
+									return model.isClosingExpanded ? A2(
+										$mdgriffith$elm_animator$Animator$arriveSmoothly,
+										0.68,
+										$mdgriffith$elm_animator$Animator$at($author$project$Main$overlayClosedScale)) : (_Utils_eq(focusedId, item.id) ? A2(
+										$mdgriffith$elm_animator$Animator$arriveSmoothly,
+										0.68,
+										$mdgriffith$elm_animator$Animator$at(1)) : A2(
+										$mdgriffith$elm_animator$Animator$arriveSmoothly,
+										0.68,
+										$mdgriffith$elm_animator$Animator$at($author$project$Main$overlayClosedScale)));
+								} else {
+									return A2(
+										$mdgriffith$elm_animator$Animator$arriveSmoothly,
+										0.68,
+										$mdgriffith$elm_animator$Animator$at($author$project$Main$overlayClosedScale));
+								}
 							}),
 							A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 							A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),

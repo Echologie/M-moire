@@ -59,13 +59,18 @@ type alias Viewport =
     }
 
 
+type FocusState
+    = FocusClosed
+    | Focused Int
+
+
 type alias Model =
     { propositions : List Proposition
     , expandedPropositionId : Maybe Int
     , selectedPropositionId : Maybe Int
     , isClosingExpanded : Bool
     , dragging : Maybe DragState
-    , focusTimeline : Animator.Timeline (Maybe Int)
+    , focusTimeline : Animator.Timeline FocusState
     , boardRect : Maybe BoardRect
     , lastKeyEvent : String
     , email : String
@@ -137,7 +142,7 @@ init _ =
       , selectedPropositionId = Just 1
       , isClosingExpanded = False
       , dragging = Nothing
-      , focusTimeline = Animator.init Nothing
+      , focusTimeline = Animator.init FocusClosed
       , boardRect = Nothing
       , lastKeyEvent = "aucune"
       , email = ""
@@ -277,7 +282,7 @@ update msg model =
                 , expandedPropositionId = Nothing
                 , selectedPropositionId = Just propositionId
                 , isClosingExpanded = False
-                , focusTimeline = animateFocusTo Nothing model.focusTimeline
+                , focusTimeline = animateFocusTo FocusClosed model.focusTimeline
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
@@ -375,7 +380,7 @@ update msg model =
                     else
                         ( { model
                             | isClosingExpanded = True
-                            , focusTimeline = animateFocusTo Nothing model.focusTimeline
+                            , focusTimeline = animateFocusTo FocusClosed model.focusTimeline
                           }
                         , Task.perform (\_ -> FinishCloseExpanded) (Process.sleep 190)
                         )
@@ -444,9 +449,9 @@ scheduleMathRender =
     renderMath "refresh"
 
 
-animateFocusTo : Maybe Int -> Animator.Timeline (Maybe Int) -> Animator.Timeline (Maybe Int)
-animateFocusTo propositionId timeline =
-    Animator.go (Animator.millis 240) propositionId timeline
+animateFocusTo : FocusState -> Animator.Timeline FocusState -> Animator.Timeline FocusState
+animateFocusTo focusState timeline =
+    Animator.go (Animator.millis 240) focusState timeline
 
 
 openExpanded : Int -> Model -> ( Model, Cmd Msg )
@@ -455,7 +460,7 @@ openExpanded propositionId model =
         | expandedPropositionId = Just propositionId
         , selectedPropositionId = Just propositionId
         , isClosingExpanded = False
-        , focusTimeline = animateFocusTo (Just propositionId) model.focusTimeline
+        , focusTimeline = animateFocusTo (Focused propositionId) model.focusTimeline
       }
     , scheduleMathRender
     )
@@ -820,15 +825,20 @@ viewExpandedOverlay model item =
         [ div
             [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
             , Animator.Inline.scale model.focusTimeline
-                (\focusedId ->
-                    if model.isClosingExpanded then
-                        Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
+                (\focusState ->
+                    case focusState of
+                        Focused focusedId ->
+                            if model.isClosingExpanded then
+                                Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
 
-                    else if focusedId == Just item.id then
-                        Animator.at 1 |> Animator.arriveSmoothly 0.68
+                            else if focusedId == item.id then
+                                Animator.at 1 |> Animator.arriveSmoothly 0.68
 
-                    else
-                        Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
+                            else
+                                Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
+
+                        FocusClosed ->
+                            Animator.at overlayClosedScale |> Animator.arriveSmoothly 0.68
                 )
             , style "position" "relative"
             , style "transform-origin" "center center"
