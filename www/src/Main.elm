@@ -548,6 +548,15 @@ clamp minVal maxVal value =
 
 view : Model -> Html Msg
 view model =
+    let
+        overlay =
+            case selectedProposition model of
+                Nothing ->
+                    text ""
+
+                Just item ->
+                    viewExpandedOverlay model item
+    in
     div
         [ style "margin" "0"
         , style "min-height" "100vh"
@@ -560,6 +569,7 @@ view model =
         ]
         [ topHeader model
         , boardView model
+        , overlay
         ]
 
 
@@ -581,7 +591,7 @@ topHeader model =
             , text "."
             ]
         , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
-            [ text ("Selection : " ++ selectedBadgeLabel model.selectedPropositionId ++ " | touche A = agrandir") ]
+            [ text ("Selection : " ++ selectedBadgeLabel model.selectedPropositionId ++ " | Expanded : " ++ selectedBadgeLabel model.expandedPropositionId ++ " | touche A = agrandir") ]
         , p [ style "margin" "2px 0 0", style "font-size" "12px", style "color" "#6b7892" ]
             [ text ("Derniere touche: " ++ model.lastKeyEvent) ]
         ]
@@ -589,15 +599,6 @@ topHeader model =
 
 boardView : Model -> Html Msg
 boardView model =
-    let
-        overlay =
-            case selectedProposition model of
-                Nothing ->
-                    text ""
-
-                Just item ->
-                    viewExpandedOverlay model item
-    in
     div
         [ id "board"
         , onBoardMouseMove
@@ -616,7 +617,7 @@ boardView model =
         ]
         ([ axisLines ]
             ++ List.map (viewMiniature model) model.propositions
-            ++ [ boardLegend, overlay ]
+            ++ [ boardLegend ]
         )
 
 
@@ -792,9 +793,12 @@ notchBadge badge =
 viewExpandedOverlay : Model -> Proposition -> Html Msg
 viewExpandedOverlay model item =
     div
-        [ style "position" "absolute"
-        , style "inset" "0"
-        , style "z-index" "90"
+        [ style "position" "fixed"
+        , style "top" "0"
+        , style "right" "0"
+        , style "bottom" "0"
+        , style "left" "0"
+        , style "z-index" "9999"
         , style "background" "rgba(16,24,40,0.28)"
         , style "display" "flex"
         , style "align-items" "center"
