@@ -7079,7 +7079,7 @@ var $author$project$Main$clamp = F3(
 	function (minVal, maxVal, value) {
 		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
 	});
-var $author$project$Main$miniScale = 0.34;
+var $author$project$Main$miniScale = 0.68;
 var $author$project$Main$miniatureHeight = 206;
 var $author$project$Main$miniatureWidth = 320;
 var $author$project$Main$positionFromClientWithOffsetBounded = F5(

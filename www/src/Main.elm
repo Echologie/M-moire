@@ -103,7 +103,7 @@ miniatureHeight =
 
 miniScale : Float
 miniScale =
-    0.34
+    0.68
 
 
 focusedScale : Float
