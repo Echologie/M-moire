@@ -1,43 +1,121 @@
 module Test exposing (main)
 
+import Animator
+import Animator.Inline
 import Browser
 import Html exposing (Html, div, h2, p, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick, stopPropagationOn)
 import Json.Decode as Decode
+import Process
+import Task
+import Time
+
+
+type ZoomState
+    = Mini
+    | Maxi
 
 
 type alias Model =
     { expanded : Bool
+    , closing : Bool
+    , zoomTimeline : Animator.Timeline ZoomState
     }
 
 
 type Msg
     = Open
     | Close
+    | FinishClose
+    | AnimatorTick Time.Posix
     | NoOp
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox
-        { init = { expanded = False }
+    Browser.element
+        { init = init
         , update = update
+        , subscriptions = subscriptions
         , view = view
         }
 
 
-update : Msg -> Model -> Model
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( { expanded = False
+      , closing = False
+      , zoomTimeline = Animator.init Mini
+      }
+    , Cmd.none
+    )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Animator.toSubscription AnimatorTick model animator
+
+
+animator : Animator.Animator Model
+animator =
+    Animator.animator
+        |> Animator.watching .zoomTimeline
+            (\newZoom currentModel ->
+                { currentModel | zoomTimeline = newZoom }
+            )
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Open ->
-            { model | expanded = True }
+            if model.expanded && not model.closing then
+                ( model, Cmd.none )
+
+            else
+                ( { model
+                    | expanded = True
+                    , closing = False
+                    , zoomTimeline = animateZoom Maxi model.zoomTimeline
+                  }
+                , Cmd.none
+                )
 
         Close ->
-            { model | expanded = False }
+            if not model.expanded || model.closing then
+                ( model, Cmd.none )
+
+            else
+                ( { model
+                    | closing = True
+                    , zoomTimeline = animateZoom Mini model.zoomTimeline
+                  }
+                , Task.perform (\_ -> FinishClose) (Process.sleep 220)
+                )
+
+        FinishClose ->
+            if model.closing then
+                ( { model
+                    | expanded = False
+                    , closing = False
+                  }
+                , Cmd.none
+                )
+
+            else
+                ( model, Cmd.none )
+
+        AnimatorTick now ->
+            ( Animator.update now animator model, Cmd.none )
 
         NoOp ->
-            model
+            ( model, Cmd.none )
+
+
+animateZoom : ZoomState -> Animator.Timeline ZoomState -> Animator.Timeline ZoomState
+animateZoom target timeline =
+    Animator.go (Animator.millis 220) target timeline
 
 
 view : Model -> Html Msg
@@ -50,9 +128,13 @@ view model =
         , style "position" "relative"
         , style "font-family" "Georgia, serif"
         ]
-        [ viewMiniCard
+        [ if model.expanded then
+            text ""
+
+          else
+            viewMiniCard
         , if model.expanded then
-            viewExpandedOverlay
+            viewExpandedOverlay model
 
           else
             text ""
@@ -83,8 +165,8 @@ viewMiniCard =
         ]
 
 
-viewExpandedOverlay : Html Msg
-viewExpandedOverlay =
+viewExpandedOverlay : Model -> Html Msg
+viewExpandedOverlay model =
     div
         [ style "position" "fixed"
         , style "top" "0"
@@ -100,6 +182,16 @@ viewExpandedOverlay =
         ]
         [ div
             [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
+            , Animator.Inline.scale model.zoomTimeline
+                (\zoom ->
+                    case zoom of
+                        Mini ->
+                            Animator.at 0.25 |> Animator.arriveSmoothly 0.75
+
+                        Maxi ->
+                            Animator.at 1 |> Animator.arriveSmoothly 0.75
+                )
+            , style "transform-origin" "center center"
             , style "width" "min(1100px, 94vw)"
             , style "max-height" "92vh"
             , style "overflow" "auto"
