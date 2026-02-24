@@ -7271,13 +7271,11 @@ var $author$project$Main$update = F2(
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(24)));
-			case 'AnimatorTick':
+			default:
 				var now = msg.a;
 				return _Utils_Tuple2(
 					A3($mdgriffith$elm_animator$Animator$update, now, $author$project$Main$animator, model),
 					$elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $elm$virtual_dom$VirtualDom$attribute = F2(
@@ -8475,7 +8473,6 @@ var $author$project$Main$propositionById = F2(
 				},
 				propositions));
 	});
-var $author$project$Main$NoOp = {$: 'NoOp'};
 var $author$project$Main$UpdateEmail = function (a) {
 	return {$: 'UpdateEmail', a: a};
 };
@@ -9684,11 +9681,7 @@ var $author$project$Main$viewExpandedCard = F2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					A2(
-					$elm$html$Html$Events$stopPropagationOn,
-					'click',
-					$elm$json$Json$Decode$succeed(
-						_Utils_Tuple2($author$project$Main$NoOp, true))),
+					$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
 					A2($elm$html$Html$Attributes$attribute, 'data-testid', 'expanded-card'),
 					A2(
 					$mdgriffith$elm_animator$Animator$Inline$scale,

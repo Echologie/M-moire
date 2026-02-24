@@ -97,7 +97,6 @@ type Msg
     | GotBoardRect (Result Dom.Error Dom.Element)
     | WindowResized Int Int
     | AnimatorTick Time.Posix
-    | NoOp
 
 
 miniatureWidth : Float
@@ -373,9 +372,6 @@ update msg model =
 
         AnimatorTick now ->
             ( Animator.update now animator model, Cmd.none )
-
-        NoOp ->
-            ( model, Cmd.none )
 
 
 animateZoomTo : ZoomState -> Animator.Timeline ZoomState -> Animator.Timeline ZoomState
@@ -705,7 +701,7 @@ viewExpandedLayer model =
 viewExpandedCard : Model -> Proposition -> Html Msg
 viewExpandedCard model item =
     div
-        [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
+        [ onClick CloseExpanded
         , attribute "data-testid" "expanded-card"
         , Animator.Inline.scale model.focusTimeline
             (\zoom ->

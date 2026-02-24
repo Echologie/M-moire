@@ -37,6 +37,16 @@ test('clic ouvre l overlay puis clic exterieur referme', async ({ page }) => {
   await expect(page.getByTestId('expanded-layer')).toHaveCount(0);
 });
 
+test('clic dans la fiche ouverte la referme', async ({ page }) => {
+  await page.goto('/index.html');
+  await page.waitForTimeout(200);
+  const miniC = page.getByTestId('mini-C');
+  await miniPressAndRelease(miniC);
+  await expect(page.getByTestId('expanded-card')).toBeVisible();
+  await page.getByTestId('expanded-card').click({ position: { x: 20, y: 20 }, force: true });
+  await expect(page.getByTestId('expanded-layer')).toHaveCount(0);
+});
+
 test.describe('mobile emulation', () => {
   test.use({
     viewport: { width: 393, height: 851 },
