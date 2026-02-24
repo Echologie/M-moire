@@ -1,7 +1,5 @@
 module Main exposing (main)
 
-import Animator
-import Animator.Inline
 import BoardLogic
 import Browser
 import Browser.Dom as Dom
@@ -15,7 +13,6 @@ import MathML as Math
 import MathML.Attributes as MathAttr
 import Process
 import Task
-import Time
 
 
 type alias Position =
@@ -58,11 +55,6 @@ type alias Viewport =
     }
 
 
-type ZoomState
-    = Mini
-    | Maxi
-
-
 type FormulaId
     = FormulaCosLinear
     | FormulaQuadratic
@@ -74,8 +66,6 @@ type alias Model =
     { propositions : List Proposition
     , selectedPropositionId : Maybe Int
     , expandedPropositionId : Maybe Int
-    , closingPropositionId : Maybe Int
-    , focusTimeline : Animator.Timeline ZoomState
     , dragging : Maybe DragState
     , suppressNextOpen : Bool
     , boardRect : Maybe BoardRect
@@ -89,13 +79,11 @@ type Msg
     | PointerUp
     | MiniMouseUp Int
     | TouchEndOnMini Int
-    | CloseExpanded
-    | FinishCloseExpanded
+    | ToggleExpanded Int
     | RefreshBoardRect
     | GotBoardRect (Result Dom.Error Dom.Element)
     | GotViewport (Result Dom.Error Dom.Viewport)
     | WindowResized Int Int
-    | AnimatorTick Time.Posix
 
 
 miniatureWidth : Float
@@ -110,17 +98,12 @@ miniatureHeight =
 
 miniScale : Float
 miniScale =
-    0.68
+    0.33
 
 
-overlayStartScale : Float
-overlayStartScale =
-    0.18
-
-
-closeAnimationDurationMs : Float
-closeAnimationDurationMs =
-    240
+expandedScale : Float
+expandedScale =
+    1
 
 
 main : Program () Model Msg
@@ -142,8 +125,6 @@ init _ =
     ( { propositions = seeded
       , selectedPropositionId = Just 1
       , expandedPropositionId = Nothing
-      , closingPropositionId = Nothing
-      , focusTimeline = Animator.init Mini
       , dragging = Nothing
       , suppressNextOpen = False
       , boardRect = Nothing
@@ -237,17 +218,7 @@ subscriptions model =
         [ Browser.Events.onResize WindowResized
         , Browser.Events.onMouseMove mouseMoveDecoder
         , Browser.Events.onMouseUp (Decode.succeed PointerUp)
-        , Animator.toSubscription AnimatorTick model animator
         ]
-
-
-animator : Animator.Animator Model
-animator =
-    Animator.animator
-        |> Animator.watching .focusTimeline
-            (\newFocus currentModel ->
-                { currentModel | focusTimeline = newFocus }
-            )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -270,10 +241,13 @@ update msg model =
                         , moved = False
                         }
                 , selectedPropositionId = Just propositionId
-                , expandedPropositionId = Nothing
-                , closingPropositionId = Nothing
+                , expandedPropositionId =
+                    if model.expandedPropositionId == Just propositionId then
+                        Nothing
+
+                    else
+                        model.expandedPropositionId
                 , suppressNextOpen = False
-                , focusTimeline = animateZoomTo Mini model.focusTimeline
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
             )
@@ -327,22 +301,18 @@ update msg model =
         TouchEndOnMini propositionId ->
             finishMiniRelease propositionId model
 
-        CloseExpanded ->
-            case model.expandedPropositionId of
-                Nothing ->
-                    ( model, Cmd.none )
+        ToggleExpanded propositionId ->
+            ( { model
+                | selectedPropositionId = Just propositionId
+                , expandedPropositionId =
+                    if model.expandedPropositionId == Just propositionId then
+                        Nothing
 
-                Just propositionId ->
-                    ( { model
-                        | expandedPropositionId = Nothing
-                        , closingPropositionId = Just propositionId
-                        , focusTimeline = animateZoomTo Mini model.focusTimeline
-                      }
-                    , Task.perform (\_ -> FinishCloseExpanded) (Process.sleep closeAnimationDurationMs)
-                    )
-
-        FinishCloseExpanded ->
-            ( { model | closingPropositionId = Nothing }, Cmd.none )
+                    else
+                        Just propositionId
+              }
+            , Cmd.none
+            )
 
         RefreshBoardRect ->
             ( model, Task.attempt GotBoardRect (Dom.getElement "board") )
@@ -385,14 +355,6 @@ update msg model =
             , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 24)
             )
 
-        AnimatorTick now ->
-            ( Animator.update now animator model, Cmd.none )
-
-
-animateZoomTo : ZoomState -> Animator.Timeline ZoomState -> Animator.Timeline ZoomState
-animateZoomTo zoomState timeline =
-    Animator.go (Animator.millis 220) zoomState timeline
-
 
 finishMiniRelease : Int -> Model -> ( Model, Cmd Msg )
 finishMiniRelease propositionId model =
@@ -405,23 +367,26 @@ finishMiniRelease propositionId model =
                 ( { model | dragging = Nothing, suppressNextOpen = False }, Cmd.none )
 
             else
-                openOverlay propositionId { model | dragging = Nothing }
+                toggleCard propositionId { model | dragging = Nothing }
 
         Nothing ->
-            openOverlay propositionId model
+            toggleCard propositionId model
 
 
-openOverlay : Int -> Model -> ( Model, Cmd Msg )
-openOverlay propositionId model =
+toggleCard : Int -> Model -> ( Model, Cmd Msg )
+toggleCard propositionId model =
     if model.suppressNextOpen then
         ( { model | suppressNextOpen = False }, Cmd.none )
 
     else
         ( { model
             | selectedPropositionId = Just propositionId
-            , expandedPropositionId = Just propositionId
-            , closingPropositionId = Nothing
-            , focusTimeline = animateZoomTo Maxi model.focusTimeline
+            , expandedPropositionId =
+                if model.expandedPropositionId == Just propositionId then
+                    Nothing
+
+                else
+                    Just propositionId
           }
         , Cmd.none
         )
@@ -462,7 +427,6 @@ view model =
         ]
         [ topHeader model
         , boardView model
-        , viewExpandedLayer model
         ]
 
 
@@ -505,18 +469,6 @@ placedCount propositions =
 
 boardView : Model -> Html Msg
 boardView model =
-    let
-        hiddenId =
-            currentOverlayId model
-
-        visiblePropositions =
-            case hiddenId of
-                Nothing ->
-                    model.propositions
-
-                Just propositionId ->
-                    List.filter (\item -> item.id /= propositionId) model.propositions
-    in
     div
         [ id "board"
         , attribute "data-testid" "board"
@@ -533,7 +485,7 @@ boardView model =
         , style "touch-action" "none"
         ]
         ([ axisLines ]
-            ++ List.map (viewMiniature model) visiblePropositions
+            ++ List.map (viewCard model) model.propositions
             ++ [ boardLegend ]
         )
 
@@ -579,14 +531,17 @@ axisLines =
         ]
 
 
-viewMiniature : Model -> Proposition -> Html Msg
-viewMiniature model item =
+viewCard : Model -> Proposition -> Html Msg
+viewCard model item =
     case item.pos of
         Nothing ->
             text ""
 
         Just pos ->
             let
+                isExpanded =
+                    model.expandedPropositionId == Just item.id
+
                 isDragging =
                     case model.dragging of
                         Just dragState ->
@@ -595,18 +550,45 @@ viewMiniature model item =
                         Nothing ->
                             False
 
+                cardScale =
+                    if isExpanded then
+                        expandedScale
+
+                    else
+                        miniScale
+
                 scaledWidth =
-                    miniatureWidth * miniScale
+                    miniatureWidth * cardScale
 
                 scaledHeight =
-                    miniatureHeight * miniScale
+                    miniatureHeight * cardScale
 
                 cursorStyle =
-                    if isDragging then
+                    if isExpanded then
+                        "zoom-out"
+
+                    else if isDragging then
                         "grabbing"
 
                     else
                         "grab"
+
+                interactionAttributes =
+                    if isExpanded then
+                        [ onClick (ToggleExpanded item.id)
+                        , onExpandedTouchEnd item.id
+                        ]
+
+                    else
+                        [ preventDefaultOn "mousedown"
+                            (Decode.map
+                                (\( x, y ) -> ( StartDrag item.id x y, True ))
+                                mousePointDecoder
+                            )
+                        , onMiniMouseUp item.id
+                        , onMiniTouchStart item.id
+                        , onMiniTouchEnd item.id
+                        ]
             in
             div
                 [ style "position" "absolute"
@@ -620,142 +602,67 @@ viewMiniature model item =
                     (if isDragging then
                         "80"
 
+                     else if isExpanded then
+                        "70"
+
                      else
                         "30"
                     )
                 ]
                 [ div
-                    [ preventDefaultOn "mousedown"
-                        (Decode.map
-                            (\( x, y ) -> ( StartDrag item.id x y, True ))
-                            mousePointDecoder
-                        )
-                    , onMiniMouseUp item.id
-                    , onMiniTouchStart item.id
-                    , onMiniTouchEnd item.id
-                    , style "transform" ("scale(" ++ String.fromFloat miniScale ++ ")")
-                    , style "transform-origin" "top left"
-                    , style "position" "relative"
-                    , style "width" (String.fromFloat miniatureWidth ++ "px")
-                    , style "height" (String.fromFloat miniatureHeight ++ "px")
-                    , style "border"
-                        (if isDragging then
-                            "2px solid #2563eb"
+                    (interactionAttributes
+                        ++ [ style "transform" ("scale(" ++ String.fromFloat cardScale ++ ")")
+                           , style "transform-origin" "top left"
+                           , style "position" "relative"
+                           , style "width" (String.fromFloat miniatureWidth ++ "px")
+                           , style "height" (String.fromFloat miniatureHeight ++ "px")
+                           , style "border"
+                                (if isDragging then
+                                    "2px solid #2563eb"
 
-                         else
-                            "1px solid #c7d3ea"
-                        )
-                    , style "border-radius" "12px"
-                    , style "background" "#fbfdff"
-                    , style "box-shadow"
-                        (if isDragging then
-                            "0 12px 24px rgba(15,34,80,0.25)"
+                                 else
+                                    "1px solid #c7d3ea"
+                                )
+                           , style "border-radius" "12px"
+                           , style "background" "#fbfdff"
+                           , style "box-shadow"
+                                (if isDragging then
+                                    "0 12px 24px rgba(15,34,80,0.25)"
 
-                         else
-                            "0 4px 12px rgba(0,0,0,0.14)"
-                        )
-                    , style "padding" "12px"
-                    , style "overflow" "hidden"
-                    , style "cursor" cursorStyle
-                    , style "user-select" "none"
-                    , style "touch-action" "none"
-                    , style "outline" "none"
-                    , attribute "data-testid" ("mini-" ++ item.badge)
-                    ]
-                    [ notchBadge item.badge
-                    , div [ style "margin-left" "48px" ]
-                        [ h3 [ style "margin" "0 0 4px", style "font-size" "16px", style "color" "#1a2947" ] [ text item.title ]
-                        , p [ style "margin" "0", style "font-size" "12px", style "color" "#4f6185" ] [ text "Cliquer pour agrandir, glisser pour placer." ]
-                        ]
-                    , div [ style "margin-top" "12px" ]
-                        [ p [ style "margin" "0", style "font-size" "12px", style "color" "#33425f" ] [ text "Version miniaturisee" ]
-                        , div [ style "margin" "8px 0 0", style "font-size" "13px", style "color" "#273554" ] [ viewFormulaInline item.previewFormula ]
-                        ]
-                    ]
+                                 else
+                                    "0 4px 12px rgba(0,0,0,0.14)"
+                                )
+                           , style "padding" "12px"
+                           , style "overflow" "hidden"
+                           , style "cursor" cursorStyle
+                           , style "user-select" "none"
+                           , style "touch-action" "none"
+                           , style "outline" "none"
+                           , attribute "data-testid" ("card-" ++ item.badge)
+                           , attribute "data-state"
+                                (if isExpanded then
+                                    "expanded"
+
+                                 else
+                                    "mini"
+                                )
+                           , style "transition" "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)"
+                           ]
+                    )
+                    [ viewCardContent item ]
                 ]
 
 
-viewExpandedLayer : Model -> Html Msg
-viewExpandedLayer model =
-    case currentOverlayId model of
-        Nothing ->
-            text ""
-
-        Just propositionId ->
-            case propositionById propositionId model.propositions of
-                Nothing ->
-                    text ""
-
-                Just item ->
-                    div
-                        [ style "position" "fixed"
-                        , style "inset" "0"
-                        , style "z-index" "9999"
-                        , style "display" "flex"
-                        , style "align-items" "center"
-                        , style "justify-content" "center"
-                        , style "pointer-events" "auto"
-                        , attribute "data-testid" "expanded-layer"
-                        , onClick CloseExpanded
-                        ]
-                        [ viewExpandedCard model item ]
-
-
-viewExpandedCard : Model -> Proposition -> Html Msg
-viewExpandedCard model item =
-    let
-        sourceOffset =
-            overlaySourceOffset model item
-    in
-    div
-        [ attribute "data-testid" "expanded-card-shell"
-        , Animator.Inline.xy model.focusTimeline
-            (\zoom ->
-                case zoom of
-                    Mini ->
-                        { x = Animator.at sourceOffset.x |> Animator.arriveSmoothly 0.75
-                        , y = Animator.at sourceOffset.y |> Animator.arriveSmoothly 0.75
-                        }
-
-                    Maxi ->
-                        { x = Animator.at 0 |> Animator.arriveSmoothly 0.75
-                        , y = Animator.at 0 |> Animator.arriveSmoothly 0.75
-                        }
-            )
-        , style "transform-origin" "center center"
-        , style "position" "relative"
-        ]
-        [ div
-            [ onClick CloseExpanded
-            , attribute "data-testid" "expanded-card"
-            , Animator.Inline.scale model.focusTimeline
-                (\zoom ->
-                    case zoom of
-                        Mini ->
-                            Animator.at overlayStartScale |> Animator.arriveSmoothly 0.75
-
-                        Maxi ->
-                            Animator.at 1 |> Animator.arriveSmoothly 0.75
-                )
-            , style "transform-origin" "center center"
-            , style "position" "relative"
-            , style "width" "min(1240px, 95vw)"
-            , style "max-height" "92vh"
-            , style "overflow" "auto"
-            , style "background" "white"
-            , style "border" "1px solid #c8d6ef"
-            , style "border-radius" "14px"
-            , style "padding" "16px"
-            , style "box-shadow" "0 24px 56px rgba(0,0,0,0.24)"
+viewCardContent : Proposition -> Html msg
+viewCardContent item =
+    div []
+        [ div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
+        , div [ style "margin-left" "54px", style "margin-top" "2px" ]
+            [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]
+            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
             ]
-            [ div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
-            , div [ style "margin-left" "54px", style "margin-top" "2px" ]
-                [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]
-                , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
-                ]
-            , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ] [ viewFormulaInline item.previewFormula ]
-            , div [ style "margin-top" "12px" ] (List.map viewStep item.steps)
-            ]
+        , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ] [ viewFormulaInline item.previewFormula ]
+        , div [ style "margin-top" "12px" ] (List.map viewStep item.steps)
         ]
 
 
@@ -947,41 +854,6 @@ propositionById propositionId propositions =
         |> List.head
 
 
-overlaySourceOffset : Model -> Proposition -> { x : Float, y : Float }
-overlaySourceOffset model item =
-    case ( model.boardRect, item.pos ) of
-        ( Just rect, Just pos ) ->
-            let
-                miniCenterX =
-                    rect.x + (rect.width * pos.x)
-
-                miniCenterY =
-                    rect.y + (rect.height * pos.y)
-
-                viewportCenterX =
-                    toFloat model.viewport.width / 2
-
-                viewportCenterY =
-                    toFloat model.viewport.height / 2
-            in
-            { x = miniCenterX - viewportCenterX
-            , y = miniCenterY - viewportCenterY
-            }
-
-        _ ->
-            { x = 0, y = 0 }
-
-
-currentOverlayId : Model -> Maybe Int
-currentOverlayId model =
-    case model.expandedPropositionId of
-        Just propositionId ->
-            Just propositionId
-
-        Nothing ->
-            model.closingPropositionId
-
-
 onMiniTouchStart : Int -> Html.Attribute Msg
 onMiniTouchStart propositionId =
     preventDefaultOn "touchstart"
@@ -999,6 +871,11 @@ onMiniMouseUp propositionId =
 onMiniTouchEnd : Int -> Html.Attribute Msg
 onMiniTouchEnd propositionId =
     stopPropagationOn "touchend" (Decode.succeed ( TouchEndOnMini propositionId, True ))
+
+
+onExpandedTouchEnd : Int -> Html.Attribute Msg
+onExpandedTouchEnd propositionId =
+    stopPropagationOn "touchend" (Decode.succeed ( ToggleExpanded propositionId, True ))
 
 
 onBoardTouchMove : Html.Attribute Msg
