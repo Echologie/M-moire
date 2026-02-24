@@ -8594,6 +8594,21 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $author$project$Main$overlaySourceOffset = F2(
+	function (model, item) {
+		var _v0 = _Utils_Tuple2(model.boardRect, item.pos);
+		if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
+			var rect = _v0.a.a;
+			var pos = _v0.b.a;
+			var viewportCenterY = model.viewport.height / 2;
+			var viewportCenterX = model.viewport.width / 2;
+			var miniCenterY = rect.y + (rect.height * pos.y);
+			var miniCenterX = rect.x + (rect.width * pos.x);
+			return {x: miniCenterX - viewportCenterX, y: miniCenterY - viewportCenterY};
+		} else {
+			return {x: 0, y: 0};
+		}
+	});
 var $author$project$Main$overlayStartScale = 0.18;
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$Attributes$rows = function (n) {
@@ -9702,14 +9717,103 @@ var $author$project$Main$viewStep = function (stepText) {
 				$elm$html$Html$text(stepText)
 			]));
 };
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $mdgriffith$elm_animator$Animator$unwrapUnits = function (_v0) {
+	var position = _v0.position;
+	var velocity = _v0.velocity;
+	return {
+		position: function () {
+			var val = position.a;
+			return val;
+		}(),
+		velocity: function () {
+			var val = velocity.a;
+			return val;
+		}()
+	};
+};
+var $mdgriffith$elm_animator$Animator$xy = F2(
+	function (timeline, lookup) {
+		return {
+			x: $mdgriffith$elm_animator$Animator$unwrapUnits(
+				A3(
+					$mdgriffith$elm_animator$Internal$Timeline$foldp,
+					A2(
+						$elm$core$Basics$composeR,
+						lookup,
+						A2(
+							$elm$core$Basics$composeR,
+							function ($) {
+								return $.x;
+							},
+							$mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault)),
+					$mdgriffith$elm_animator$Internal$Interpolate$moving,
+					timeline)).position,
+			y: $mdgriffith$elm_animator$Animator$unwrapUnits(
+				A3(
+					$mdgriffith$elm_animator$Internal$Timeline$foldp,
+					A2(
+						$elm$core$Basics$composeR,
+						lookup,
+						A2(
+							$elm$core$Basics$composeR,
+							function ($) {
+								return $.y;
+							},
+							$mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault)),
+					$mdgriffith$elm_animator$Internal$Interpolate$moving,
+					timeline)).position
+		};
+	});
+var $mdgriffith$elm_animator$Animator$Inline$xy = F2(
+	function (timeline, lookup) {
+		var pos = A2($mdgriffith$elm_animator$Animator$xy, timeline, lookup);
+		return A2(
+			$elm$html$Html$Attributes$style,
+			'transform',
+			'translate(' + ($elm$core$String$fromFloat(pos.x) + ('px, ' + ($elm$core$String$fromFloat(pos.y) + 'px)'))));
+	});
 var $author$project$Main$viewExpandedCard = F2(
 	function (model, item) {
+		var sourceOffset = A2($author$project$Main$overlaySourceOffset, model, item);
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
 					$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
 					A2($elm$html$Html$Attributes$attribute, 'data-testid', 'expanded-card'),
+					A2(
+					$mdgriffith$elm_animator$Animator$Inline$xy,
+					model.focusTimeline,
+					function (zoom) {
+						if (zoom.$ === 'Mini') {
+							return {
+								x: A2(
+									$mdgriffith$elm_animator$Animator$arriveSmoothly,
+									0.75,
+									$mdgriffith$elm_animator$Animator$at(sourceOffset.x)),
+								y: A2(
+									$mdgriffith$elm_animator$Animator$arriveSmoothly,
+									0.75,
+									$mdgriffith$elm_animator$Animator$at(sourceOffset.y))
+							};
+						} else {
+							return {
+								x: A2(
+									$mdgriffith$elm_animator$Animator$arriveSmoothly,
+									0.75,
+									$mdgriffith$elm_animator$Animator$at(0)),
+								y: A2(
+									$mdgriffith$elm_animator$Animator$arriveSmoothly,
+									0.75,
+									$mdgriffith$elm_animator$Animator$at(0))
+							};
+						}
+					}),
 					A2(
 					$mdgriffith$elm_animator$Animator$Inline$scale,
 					model.focusTimeline,

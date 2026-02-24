@@ -714,9 +714,26 @@ viewExpandedLayer model =
 
 viewExpandedCard : Model -> Proposition -> Html Msg
 viewExpandedCard model item =
+    let
+        sourceOffset =
+            overlaySourceOffset model item
+    in
     div
         [ onClick CloseExpanded
         , attribute "data-testid" "expanded-card"
+        , Animator.Inline.xy model.focusTimeline
+            (\zoom ->
+                case zoom of
+                    Mini ->
+                        { x = Animator.at sourceOffset.x |> Animator.arriveSmoothly 0.75
+                        , y = Animator.at sourceOffset.y |> Animator.arriveSmoothly 0.75
+                        }
+
+                    Maxi ->
+                        { x = Animator.at 0 |> Animator.arriveSmoothly 0.75
+                        , y = Animator.at 0 |> Animator.arriveSmoothly 0.75
+                        }
+            )
         , Animator.Inline.scale model.focusTimeline
             (\zoom ->
                 case zoom of
@@ -974,6 +991,31 @@ propositionById propositionId propositions =
     propositions
         |> List.filter (\item -> item.id == propositionId)
         |> List.head
+
+
+overlaySourceOffset : Model -> Proposition -> { x : Float, y : Float }
+overlaySourceOffset model item =
+    case ( model.boardRect, item.pos ) of
+        ( Just rect, Just pos ) ->
+            let
+                miniCenterX =
+                    rect.x + (rect.width * pos.x)
+
+                miniCenterY =
+                    rect.y + (rect.height * pos.y)
+
+                viewportCenterX =
+                    toFloat model.viewport.width / 2
+
+                viewportCenterY =
+                    toFloat model.viewport.height / 2
+            in
+            { x = miniCenterX - viewportCenterX
+            , y = miniCenterY - viewportCenterY
+            }
+
+        _ ->
+            { x = 0, y = 0 }
 
 
 currentOverlayId : Model -> Maybe Int
