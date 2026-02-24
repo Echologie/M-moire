@@ -11,6 +11,8 @@ import Html exposing (Html, button, div, h1, h2, h3, input, p, small, span, text
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, onInput, preventDefaultOn, stopPropagationOn)
 import Json.Decode as Decode
+import MathML as Math
+import MathML.Attributes as MathAttr
 import Process
 import Task
 import Time
@@ -26,7 +28,7 @@ type alias Proposition =
     { id : Int
     , badge : String
     , title : String
-    , preview : String
+    , previewFormula : FormulaId
     , steps : List String
     , pos : Maybe Position
     , comment : String
@@ -60,6 +62,13 @@ type alias Viewport =
 type ZoomState
     = Mini
     | Maxi
+
+
+type FormulaId
+    = FormulaCosLinear
+    | FormulaQuadratic
+    | FormulaProduct
+    | FormulaGeneral
 
 
 type alias Model =
@@ -147,7 +156,7 @@ initialPropositions =
         1
         "A"
         "Copie A"
-        "cos(2x)=1-2sin(x)"
+        FormulaCosLinear
         [ "Je remplace par cos(2x)=1-2sin(x)."
         , "Donc 1-2sin(x)=sin(x) puis 1=3sin(x)."
         , "Alors sin(x)=1/3, donc x≈0,34 ou x≈2,80."
@@ -156,7 +165,7 @@ initialPropositions =
         2
         "B"
         "Copie B"
-        "2sin²(x)+sin(x)-1=0"
+        FormulaQuadratic
         [ "On part de cos(2x)=1-2sin²(x)."
         , "On obtient 1-2sin²(x)=sin(x), donc 2sin²(x)+sin(x)-1=0."
         , "En posant y=sin(x) : 2y²+y-1=0, d'ou y=1/2 ou y=-1."
@@ -166,7 +175,7 @@ initialPropositions =
         3
         "C"
         "Copie C"
-        "(2sin(x)-1)(sin(x)+1)=0"
+        FormulaProduct
         [ "Comme cos(2x)=1-2sin²(x), on a 2sin²(x)+sin(x)-1=0."
         , "Factorisation : (2sin(x)-1)(sin(x)+1)=0."
         , "Alors sin(x)=1/2 ou sin(x)=-1."
@@ -176,7 +185,7 @@ initialPropositions =
         4
         "D"
         "Copie D"
-        "x=π/6+2kπ"
+        FormulaGeneral
         [ "Identite : cos(2x)=1-2sin²(x), donc 2sin²(x)+sin(x)-1=0."
         , "Produit nul : (2sin(x)-1)(sin(x)+1)=0."
         , "Cas 1 : sin(x)=1/2, donc x=π/6+2kπ ou x=5π/6+2kπ."
@@ -205,12 +214,12 @@ withInitialPositions propositions =
         propositions
 
 
-proposition : Int -> String -> String -> String -> List String -> Proposition
-proposition id badge title preview steps =
+proposition : Int -> String -> String -> FormulaId -> List String -> Proposition
+proposition id badge title previewFormula steps =
     { id = id
     , badge = badge
     , title = title
-    , preview = preview
+    , previewFormula = previewFormula
     , steps = steps
     , pos = Nothing
     , comment = ""
@@ -470,9 +479,9 @@ topHeader model =
         [ h1 [ style "margin" "0", style "font-size" "24px" ] [ text "Evaluation de productions d'eleves" ]
         , p [ style "margin" "6px 0 0", style "color" "#33425f" ]
             [ text "Exercice : resoudre "
-            , span [ style "font-weight" "700" ] [ text "cos(2x)=sin(x)" ]
+            , span [ style "font-weight" "700" ] [ viewExerciseEquation ]
             , text " sur "
-            , span [ style "font-weight" "700" ] [ text "[0;2π[" ]
+            , span [ style "font-weight" "700" ] [ viewInterval ]
             , text "."
             ]
         , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
@@ -661,7 +670,7 @@ viewMiniature model item =
                         ]
                     , div [ style "margin-top" "12px" ]
                         [ p [ style "margin" "0", style "font-size" "12px", style "color" "#33425f" ] [ text "Version miniaturisee" ]
-                        , p [ style "margin" "8px 0 0", style "font-size" "12px", style "color" "#5a6986" ] [ text "La redaction complete s'affiche au clic." ]
+                        , div [ style "margin" "8px 0 0", style "font-size" "13px", style "color" "#273554" ] [ viewFormulaInline item.previewFormula ]
                         ]
                     ]
                 ]
@@ -737,6 +746,7 @@ viewExpandedCard model item =
             [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]
             , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
             ]
+        , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ] [ viewFormulaInline item.previewFormula ]
         , div [ style "margin-top" "12px" ] (List.map viewStep item.steps)
         , h3 [ style "margin" "14px 0 8px" ] [ text "Commentaire" ]
         , textarea
@@ -766,6 +776,136 @@ viewExpandedCard model item =
         , small [ style "display" "block", style "margin-top" "8px", style "color" "#6b7892" ]
             [ text "Cliquer hors de la fiche pour la reduire." ]
         ]
+
+
+viewExerciseEquation : Html msg
+viewExerciseEquation =
+    mathInline
+        [ Math.mrow []
+            [ Math.mi [] [ text "cos" ]
+            , Math.mo [] [ text "(" ]
+            , Math.mn [] [ text "2" ]
+            , Math.mi [] [ text "x" ]
+            , Math.mo [] [ text ")" ]
+            , Math.mo [] [ text "=" ]
+            , Math.mi [] [ text "sin" ]
+            , Math.mo [] [ text "(" ]
+            , Math.mi [] [ text "x" ]
+            , Math.mo [] [ text ")" ]
+            ]
+        ]
+
+
+viewInterval : Html msg
+viewInterval =
+    mathInline
+        [ Math.mrow []
+            [ Math.mo [] [ text "[" ]
+            , Math.mn [] [ text "0" ]
+            , Math.mo [] [ text ";" ]
+            , Math.mn [] [ text "2" ]
+            , Math.mi [] [ text "π" ]
+            , Math.mo [] [ text "[" ]
+            ]
+        ]
+
+
+viewFormulaInline : FormulaId -> Html msg
+viewFormulaInline formulaId =
+    case formulaId of
+        FormulaCosLinear ->
+            mathInline
+                [ Math.mrow []
+                    [ Math.mi [] [ text "cos" ]
+                    , Math.mo [] [ text "(" ]
+                    , Math.mn [] [ text "2" ]
+                    , Math.mi [] [ text "x" ]
+                    , Math.mo [] [ text ")" ]
+                    , Math.mo [] [ text "=" ]
+                    , Math.mn [] [ text "1" ]
+                    , Math.mo [] [ text "-" ]
+                    , Math.mn [] [ text "2" ]
+                    , Math.mi [] [ text "sin" ]
+                    , Math.mo [] [ text "(" ]
+                    , Math.mi [] [ text "x" ]
+                    , Math.mo [] [ text ")" ]
+                    ]
+                ]
+
+        FormulaQuadratic ->
+            mathInline
+                [ Math.mrow []
+                    [ Math.mn [] [ text "2" ]
+                    , Math.msup []
+                        [ Math.mrow []
+                            [ Math.mi [] [ text "sin" ]
+                            , Math.mo [] [ text "(" ]
+                            , Math.mi [] [ text "x" ]
+                            , Math.mo [] [ text ")" ]
+                            ]
+                        , Math.mn [] [ text "2" ]
+                        ]
+                    , Math.mo [] [ text "+" ]
+                    , Math.mi [] [ text "sin" ]
+                    , Math.mo [] [ text "(" ]
+                    , Math.mi [] [ text "x" ]
+                    , Math.mo [] [ text ")" ]
+                    , Math.mo [] [ text "-" ]
+                    , Math.mn [] [ text "1" ]
+                    , Math.mo [] [ text "=" ]
+                    , Math.mn [] [ text "0" ]
+                    ]
+                ]
+
+        FormulaProduct ->
+            mathInline
+                [ Math.mrow []
+                    [ Math.mo [] [ text "(" ]
+                    , Math.mn [] [ text "2" ]
+                    , Math.mi [] [ text "sin" ]
+                    , Math.mo [] [ text "(" ]
+                    , Math.mi [] [ text "x" ]
+                    , Math.mo [] [ text ")" ]
+                    , Math.mo [] [ text "-" ]
+                    , Math.mn [] [ text "1" ]
+                    , Math.mo [] [ text ")" ]
+                    , Math.mo [] [ text "(" ]
+                    , Math.mi [] [ text "sin" ]
+                    , Math.mo [] [ text "(" ]
+                    , Math.mi [] [ text "x" ]
+                    , Math.mo [] [ text ")" ]
+                    , Math.mo [] [ text "+" ]
+                    , Math.mn [] [ text "1" ]
+                    , Math.mo [] [ text ")" ]
+                    , Math.mo [] [ text "=" ]
+                    , Math.mn [] [ text "0" ]
+                    ]
+                ]
+
+        FormulaGeneral ->
+            mathInline
+                [ Math.mrow []
+                    [ Math.mi [] [ text "x" ]
+                    , Math.mo [] [ text "=" ]
+                    , Math.mfrac []
+                        [ Math.mi [] [ text "π" ]
+                        , Math.mn [] [ text "6" ]
+                        ]
+                    , Math.mo [] [ text "+" ]
+                    , Math.mn [] [ text "2" ]
+                    , Math.mi [] [ text "k" ]
+                    , Math.mi [] [ text "π" ]
+                    ]
+                ]
+
+
+mathInline : List (Html msg) -> Html msg
+mathInline nodes =
+    Math.math
+        [ MathAttr.display "inline"
+        , MathAttr.xmlns "http://www.w3.org/1998/Math/MathML"
+        ]
+        nodes
 
 
 viewStep : String -> Html msg

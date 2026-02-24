@@ -5194,9 +5194,13 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 			running: true
 		});
 };
+var $author$project$Main$FormulaCosLinear = {$: 'FormulaCosLinear'};
+var $author$project$Main$FormulaGeneral = {$: 'FormulaGeneral'};
+var $author$project$Main$FormulaProduct = {$: 'FormulaProduct'};
+var $author$project$Main$FormulaQuadratic = {$: 'FormulaQuadratic'};
 var $author$project$Main$proposition = F5(
-	function (id, badge, title, preview, steps) {
-		return {badge: badge, comment: '', id: id, pos: $elm$core$Maybe$Nothing, preview: preview, steps: steps, title: title};
+	function (id, badge, title, previewFormula, steps) {
+		return {badge: badge, comment: '', id: id, pos: $elm$core$Maybe$Nothing, previewFormula: previewFormula, steps: steps, title: title};
 	});
 var $author$project$Main$initialPropositions = _List_fromArray(
 	[
@@ -5205,7 +5209,7 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		1,
 		'A',
 		'Copie A',
-		'cos(2x)=1-2sin(x)',
+		$author$project$Main$FormulaCosLinear,
 		_List_fromArray(
 			['Je remplace par cos(2x)=1-2sin(x).', 'Donc 1-2sin(x)=sin(x) puis 1=3sin(x).', 'Alors sin(x)=1/3, donc x≈0,34 ou x≈2,80.'])),
 		A5(
@@ -5213,7 +5217,7 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		2,
 		'B',
 		'Copie B',
-		'2sin²(x)+sin(x)-1=0',
+		$author$project$Main$FormulaQuadratic,
 		_List_fromArray(
 			['On part de cos(2x)=1-2sin²(x).', 'On obtient 1-2sin²(x)=sin(x), donc 2sin²(x)+sin(x)-1=0.', 'En posant y=sin(x) : 2y²+y-1=0, d\'ou y=1/2 ou y=-1.', 'Donc x=π/6, 5π/6 ou 3π/2 sur l\'intervalle.'])),
 		A5(
@@ -5221,7 +5225,7 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		3,
 		'C',
 		'Copie C',
-		'(2sin(x)-1)(sin(x)+1)=0',
+		$author$project$Main$FormulaProduct,
 		_List_fromArray(
 			['Comme cos(2x)=1-2sin²(x), on a 2sin²(x)+sin(x)-1=0.', 'Factorisation : (2sin(x)-1)(sin(x)+1)=0.', 'Alors sin(x)=1/2 ou sin(x)=-1.', 'Dans [0;2π[ : x appartient a {π/6, 5π/6, 3π/2}.'])),
 		A5(
@@ -5229,7 +5233,7 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		4,
 		'D',
 		'Copie D',
-		'x=π/6+2kπ',
+		$author$project$Main$FormulaGeneral,
 		_List_fromArray(
 			['Identite : cos(2x)=1-2sin²(x), donc 2sin²(x)+sin(x)-1=0.', 'Produit nul : (2sin(x)-1)(sin(x)+1)=0.', 'Cas 1 : sin(x)=1/2, donc x=π/6+2kπ ou x=5π/6+2kπ.', 'Cas 2 : sin(x)=-1, donc x=3π/2+2kπ.', 'Intersection avec [0;2π[ : S={π/6, 5π/6, 3π/2}.']))
 	]);
@@ -7527,6 +7531,484 @@ var $author$project$Main$onMiniTouchStart = function (propositionId) {
 			$author$project$Main$touchPointDecoder));
 };
 var $elm$html$Html$p = _VirtualDom_node('p');
+var $brainrake$elm_mathml$MathML$Attributes$display = $elm$virtual_dom$VirtualDom$attribute('display');
+var $elm$virtual_dom$VirtualDom$nodeNS = F2(
+	function (namespace, tag) {
+		return A2(
+			_VirtualDom_nodeNS,
+			namespace,
+			_VirtualDom_noScript(tag));
+	});
+var $brainrake$elm_mathml$MathML$node = $elm$virtual_dom$VirtualDom$nodeNS('http://www.w3.org/1998/Math/MathML');
+var $brainrake$elm_mathml$MathML$math = $brainrake$elm_mathml$MathML$node('math');
+var $brainrake$elm_mathml$MathML$Attributes$xmlns = $elm$virtual_dom$VirtualDom$attribute('xmlns');
+var $author$project$Main$mathInline = function (nodes) {
+	return A2(
+		$brainrake$elm_mathml$MathML$math,
+		_List_fromArray(
+			[
+				$brainrake$elm_mathml$MathML$Attributes$display('inline'),
+				$brainrake$elm_mathml$MathML$Attributes$xmlns('http://www.w3.org/1998/Math/MathML')
+			]),
+		nodes);
+};
+var $brainrake$elm_mathml$MathML$mfrac = $brainrake$elm_mathml$MathML$node('mfrac');
+var $brainrake$elm_mathml$MathML$mi = $brainrake$elm_mathml$MathML$node('mi');
+var $brainrake$elm_mathml$MathML$mn = $brainrake$elm_mathml$MathML$node('mn');
+var $brainrake$elm_mathml$MathML$mo = $brainrake$elm_mathml$MathML$node('mo');
+var $brainrake$elm_mathml$MathML$mrow = $brainrake$elm_mathml$MathML$node('mrow');
+var $brainrake$elm_mathml$MathML$msup = $brainrake$elm_mathml$MathML$node('msup');
+var $author$project$Main$viewFormulaInline = function (formulaId) {
+	switch (formulaId.$) {
+		case 'FormulaCosLinear':
+			return $author$project$Main$mathInline(
+				_List_fromArray(
+					[
+						A2(
+						$brainrake$elm_mathml$MathML$mrow,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('cos')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('(')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('x')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(')')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('=')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('1')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('-')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('sin')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('(')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('x')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(')')
+									]))
+							]))
+					]));
+		case 'FormulaQuadratic':
+			return $author$project$Main$mathInline(
+				_List_fromArray(
+					[
+						A2(
+						$brainrake$elm_mathml$MathML$mrow,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$msup,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$brainrake$elm_mathml$MathML$mrow,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												$brainrake$elm_mathml$MathML$mi,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('sin')
+													])),
+												A2(
+												$brainrake$elm_mathml$MathML$mo,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('(')
+													])),
+												A2(
+												$brainrake$elm_mathml$MathML$mi,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('x')
+													])),
+												A2(
+												$brainrake$elm_mathml$MathML$mo,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text(')')
+													]))
+											])),
+										A2(
+										$brainrake$elm_mathml$MathML$mn,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('2')
+											]))
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('+')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('sin')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('(')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('x')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(')')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('-')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('1')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('=')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('0')
+									]))
+							]))
+					]));
+		case 'FormulaProduct':
+			return $author$project$Main$mathInline(
+				_List_fromArray(
+					[
+						A2(
+						$brainrake$elm_mathml$MathML$mrow,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('(')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('sin')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('(')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('x')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(')')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('-')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('1')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(')')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('(')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('sin')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('(')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('x')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(')')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('+')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('1')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(')')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('=')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('0')
+									]))
+							]))
+					]));
+		default:
+			return $author$project$Main$mathInline(
+				_List_fromArray(
+					[
+						A2(
+						$brainrake$elm_mathml$MathML$mrow,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('x')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('=')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mfrac,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$brainrake$elm_mathml$MathML$mi,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('π')
+											])),
+										A2(
+										$brainrake$elm_mathml$MathML$mn,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('6')
+											]))
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mo,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('+')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mn,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('k')
+									])),
+								A2(
+								$brainrake$elm_mathml$MathML$mi,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('π')
+									]))
+							]))
+					]));
+	}
+};
 var $author$project$Main$viewMiniature = F2(
 	function (model, item) {
 		var _v0 = item.pos;
@@ -7685,16 +8167,16 @@ var $author$project$Main$viewMiniature = F2(
 												$elm$html$Html$text('Version miniaturisee')
 											])),
 										A2(
-										$elm$html$Html$p,
+										$elm$html$Html$div,
 										_List_fromArray(
 											[
 												A2($elm$html$Html$Attributes$style, 'margin', '8px 0 0'),
-												A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
-												A2($elm$html$Html$Attributes$style, 'color', '#5a6986')
+												A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
+												A2($elm$html$Html$Attributes$style, 'color', '#273554')
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('La redaction complete s\'affiche au clic.')
+												$author$project$Main$viewFormulaInline(item.previewFormula)
 											]))
 									]))
 							]))
@@ -7774,6 +8256,138 @@ var $author$project$Main$selectedBadgeLabel = function (maybeId) {
 		return 'aucune';
 	}
 };
+var $author$project$Main$viewExerciseEquation = $author$project$Main$mathInline(
+	_List_fromArray(
+		[
+			A2(
+			$brainrake$elm_mathml$MathML$mrow,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$brainrake$elm_mathml$MathML$mi,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('cos')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mo,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('(')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mn,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('2')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mi,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('x')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mo,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(')')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mo,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('=')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mi,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('sin')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mo,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('(')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mi,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('x')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mo,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(')')
+						]))
+				]))
+		]));
+var $author$project$Main$viewInterval = $author$project$Main$mathInline(
+	_List_fromArray(
+		[
+			A2(
+			$brainrake$elm_mathml$MathML$mrow,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$brainrake$elm_mathml$MathML$mo,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('[')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mn,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('0')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mo,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(';')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mn,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('2')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mi,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('π')
+						])),
+					A2(
+					$brainrake$elm_mathml$MathML$mo,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('[')
+						]))
+				]))
+		]));
 var $author$project$Main$topHeader = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -7815,9 +8429,7 @@ var $author$project$Main$topHeader = function (model) {
 								A2($elm$html$Html$Attributes$style, 'font-weight', '700')
 							]),
 						_List_fromArray(
-							[
-								$elm$html$Html$text('cos(2x)=sin(x)')
-							])),
+							[$author$project$Main$viewExerciseEquation])),
 						$elm$html$Html$text(' sur '),
 						A2(
 						$elm$html$Html$span,
@@ -7826,9 +8438,7 @@ var $author$project$Main$topHeader = function (model) {
 								A2($elm$html$Html$Attributes$style, 'font-weight', '700')
 							]),
 						_List_fromArray(
-							[
-								$elm$html$Html$text('[0;2π[')
-							])),
+							[$author$project$Main$viewInterval])),
 						$elm$html$Html$text('.')
 					])),
 				A2(
@@ -9171,6 +9781,18 @@ var $author$project$Main$viewExpandedCard = F2(
 								[
 									$elm$html$Html$text('Version eleve')
 								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'margin-top', '10px'),
+							A2($elm$html$Html$Attributes$style, 'font-size', '18px'),
+							A2($elm$html$Html$Attributes$style, 'color', '#243353')
+						]),
+					_List_fromArray(
+						[
+							$author$project$Main$viewFormulaInline(item.previewFormula)
 						])),
 					A2(
 					$elm$html$Html$div,
