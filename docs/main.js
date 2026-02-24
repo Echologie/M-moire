@@ -5161,7 +5161,6 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$Mini = {$: 'Mini'};
 var $author$project$Main$RefreshBoardRect = {$: 'RefreshBoardRect'};
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
 	return {$: 'Timeline', a: a};
 };
@@ -5206,37 +5205,34 @@ var $author$project$Main$initialPropositions = _List_fromArray(
 		1,
 		'A',
 		'Copie A',
-		'$\\cos(2x)=1-2\\sin(x)$',
+		'cos(2x)=1-2sin(x)',
 		_List_fromArray(
-			['Je remplace par $\\cos(2x)=1-2\\sin(x)$.', 'Donc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$.', 'Alors $\\sin(x)=\\dfrac{1}{3}$, donc $x\\approx0{,}34$ ou $x\\approx2{,}80$.'])),
+			['Je remplace par cos(2x)=1-2sin(x).', 'Donc 1-2sin(x)=sin(x) puis 1=3sin(x).', 'Alors sin(x)=1/3, donc x≈0,34 ou x≈2,80.'])),
 		A5(
 		$author$project$Main$proposition,
 		2,
 		'B',
 		'Copie B',
-		'$2\\sin^2(x)+\\sin(x)-1=0$',
+		'2sin²(x)+sin(x)-1=0',
 		_List_fromArray(
-			['On part de $\\cos(2x)=1-2\\sin^2(x)$.', 'On obtient $1-2\\sin^2(x)=\\sin(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'En posant $y=\\sin(x)$ : $2y^2+y-1=0$, d\'ou $y=\\dfrac{1}{2}$ ou $y=-1$.', 'Donc $x=\\dfrac{\\pi}{6}$, $\\dfrac{5\\pi}{6}$ ou $\\dfrac{3\\pi}{2}$ sur l\'intervalle.'])),
+			['On part de cos(2x)=1-2sin²(x).', 'On obtient 1-2sin²(x)=sin(x), donc 2sin²(x)+sin(x)-1=0.', 'En posant y=sin(x) : 2y²+y-1=0, d\'ou y=1/2 ou y=-1.', 'Donc x=π/6, 5π/6 ou 3π/2 sur l\'intervalle.'])),
 		A5(
 		$author$project$Main$proposition,
 		3,
 		'C',
 		'Copie C',
-		'$(2\\sin(x)-1)(\\sin(x)+1)=0$',
+		'(2sin(x)-1)(sin(x)+1)=0',
 		_List_fromArray(
-			['Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$.', 'Factorisation : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Alors $\\sin(x)=\\dfrac{1}{2}$ ou $\\sin(x)=-1$.', 'Dans $[0;2\\pi[$ : $x\\in\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.'])),
+			['Comme cos(2x)=1-2sin²(x), on a 2sin²(x)+sin(x)-1=0.', 'Factorisation : (2sin(x)-1)(sin(x)+1)=0.', 'Alors sin(x)=1/2 ou sin(x)=-1.', 'Dans [0;2π[ : x appartient a {π/6, 5π/6, 3π/2}.'])),
 		A5(
 		$author$project$Main$proposition,
 		4,
 		'D',
 		'Copie D',
-		'$x=\\dfrac{\\pi}{6}+2k\\pi$',
+		'x=π/6+2kπ',
 		_List_fromArray(
-			['Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.', 'Produit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$.', 'Cas 1 : $\\sin(x)=\\dfrac{1}{2}\\iff x=\\dfrac{\\pi}{6}+2k\\pi$ ou $x=\\dfrac{5\\pi}{6}+2k\\pi$.', 'Cas 2 : $\\sin(x)=-1\\iff x=\\dfrac{3\\pi}{2}+2k\\pi$.', 'Intersection avec $[0;2\\pi[$ : $S=\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$.']))
+			['Identite : cos(2x)=1-2sin²(x), donc 2sin²(x)+sin(x)-1=0.', 'Produit nul : (2sin(x)-1)(sin(x)+1)=0.', 'Cas 1 : sin(x)=1/2, donc x=π/6+2kπ ou x=5π/6+2kπ.', 'Cas 2 : sin(x)=-1, donc x=3π/2+2kπ.', 'Intersection avec [0;2π[ : S={π/6, 5π/6, 3π/2}.']))
 	]);
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$renderMath = _Platform_outgoingPort('renderMath', $elm$json$Json$Encode$string);
-var $author$project$Main$scheduleMathRender = $author$project$Main$renderMath('refresh');
 var $elm$core$Process$sleep = _Process_sleep;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5425,7 +5421,6 @@ var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			boardRect: $elm$core$Maybe$Nothing,
-			closingPropositionId: $elm$core$Maybe$Nothing,
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
 			expandedPropositionId: $elm$core$Maybe$Nothing,
@@ -5435,17 +5430,12 @@ var $author$project$Main$init = function (_v0) {
 			suppressNextOpen: false,
 			viewport: {height: 800, width: 1200}
 		},
-		$elm$core$Platform$Cmd$batch(
-			_List_fromArray(
-				[
-					A2(
-					$elm$core$Task$perform,
-					function (_v1) {
-						return $author$project$Main$RefreshBoardRect;
-					},
-					$elm$core$Process$sleep(60)),
-					$author$project$Main$scheduleMathRender
-				])));
+		A2(
+			$elm$core$Task$perform,
+			function (_v1) {
+				return $author$project$Main$RefreshBoardRect;
+			},
+			$elm$core$Process$sleep(60)));
 };
 var $author$project$Main$AnimatorTick = function (a) {
 	return {$: 'AnimatorTick', a: a};
@@ -6777,11 +6767,9 @@ var $author$project$Main$subscriptions = function (model) {
 				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Main$AnimatorTick, model, $author$project$Main$animator)
 			]));
 };
-var $author$project$Main$FinishCloseExpanded = {$: 'FinishCloseExpanded'};
 var $author$project$Main$GotBoardRect = function (a) {
 	return {$: 'GotBoardRect', a: a};
 };
-var $author$project$Main$Maxi = {$: 'Maxi'};
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
 		return {$: 'TransitionTo', a: a, b: b};
@@ -6985,15 +6973,45 @@ var $elm$core$Task$attempt = F2(
 							$elm$core$Result$Ok),
 						task))));
 	});
-var $author$project$Main$currentOverlayId = function (model) {
-	var _v0 = model.expandedPropositionId;
-	if (_v0.$ === 'Just') {
-		var propositionId = _v0.a;
-		return $elm$core$Maybe$Just(propositionId);
-	} else {
-		return model.closingPropositionId;
-	}
-};
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$Maxi = {$: 'Maxi'};
+var $author$project$Main$openOverlay = F2(
+	function (propositionId, model) {
+		return model.suppressNextOpen ? _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{suppressNextOpen: false}),
+			$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{
+					expandedPropositionId: $elm$core$Maybe$Just(propositionId),
+					focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Maxi, model.focusTimeline),
+					selectedPropositionId: $elm$core$Maybe$Just(propositionId)
+				}),
+			$elm$core$Platform$Cmd$none);
+	});
+var $author$project$Main$finishMiniRelease = F2(
+	function (propositionId, model) {
+		var _v0 = model.dragging;
+		if (_v0.$ === 'Just') {
+			var dragState = _v0.a;
+			return (!_Utils_eq(dragState.propositionId, propositionId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : (dragState.moved ? _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{dragging: $elm$core$Maybe$Nothing, suppressNextOpen: false}),
+				$elm$core$Platform$Cmd$none) : A2(
+				$author$project$Main$openOverlay,
+				propositionId,
+				_Utils_update(
+					model,
+					{dragging: $elm$core$Maybe$Nothing})));
+		} else {
+			return A2($author$project$Main$openOverlay, propositionId, model);
+		}
+	});
 var $elm$browser$Browser$Dom$getElement = _Browser_getElement;
 var $author$project$Main$miniScale = 0.68;
 var $author$project$Main$miniatureHeight = 206;
@@ -7011,7 +7029,6 @@ var $author$project$BoardLogic$movedBeyond = F5(
 			A4($author$project$BoardLogic$distance, startX, startY, currentX, currentY),
 			threshold) > 0;
 	});
-var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$BoardLogic$clamp = F3(
 	function (minVal, maxVal, value) {
 		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
@@ -7046,7 +7063,6 @@ var $author$project$BoardLogic$nextClampedPosition = function (miniatureWidth) {
 		};
 	};
 };
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -7126,7 +7142,6 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							closingPropositionId: $elm$core$Maybe$Nothing,
 							dragging: $elm$core$Maybe$Just(
 								{moved: false, propositionId: propositionId, startCardX: startPosition.x, startCardY: startPosition.y, startMouseX: clientX, startMouseY: clientY}),
 							expandedPropositionId: $elm$core$Maybe$Nothing,
@@ -7173,88 +7188,33 @@ var $author$project$Main$update = F2(
 							{dragging: $elm$core$Maybe$Nothing, suppressNextOpen: dragState.moved}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 'OpenCard':
+			case 'MiniMouseUp':
 				var propositionId = msg.a;
-				return model.suppressNextOpen ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{suppressNextOpen: false}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							closingPropositionId: $elm$core$Maybe$Nothing,
-							expandedPropositionId: $elm$core$Maybe$Just(propositionId),
-							focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Maxi, model.focusTimeline),
-							selectedPropositionId: $elm$core$Maybe$Just(propositionId)
-						}),
-					$author$project$Main$scheduleMathRender);
+				return A2($author$project$Main$finishMiniRelease, propositionId, model);
 			case 'TouchEndOnMini':
 				var propositionId = msg.a;
-				var _v3 = model.dragging;
-				if (_v3.$ === 'Just') {
-					var dragState = _v3.a;
-					return (!_Utils_eq(dragState.propositionId, propositionId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : (dragState.moved ? _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{dragging: $elm$core$Maybe$Nothing, suppressNextOpen: false}),
-						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								closingPropositionId: $elm$core$Maybe$Nothing,
-								dragging: $elm$core$Maybe$Nothing,
-								expandedPropositionId: $elm$core$Maybe$Just(propositionId),
-								focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Maxi, model.focusTimeline),
-								selectedPropositionId: $elm$core$Maybe$Just(propositionId)
-							}),
-						$author$project$Main$scheduleMathRender));
+				return A2($author$project$Main$finishMiniRelease, propositionId, model);
+			case 'CloseExpanded':
+				var _v3 = model.expandedPropositionId;
+				if (_v3.$ === 'Nothing') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								closingPropositionId: $elm$core$Maybe$Nothing,
-								expandedPropositionId: $elm$core$Maybe$Just(propositionId),
-								focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Maxi, model.focusTimeline),
-								selectedPropositionId: $elm$core$Maybe$Just(propositionId)
+								expandedPropositionId: $elm$core$Maybe$Nothing,
+								focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Mini, model.focusTimeline)
 							}),
-						$author$project$Main$scheduleMathRender);
+						$elm$core$Platform$Cmd$none);
 				}
-			case 'CloseExpanded':
-				var _v4 = $author$project$Main$currentOverlayId(model);
+			case 'UpdateExpandedComment':
+				var newComment = msg.a;
+				var _v4 = model.expandedPropositionId;
 				if (_v4.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					var propositionId = _v4.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								closingPropositionId: $elm$core$Maybe$Just(propositionId),
-								expandedPropositionId: $elm$core$Maybe$Nothing,
-								focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Mini, model.focusTimeline)
-							}),
-						A2(
-							$elm$core$Task$perform,
-							function (_v5) {
-								return $author$project$Main$FinishCloseExpanded;
-							},
-							$elm$core$Process$sleep(240)));
-				}
-			case 'FinishCloseExpanded':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{closingPropositionId: $elm$core$Maybe$Nothing}),
-					$elm$core$Platform$Cmd$none);
-			case 'UpdateExpandedComment':
-				var newComment = msg.a;
-				var _v6 = $author$project$Main$currentOverlayId(model);
-				if (_v6.$ === 'Nothing') {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				} else {
-					var propositionId = _v6.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7303,14 +7263,10 @@ var $author$project$Main$update = F2(
 						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v8) {
+						function (_v6) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(24)));
-			case 'RenderMathNow':
-				return _Utils_Tuple2(
-					model,
-					$author$project$Main$renderMath('refresh'));
 			case 'AnimatorTick':
 				var now = msg.a;
 				return _Utils_Tuple2(
@@ -7320,7 +7276,6 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$CloseExpanded = {$: 'CloseExpanded'};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -7395,6 +7350,7 @@ var $author$project$Main$boardLegend = A2(
 					$elm$html$Html$text('Rigueur elevee')
 				]))
 		]));
+var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -7484,15 +7440,6 @@ var $author$project$Main$onBoardTouchMove = A2(
 				true);
 		},
 		$author$project$Main$touchPointDecoder));
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $author$project$Main$OpenCard = function (a) {
-	return {$: 'OpenCard', a: a};
-};
 var $author$project$Main$StartDrag = F3(
 	function (a, b, c) {
 		return {$: 'StartDrag', a: a, b: b, c: c};
@@ -7530,8 +7477,8 @@ var $author$project$Main$notchBadge = function (badge) {
 				$elm$html$Html$text(badge)
 			]));
 };
-var $author$project$Main$TouchEndOnMini = function (a) {
-	return {$: 'TouchEndOnMini', a: a};
+var $author$project$Main$MiniMouseUp = function (a) {
+	return {$: 'MiniMouseUp', a: a};
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
@@ -7543,6 +7490,18 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
+var $author$project$Main$onMiniMouseUp = function (propositionId) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'mouseup',
+		$elm$json$Json$Decode$succeed(
+			_Utils_Tuple2(
+				$author$project$Main$MiniMouseUp(propositionId),
+				true)));
+};
+var $author$project$Main$TouchEndOnMini = function (a) {
+	return {$: 'TouchEndOnMini', a: a};
+};
 var $author$project$Main$onMiniTouchEnd = function (propositionId) {
 	return A2(
 		$elm$html$Html$Events$stopPropagationOn,
@@ -7634,15 +7593,9 @@ var $author$project$Main$viewMiniature = F2(
 											true);
 									},
 									$author$project$Main$mousePointDecoder)),
+								$author$project$Main$onMiniMouseUp(item.id),
 								$author$project$Main$onMiniTouchStart(item.id),
 								$author$project$Main$onMiniTouchEnd(item.id),
-								A2(
-								$elm$html$Html$Events$stopPropagationOn,
-								'click',
-								$elm$json$Json$Decode$succeed(
-									_Utils_Tuple2(
-										$author$project$Main$OpenCard(item.id),
-										true))),
 								A2(
 								$elm$html$Html$Attributes$style,
 								'transform',
@@ -7749,7 +7702,7 @@ var $author$project$Main$viewMiniature = F2(
 		}
 	});
 var $author$project$Main$boardView = function (model) {
-	var hiddenId = $author$project$Main$currentOverlayId(model);
+	var hiddenId = model.expandedPropositionId;
 	var visiblePropositions = function () {
 		if (hiddenId.$ === 'Nothing') {
 			return model.propositions;
@@ -7772,7 +7725,6 @@ var $author$project$Main$boardView = function (model) {
 				$author$project$Main$onBoardTouchMove,
 				$author$project$Main$onBoardTouchEnd,
 				$author$project$Main$onBoardTouchCancel,
-				$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
 				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 				A2($elm$html$Html$Attributes$style, 'flex', '1'),
 				A2($elm$html$Html$Attributes$style, 'width', '100%'),
@@ -7864,7 +7816,7 @@ var $author$project$Main$topHeader = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('$\\cos(2x)=\\sin(x)$')
+								$elm$html$Html$text('cos(2x)=sin(x)')
 							])),
 						$elm$html$Html$text(' sur '),
 						A2(
@@ -7875,7 +7827,7 @@ var $author$project$Main$topHeader = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('$[0;2\\pi[$')
+								$elm$html$Html$text('[0;2π[')
 							])),
 						$elm$html$Html$text('.')
 					])),
@@ -7895,6 +7847,13 @@ var $author$project$Main$topHeader = function (model) {
 							$elm$core$List$length(model.propositions)))))))
 					]))
 			]));
+};
+var $author$project$Main$CloseExpanded = {$: 'CloseExpanded'};
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
 };
 var $author$project$Main$propositionById = F2(
 	function (propositionId, propositions) {
@@ -9284,7 +9243,7 @@ var $author$project$Main$viewExpandedCard = F2(
 				]));
 	});
 var $author$project$Main$viewExpandedLayer = function (model) {
-	var _v0 = $author$project$Main$currentOverlayId(model);
+	var _v0 = model.expandedPropositionId;
 	if (_v0.$ === 'Nothing') {
 		return $elm$html$Html$text('');
 	} else {

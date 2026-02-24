@@ -1,5 +1,14 @@
 const { test, expect } = require('@playwright/test');
 
+async function miniPressAndRelease(locator) {
+  const box = await locator.boundingBox();
+  if (!box) throw new Error('miniature introuvable');
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+  await locator.dispatchEvent('mousedown', { button: 0, clientX: x, clientY: y });
+  await locator.dispatchEvent('mouseup', { button: 0, clientX: x, clientY: y });
+}
+
 test('drag ne doit pas ouvrir d overlay', async ({ page }) => {
   await page.goto('/index.html');
   await page.waitForTimeout(200);
@@ -18,13 +27,13 @@ test('drag ne doit pas ouvrir d overlay', async ({ page }) => {
   await expect(page.getByTestId('expanded-layer')).toHaveCount(0);
 });
 
-test.fixme('clic ouvre l overlay puis clic exterieur referme', async ({ page }) => {
+test('clic ouvre l overlay puis clic exterieur referme', async ({ page }) => {
   await page.goto('/index.html');
   await page.waitForTimeout(200);
   const miniB = page.getByTestId('mini-B');
-  await miniB.click({ force: true });
+  await miniPressAndRelease(miniB);
   await expect(page.getByTestId('expanded-card')).toBeVisible();
-  await page.getByTestId('board').click({ position: { x: 12, y: 12 }, force: true });
+  await page.getByTestId('expanded-layer').click({ position: { x: 12, y: 12 }, force: true });
   await expect(page.getByTestId('expanded-layer')).toHaveCount(0);
 });
 
@@ -34,17 +43,17 @@ test.describe('mobile emulation', () => {
     hasTouch: true
   });
 
-  test.fixme('mobile: ouverture/fermeture overlay', async ({ page }) => {
+  test('mobile: ouverture/fermeture overlay', async ({ page }) => {
     await page.goto('/index.html');
     await page.waitForTimeout(200);
 
     const miniB = page.getByTestId('mini-B');
     await expect(miniB).toBeVisible();
 
-    await miniB.click({ force: true });
+    await miniPressAndRelease(miniB);
     await expect(page.getByTestId('expanded-card')).toBeVisible();
 
-    await page.getByTestId('board').click({ position: { x: 16, y: 16 }, force: true });
+    await page.getByTestId('expanded-layer').click({ position: { x: 16, y: 16 }, force: true });
     await expect(page.getByTestId('expanded-layer')).toHaveCount(0);
   });
 });

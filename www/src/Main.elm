@@ -1,4 +1,4 @@
-port module Main exposing (main)
+module Main exposing (main)
 
 import Animator
 import Animator.Inline
@@ -14,9 +14,6 @@ import Json.Decode as Decode
 import Process
 import Task
 import Time
-
-
-port renderMath : String -> Cmd msg
 
 
 type alias Position =
@@ -69,7 +66,6 @@ type alias Model =
     { propositions : List Proposition
     , selectedPropositionId : Maybe Int
     , expandedPropositionId : Maybe Int
-    , closingPropositionId : Maybe Int
     , focusTimeline : Animator.Timeline ZoomState
     , dragging : Maybe DragState
     , suppressNextOpen : Bool
@@ -83,16 +79,14 @@ type Msg
     = StartDrag Int Float Float
     | PointerMove Float Float
     | PointerUp
-    | OpenCard Int
+    | MiniMouseUp Int
     | TouchEndOnMini Int
     | CloseExpanded
-    | FinishCloseExpanded
     | UpdateExpandedComment String
     | UpdateEmail String
     | RefreshBoardRect
     | GotBoardRect (Result Dom.Error Dom.Element)
     | WindowResized Int Int
-    | RenderMathNow
     | AnimatorTick Time.Posix
     | NoOp
 
@@ -136,7 +130,6 @@ init _ =
     ( { propositions = seeded
       , selectedPropositionId = Just 1
       , expandedPropositionId = Nothing
-      , closingPropositionId = Nothing
       , focusTimeline = Animator.init Mini
       , dragging = Nothing
       , suppressNextOpen = False
@@ -144,10 +137,7 @@ init _ =
       , email = ""
       , viewport = { width = 1200, height = 800 }
       }
-    , Cmd.batch
-        [ Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
-        , scheduleMathRender
-        ]
+    , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
     )
 
 
@@ -157,41 +147,41 @@ initialPropositions =
         1
         "A"
         "Copie A"
-        "$\\cos(2x)=1-2\\sin(x)$"
-        [ "Je remplace par $\\cos(2x)=1-2\\sin(x)$."
-        , "Donc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$."
-        , "Alors $\\sin(x)=\\dfrac{1}{3}$, donc $x\\approx0{,}34$ ou $x\\approx2{,}80$."
+        "cos(2x)=1-2sin(x)"
+        [ "Je remplace par cos(2x)=1-2sin(x)."
+        , "Donc 1-2sin(x)=sin(x) puis 1=3sin(x)."
+        , "Alors sin(x)=1/3, donc x≈0,34 ou x≈2,80."
         ]
     , proposition
         2
         "B"
         "Copie B"
-        "$2\\sin^2(x)+\\sin(x)-1=0$"
-        [ "On part de $\\cos(2x)=1-2\\sin^2(x)$."
-        , "On obtient $1-2\\sin^2(x)=\\sin(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$."
-        , "En posant $y=\\sin(x)$ : $2y^2+y-1=0$, d'ou $y=\\dfrac{1}{2}$ ou $y=-1$."
-        , "Donc $x=\\dfrac{\\pi}{6}$, $\\dfrac{5\\pi}{6}$ ou $\\dfrac{3\\pi}{2}$ sur l'intervalle."
+        "2sin²(x)+sin(x)-1=0"
+        [ "On part de cos(2x)=1-2sin²(x)."
+        , "On obtient 1-2sin²(x)=sin(x), donc 2sin²(x)+sin(x)-1=0."
+        , "En posant y=sin(x) : 2y²+y-1=0, d'ou y=1/2 ou y=-1."
+        , "Donc x=π/6, 5π/6 ou 3π/2 sur l'intervalle."
         ]
     , proposition
         3
         "C"
         "Copie C"
-        "$(2\\sin(x)-1)(\\sin(x)+1)=0$"
-        [ "Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$."
-        , "Factorisation : $(2\\sin(x)-1)(\\sin(x)+1)=0$."
-        , "Alors $\\sin(x)=\\dfrac{1}{2}$ ou $\\sin(x)=-1$."
-        , "Dans $[0;2\\pi[$ : $x\\in\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$."
+        "(2sin(x)-1)(sin(x)+1)=0"
+        [ "Comme cos(2x)=1-2sin²(x), on a 2sin²(x)+sin(x)-1=0."
+        , "Factorisation : (2sin(x)-1)(sin(x)+1)=0."
+        , "Alors sin(x)=1/2 ou sin(x)=-1."
+        , "Dans [0;2π[ : x appartient a {π/6, 5π/6, 3π/2}."
         ]
     , proposition
         4
         "D"
         "Copie D"
-        "$x=\\dfrac{\\pi}{6}+2k\\pi$"
-        [ "Identite : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$."
-        , "Produit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$."
-        , "Cas 1 : $\\sin(x)=\\dfrac{1}{2}\\iff x=\\dfrac{\\pi}{6}+2k\\pi$ ou $x=\\dfrac{5\\pi}{6}+2k\\pi$."
-        , "Cas 2 : $\\sin(x)=-1\\iff x=\\dfrac{3\\pi}{2}+2k\\pi$."
-        , "Intersection avec $[0;2\\pi[$ : $S=\\left\\{\\dfrac{\\pi}{6},\\dfrac{5\\pi}{6},\\dfrac{3\\pi}{2}\\right\\}$."
+        "x=π/6+2kπ"
+        [ "Identite : cos(2x)=1-2sin²(x), donc 2sin²(x)+sin(x)-1=0."
+        , "Produit nul : (2sin(x)-1)(sin(x)+1)=0."
+        , "Cas 1 : sin(x)=1/2, donc x=π/6+2kπ ou x=5π/6+2kπ."
+        , "Cas 2 : sin(x)=-1, donc x=3π/2+2kπ."
+        , "Intersection avec [0;2π[ : S={π/6, 5π/6, 3π/2}."
         ]
     ]
 
@@ -267,7 +257,6 @@ update msg model =
                         }
                 , selectedPropositionId = Just propositionId
                 , expandedPropositionId = Nothing
-                , closingPropositionId = Nothing
                 , suppressNextOpen = False
                 , focusTimeline = animateZoomTo Mini model.focusTimeline
               }
@@ -317,69 +306,27 @@ update msg model =
                     , Cmd.none
                     )
 
-        OpenCard propositionId ->
-            if model.suppressNextOpen then
-                ( { model | suppressNextOpen = False }, Cmd.none )
-
-            else
-                ( { model
-                    | selectedPropositionId = Just propositionId
-                    , expandedPropositionId = Just propositionId
-                    , closingPropositionId = Nothing
-                    , focusTimeline = animateZoomTo Maxi model.focusTimeline
-                  }
-                , scheduleMathRender
-                )
+        MiniMouseUp propositionId ->
+            finishMiniRelease propositionId model
 
         TouchEndOnMini propositionId ->
-            case model.dragging of
-                Just dragState ->
-                    if dragState.propositionId /= propositionId then
-                        ( model, Cmd.none )
-
-                    else if dragState.moved then
-                        ( { model | dragging = Nothing, suppressNextOpen = False }, Cmd.none )
-
-                    else
-                        ( { model
-                            | dragging = Nothing
-                            , selectedPropositionId = Just propositionId
-                            , expandedPropositionId = Just propositionId
-                            , closingPropositionId = Nothing
-                            , focusTimeline = animateZoomTo Maxi model.focusTimeline
-                          }
-                        , scheduleMathRender
-                        )
-
-                Nothing ->
-                    ( { model
-                        | selectedPropositionId = Just propositionId
-                        , expandedPropositionId = Just propositionId
-                        , closingPropositionId = Nothing
-                        , focusTimeline = animateZoomTo Maxi model.focusTimeline
-                      }
-                    , scheduleMathRender
-                    )
+            finishMiniRelease propositionId model
 
         CloseExpanded ->
-            case currentOverlayId model of
+            case model.expandedPropositionId of
                 Nothing ->
                     ( model, Cmd.none )
 
-                Just propositionId ->
+                Just _ ->
                     ( { model
                         | expandedPropositionId = Nothing
-                        , closingPropositionId = Just propositionId
                         , focusTimeline = animateZoomTo Mini model.focusTimeline
                       }
-                    , Task.perform (\_ -> FinishCloseExpanded) (Process.sleep 240)
+                    , Cmd.none
                     )
 
-        FinishCloseExpanded ->
-            ( { model | closingPropositionId = Nothing }, Cmd.none )
-
         UpdateExpandedComment newComment ->
-            case currentOverlayId model of
+            case model.expandedPropositionId of
                 Nothing ->
                     ( model, Cmd.none )
 
@@ -415,9 +362,6 @@ update msg model =
             , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 24)
             )
 
-        RenderMathNow ->
-            ( model, renderMath "refresh" )
-
         AnimatorTick now ->
             ( Animator.update now animator model, Cmd.none )
 
@@ -425,14 +369,41 @@ update msg model =
             ( model, Cmd.none )
 
 
-scheduleMathRender : Cmd Msg
-scheduleMathRender =
-    renderMath "refresh"
-
-
 animateZoomTo : ZoomState -> Animator.Timeline ZoomState -> Animator.Timeline ZoomState
 animateZoomTo zoomState timeline =
     Animator.go (Animator.millis 220) zoomState timeline
+
+
+finishMiniRelease : Int -> Model -> ( Model, Cmd Msg )
+finishMiniRelease propositionId model =
+    case model.dragging of
+        Just dragState ->
+            if dragState.propositionId /= propositionId then
+                ( model, Cmd.none )
+
+            else if dragState.moved then
+                ( { model | dragging = Nothing, suppressNextOpen = False }, Cmd.none )
+
+            else
+                openOverlay propositionId { model | dragging = Nothing }
+
+        Nothing ->
+            openOverlay propositionId model
+
+
+openOverlay : Int -> Model -> ( Model, Cmd Msg )
+openOverlay propositionId model =
+    if model.suppressNextOpen then
+        ( { model | suppressNextOpen = False }, Cmd.none )
+
+    else
+        ( { model
+            | selectedPropositionId = Just propositionId
+            , expandedPropositionId = Just propositionId
+            , focusTimeline = animateZoomTo Maxi model.focusTimeline
+          }
+        , Cmd.none
+        )
 
 
 updatePropositionPosition : Int -> Position -> List Proposition -> List Proposition
@@ -469,16 +440,6 @@ propositionPosition propositionId propositions =
         |> Maybe.andThen .pos
 
 
-currentOverlayId : Model -> Maybe Int
-currentOverlayId model =
-    case model.expandedPropositionId of
-        Just propositionId ->
-            Just propositionId
-
-        Nothing ->
-            model.closingPropositionId
-
-
 view : Model -> Html Msg
 view model =
     div
@@ -509,9 +470,9 @@ topHeader model =
         [ h1 [ style "margin" "0", style "font-size" "24px" ] [ text "Evaluation de productions d'eleves" ]
         , p [ style "margin" "6px 0 0", style "color" "#33425f" ]
             [ text "Exercice : resoudre "
-            , span [ style "font-weight" "700" ] [ text "$\\cos(2x)=\\sin(x)$" ]
+            , span [ style "font-weight" "700" ] [ text "cos(2x)=sin(x)" ]
             , text " sur "
-            , span [ style "font-weight" "700" ] [ text "$[0;2\\pi[$" ]
+            , span [ style "font-weight" "700" ] [ text "[0;2π[" ]
             , text "."
             ]
         , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
@@ -538,7 +499,7 @@ boardView : Model -> Html Msg
 boardView model =
     let
         hiddenId =
-            currentOverlayId model
+            model.expandedPropositionId
 
         visiblePropositions =
             case hiddenId of
@@ -554,7 +515,6 @@ boardView model =
         , onBoardTouchMove
         , onBoardTouchEnd
         , onBoardTouchCancel
-        , onClick CloseExpanded
         , style "position" "relative"
         , style "flex" "1"
         , style "width" "100%"
@@ -662,9 +622,9 @@ viewMiniature model item =
                             (\( x, y ) -> ( StartDrag item.id x y, True ))
                             mousePointDecoder
                         )
+                    , onMiniMouseUp item.id
                     , onMiniTouchStart item.id
                     , onMiniTouchEnd item.id
-                    , stopPropagationOn "click" (Decode.succeed ( OpenCard item.id, True ))
                     , style "transform" ("scale(" ++ String.fromFloat miniScale ++ ")")
                     , style "transform-origin" "top left"
                     , style "position" "relative"
@@ -709,7 +669,7 @@ viewMiniature model item =
 
 viewExpandedLayer : Model -> Html Msg
 viewExpandedLayer model =
-    case currentOverlayId model of
+    case model.expandedPropositionId of
         Nothing ->
             text ""
 
@@ -873,6 +833,11 @@ onMiniTouchStart propositionId =
             (\( clientX, clientY ) -> ( StartDrag propositionId clientX clientY, True ))
             touchPointDecoder
         )
+
+
+onMiniMouseUp : Int -> Html.Attribute Msg
+onMiniMouseUp propositionId =
+    stopPropagationOn "mouseup" (Decode.succeed ( MiniMouseUp propositionId, True ))
 
 
 onMiniTouchEnd : Int -> Html.Attribute Msg
