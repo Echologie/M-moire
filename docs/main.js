@@ -5229,7 +5229,7 @@ var $author$project$Main$FormulaProduct = {$: 'FormulaProduct'};
 var $author$project$Main$FormulaQuadratic = {$: 'FormulaQuadratic'};
 var $author$project$Main$proposition = F5(
 	function (id, badge, title, previewFormula, steps) {
-		return {badge: badge, comment: '', id: id, pos: $elm$core$Maybe$Nothing, previewFormula: previewFormula, steps: steps, title: title};
+		return {badge: badge, id: id, pos: $elm$core$Maybe$Nothing, previewFormula: previewFormula, steps: steps, title: title};
 	});
 var $author$project$Main$initialPropositions = _List_fromArray(
 	[
@@ -5456,7 +5456,6 @@ var $author$project$Main$init = function (_v0) {
 			boardRect: $elm$core$Maybe$Nothing,
 			closingPropositionId: $elm$core$Maybe$Nothing,
 			dragging: $elm$core$Maybe$Nothing,
-			email: '',
 			expandedPropositionId: $elm$core$Maybe$Nothing,
 			focusTimeline: $mdgriffith$elm_animator$Animator$init($author$project$Main$Mini),
 			propositions: seeded,
@@ -7121,17 +7120,6 @@ var $mdgriffith$elm_animator$Animator$update = F3(
 		var updateModel = _v0.b;
 		return A2(updateModel, newTime, model);
 	});
-var $author$project$Main$updatePropositionComment = F3(
-	function (propositionId, newComment, propositions) {
-		return A2(
-			$elm$core$List$map,
-			function (item) {
-				return _Utils_eq(item.id, propositionId) ? _Utils_update(
-					item,
-					{comment: newComment}) : item;
-			},
-			propositions);
-	});
 var $author$project$Main$updatePropositionPosition = F3(
 	function (propositionId, newPos, propositions) {
 		return A2(
@@ -7240,28 +7228,6 @@ var $author$project$Main$update = F2(
 						model,
 						{closingPropositionId: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none);
-			case 'UpdateExpandedComment':
-				var newComment = msg.a;
-				var _v5 = model.expandedPropositionId;
-				if (_v5.$ === 'Nothing') {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				} else {
-					var propositionId = _v5.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								propositions: A3($author$project$Main$updatePropositionComment, propositionId, newComment, model.propositions)
-							}),
-						$elm$core$Platform$Cmd$none);
-				}
-			case 'UpdateEmail':
-				var newEmail = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{email: newEmail}),
-					$elm$core$Platform$Cmd$none);
 			case 'RefreshBoardRect':
 				return _Utils_Tuple2(
 					model,
@@ -7312,7 +7278,7 @@ var $author$project$Main$update = F2(
 						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v8) {
+						function (_v7) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(24)));
@@ -8527,12 +8493,6 @@ var $author$project$Main$propositionById = F2(
 				},
 				propositions));
 	});
-var $author$project$Main$UpdateEmail = function (a) {
-	return {$: 'UpdateEmail', a: a};
-};
-var $author$project$Main$UpdateExpandedComment = function (a) {
-	return {$: 'UpdateExpandedComment', a: a};
-};
 var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
 	return {$: 'Specified', a: a};
 };
@@ -8600,27 +8560,7 @@ var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
 	});
 var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
 var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$Events$alwaysStop = function (x) {
-	return _Utils_Tuple2(x, true);
-};
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
-var $elm$html$Html$Events$onInput = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$html$Html$Events$alwaysStop,
-			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
-};
 var $author$project$Main$overlaySourceOffset = F2(
 	function (model, item) {
 		var _v0 = _Utils_Tuple2(model.boardRect, item.pos);
@@ -8637,13 +8577,6 @@ var $author$project$Main$overlaySourceOffset = F2(
 		}
 	});
 var $author$project$Main$overlayStartScale = 0.18;
-var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$html$Html$Attributes$rows = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'rows',
-		$elm$core$String$fromInt(n));
-};
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 	function (_v0, _v1) {
 		var y = _v0.a;
@@ -9725,10 +9658,6 @@ var $mdgriffith$elm_animator$Animator$Inline$scale = F2(
 			},
 			lookup);
 	});
-var $elm$html$Html$small = _VirtualDom_node('small');
-var $elm$html$Html$textarea = _VirtualDom_node('textarea');
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$viewStep = function (stepText) {
 	return A2(
 		$elm$html$Html$p,
@@ -9880,26 +9809,6 @@ var $author$project$Main$viewExpandedCard = F2(
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
-									A2($elm$html$Html$Attributes$attribute, 'data-testid', 'close-expanded'),
-									A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-									A2($elm$html$Html$Attributes$style, 'top', '10px'),
-									A2($elm$html$Html$Attributes$style, 'right', '10px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b7c7e6'),
-									A2($elm$html$Html$Attributes$style, 'background', 'white'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
-									A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Fermer')
-								])),
-							A2(
 							$elm$html$Html$div,
 							_List_fromArray(
 								[
@@ -9960,68 +9869,7 @@ var $author$project$Main$viewExpandedCard = F2(
 								[
 									A2($elm$html$Html$Attributes$style, 'margin-top', '12px')
 								]),
-							A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
-							A2(
-							$elm$html$Html$h3,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Commentaire')
-								])),
-							A2(
-							$elm$html$Html$textarea,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$rows(5),
-									A2($elm$html$Html$Attributes$style, 'width', '100%'),
-									A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
-									A2($elm$html$Html$Attributes$style, 'padding', '8px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-									$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
-									$elm$html$Html$Attributes$value(item.comment),
-									$elm$html$Html$Events$onInput($author$project$Main$UpdateExpandedComment)
-								]),
-							_List_Nil),
-							A2(
-							$elm$html$Html$h3,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Email (optionnel)')
-								])),
-							A2(
-							$elm$html$Html$input,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$type_('email'),
-									$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
-									$elm$html$Html$Attributes$value(model.email),
-									$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
-									A2($elm$html$Html$Attributes$style, 'width', '100%'),
-									A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-									A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
-								]),
-							_List_Nil),
-							A2(
-							$elm$html$Html$small,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'display', 'block'),
-									A2($elm$html$Html$Attributes$style, 'margin-top', '8px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Cliquer hors de la fiche pour la reduire.')
-								]))
+							A2($elm$core$List$map, $author$project$Main$viewStep, item.steps))
 						]))
 				]));
 	});

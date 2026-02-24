@@ -7,9 +7,9 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Dict exposing (Dict)
-import Html exposing (Html, button, div, h1, h2, h3, input, p, small, span, text, textarea)
+import Html exposing (Html, div, h1, h2, h3, p, span, text)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, onClick, onInput, preventDefaultOn, stopPropagationOn)
+import Html.Events exposing (on, onClick, preventDefaultOn, stopPropagationOn)
 import Json.Decode as Decode
 import MathML as Math
 import MathML.Attributes as MathAttr
@@ -31,7 +31,6 @@ type alias Proposition =
     , previewFormula : FormulaId
     , steps : List String
     , pos : Maybe Position
-    , comment : String
     }
 
 
@@ -80,7 +79,6 @@ type alias Model =
     , dragging : Maybe DragState
     , suppressNextOpen : Bool
     , boardRect : Maybe BoardRect
-    , email : String
     , viewport : Viewport
     }
 
@@ -93,8 +91,6 @@ type Msg
     | TouchEndOnMini Int
     | CloseExpanded
     | FinishCloseExpanded
-    | UpdateExpandedComment String
-    | UpdateEmail String
     | RefreshBoardRect
     | GotBoardRect (Result Dom.Error Dom.Element)
     | GotViewport (Result Dom.Error Dom.Viewport)
@@ -151,7 +147,6 @@ init _ =
       , dragging = Nothing
       , suppressNextOpen = False
       , boardRect = Nothing
-      , email = ""
       , viewport = { width = 1200, height = 800 }
       }
     , Cmd.batch
@@ -233,7 +228,6 @@ proposition id badge title previewFormula steps =
     , previewFormula = previewFormula
     , steps = steps
     , pos = Nothing
-    , comment = ""
     }
 
 
@@ -350,17 +344,6 @@ update msg model =
         FinishCloseExpanded ->
             ( { model | closingPropositionId = Nothing }, Cmd.none )
 
-        UpdateExpandedComment newComment ->
-            case model.expandedPropositionId of
-                Nothing ->
-                    ( model, Cmd.none )
-
-                Just propositionId ->
-                    ( { model | propositions = updatePropositionComment propositionId newComment model.propositions }, Cmd.none )
-
-        UpdateEmail newEmail ->
-            ( { model | email = newEmail }, Cmd.none )
-
         RefreshBoardRect ->
             ( model, Task.attempt GotBoardRect (Dom.getElement "board") )
 
@@ -450,19 +433,6 @@ updatePropositionPosition propositionId newPos propositions =
         (\item ->
             if item.id == propositionId then
                 { item | pos = Just newPos }
-
-            else
-                item
-        )
-        propositions
-
-
-updatePropositionComment : Int -> String -> List Proposition -> List Proposition
-updatePropositionComment propositionId newComment propositions =
-    List.map
-        (\item ->
-            if item.id == propositionId then
-                { item | comment = newComment }
 
             else
                 item
@@ -778,54 +748,13 @@ viewExpandedCard model item =
             , style "padding" "16px"
             , style "box-shadow" "0 24px 56px rgba(0,0,0,0.24)"
             ]
-            [ button
-                [ onClick CloseExpanded
-                , attribute "data-testid" "close-expanded"
-                , style "position" "absolute"
-                , style "top" "10px"
-                , style "right" "10px"
-                , style "border" "1px solid #b7c7e6"
-                , style "background" "white"
-                , style "border-radius" "8px"
-                , style "padding" "4px 8px"
-                , style "cursor" "pointer"
-                , style "font-weight" "700"
-                ]
-                [ text "Fermer" ]
-            , div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
+            [ div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
             , div [ style "margin-left" "54px", style "margin-top" "2px" ]
                 [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]
                 , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
                 ]
             , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ] [ viewFormulaInline item.previewFormula ]
             , div [ style "margin-top" "12px" ] (List.map viewStep item.steps)
-            , h3 [ style "margin" "14px 0 8px" ] [ text "Commentaire" ]
-            , textarea
-                [ rows 5
-                , style "width" "100%"
-                , style "resize" "vertical"
-                , style "padding" "8px"
-                , style "border" "1px solid #c7d3ea"
-                , style "border-radius" "8px"
-                , placeholder "Observations sur cette copie..."
-                , value item.comment
-                , onInput UpdateExpandedComment
-                ]
-                []
-            , h3 [ style "margin" "12px 0 8px" ] [ text "Email (optionnel)" ]
-            , input
-                [ type_ "email"
-                , placeholder "nom@exemple.fr"
-                , value model.email
-                , onInput UpdateEmail
-                , style "width" "100%"
-                , style "padding" "10px"
-                , style "border" "1px solid #c7d3ea"
-                , style "border-radius" "8px"
-                ]
-                []
-            , small [ style "display" "block", style "margin-top" "8px", style "color" "#6b7892" ]
-                [ text "Cliquer hors de la fiche pour la reduire." ]
             ]
         ]
 
