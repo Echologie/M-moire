@@ -75,6 +75,7 @@ type alias Model =
     { propositions : List Proposition
     , selectedPropositionId : Maybe Int
     , expandedPropositionId : Maybe Int
+    , closingPropositionId : Maybe Int
     , focusTimeline : Animator.Timeline ZoomState
     , dragging : Maybe DragState
     , suppressNextOpen : Bool
@@ -91,6 +92,7 @@ type Msg
     | MiniMouseUp Int
     | TouchEndOnMini Int
     | CloseExpanded
+    | FinishCloseExpanded
     | UpdateExpandedComment String
     | UpdateEmail String
     | RefreshBoardRect
@@ -119,6 +121,11 @@ overlayStartScale =
     0.18
 
 
+closeAnimationDurationMs : Float
+closeAnimationDurationMs =
+    240
+
+
 main : Program () Model Msg
 main =
     Browser.element
@@ -138,6 +145,7 @@ init _ =
     ( { propositions = seeded
       , selectedPropositionId = Just 1
       , expandedPropositionId = Nothing
+      , closingPropositionId = Nothing
       , focusTimeline = Animator.init Mini
       , dragging = Nothing
       , suppressNextOpen = False
@@ -265,6 +273,7 @@ update msg model =
                         }
                 , selectedPropositionId = Just propositionId
                 , expandedPropositionId = Nothing
+                , closingPropositionId = Nothing
                 , suppressNextOpen = False
                 , focusTimeline = animateZoomTo Mini model.focusTimeline
               }
@@ -325,13 +334,17 @@ update msg model =
                 Nothing ->
                     ( model, Cmd.none )
 
-                Just _ ->
+                Just propositionId ->
                     ( { model
                         | expandedPropositionId = Nothing
+                        , closingPropositionId = Just propositionId
                         , focusTimeline = animateZoomTo Mini model.focusTimeline
                       }
-                    , Cmd.none
+                    , Task.perform (\_ -> FinishCloseExpanded) (Process.sleep closeAnimationDurationMs)
                     )
+
+        FinishCloseExpanded ->
+            ( { model | closingPropositionId = Nothing }, Cmd.none )
 
         UpdateExpandedComment newComment ->
             case model.expandedPropositionId of
@@ -405,6 +418,7 @@ openOverlay propositionId model =
         ( { model
             | selectedPropositionId = Just propositionId
             , expandedPropositionId = Just propositionId
+            , closingPropositionId = Nothing
             , focusTimeline = animateZoomTo Maxi model.focusTimeline
           }
         , Cmd.none
@@ -504,7 +518,7 @@ boardView : Model -> Html Msg
 boardView model =
     let
         hiddenId =
-            model.expandedPropositionId
+            currentOverlayId model
 
         visiblePropositions =
             case hiddenId of
@@ -674,7 +688,7 @@ viewMiniature model item =
 
 viewExpandedLayer : Model -> Html Msg
 viewExpandedLayer model =
-    case model.expandedPropositionId of
+    case currentOverlayId model of
         Nothing ->
             text ""
 
@@ -960,6 +974,16 @@ propositionById propositionId propositions =
     propositions
         |> List.filter (\item -> item.id == propositionId)
         |> List.head
+
+
+currentOverlayId : Model -> Maybe Int
+currentOverlayId model =
+    case model.expandedPropositionId of
+        Just propositionId ->
+            Just propositionId
+
+        Nothing ->
+            model.closingPropositionId
 
 
 onMiniTouchStart : Int -> Html.Attribute Msg

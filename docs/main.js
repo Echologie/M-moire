@@ -5425,6 +5425,7 @@ var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			boardRect: $elm$core$Maybe$Nothing,
+			closingPropositionId: $elm$core$Maybe$Nothing,
 			dragging: $elm$core$Maybe$Nothing,
 			email: '',
 			expandedPropositionId: $elm$core$Maybe$Nothing,
@@ -6771,6 +6772,7 @@ var $author$project$Main$subscriptions = function (model) {
 				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Main$AnimatorTick, model, $author$project$Main$animator)
 			]));
 };
+var $author$project$Main$FinishCloseExpanded = {$: 'FinishCloseExpanded'};
 var $author$project$Main$GotBoardRect = function (a) {
 	return {$: 'GotBoardRect', a: a};
 };
@@ -6977,6 +6979,7 @@ var $elm$core$Task$attempt = F2(
 							$elm$core$Result$Ok),
 						task))));
 	});
+var $author$project$Main$closeAnimationDurationMs = 240;
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6991,6 +6994,7 @@ var $author$project$Main$openOverlay = F2(
 			_Utils_update(
 				model,
 				{
+					closingPropositionId: $elm$core$Maybe$Nothing,
 					expandedPropositionId: $elm$core$Maybe$Just(propositionId),
 					focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Maxi, model.focusTimeline),
 					selectedPropositionId: $elm$core$Maybe$Just(propositionId)
@@ -7146,6 +7150,7 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
+							closingPropositionId: $elm$core$Maybe$Nothing,
 							dragging: $elm$core$Maybe$Just(
 								{moved: false, propositionId: propositionId, startCardX: startPosition.x, startCardY: startPosition.y, startMouseX: clientX, startMouseY: clientY}),
 							expandedPropositionId: $elm$core$Maybe$Nothing,
@@ -7203,22 +7208,35 @@ var $author$project$Main$update = F2(
 				if (_v3.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
+					var propositionId = _v3.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
+								closingPropositionId: $elm$core$Maybe$Just(propositionId),
 								expandedPropositionId: $elm$core$Maybe$Nothing,
 								focusTimeline: A2($author$project$Main$animateZoomTo, $author$project$Main$Mini, model.focusTimeline)
 							}),
-						$elm$core$Platform$Cmd$none);
+						A2(
+							$elm$core$Task$perform,
+							function (_v4) {
+								return $author$project$Main$FinishCloseExpanded;
+							},
+							$elm$core$Process$sleep($author$project$Main$closeAnimationDurationMs)));
 				}
+			case 'FinishCloseExpanded':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{closingPropositionId: $elm$core$Maybe$Nothing}),
+					$elm$core$Platform$Cmd$none);
 			case 'UpdateExpandedComment':
 				var newComment = msg.a;
-				var _v4 = model.expandedPropositionId;
-				if (_v4.$ === 'Nothing') {
+				var _v5 = model.expandedPropositionId;
+				if (_v5.$ === 'Nothing') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var propositionId = _v4.a;
+					var propositionId = _v5.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7267,7 +7285,7 @@ var $author$project$Main$update = F2(
 						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v6) {
+						function (_v7) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(24)));
@@ -7352,6 +7370,15 @@ var $author$project$Main$boardLegend = A2(
 					$elm$html$Html$text('Rigueur elevee')
 				]))
 		]));
+var $author$project$Main$currentOverlayId = function (model) {
+	var _v0 = model.expandedPropositionId;
+	if (_v0.$ === 'Just') {
+		var propositionId = _v0.a;
+		return $elm$core$Maybe$Just(propositionId);
+	} else {
+		return model.closingPropositionId;
+	}
+};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -8182,7 +8209,7 @@ var $author$project$Main$viewMiniature = F2(
 		}
 	});
 var $author$project$Main$boardView = function (model) {
-	var hiddenId = model.expandedPropositionId;
+	var hiddenId = $author$project$Main$currentOverlayId(model);
 	var visiblePropositions = function () {
 		if (hiddenId.$ === 'Nothing') {
 			return model.propositions;
@@ -9858,7 +9885,7 @@ var $author$project$Main$viewExpandedCard = F2(
 				]));
 	});
 var $author$project$Main$viewExpandedLayer = function (model) {
-	var _v0 = model.expandedPropositionId;
+	var _v0 = $author$project$Main$currentOverlayId(model);
 	if (_v0.$ === 'Nothing') {
 		return $elm$html$Html$text('');
 	} else {

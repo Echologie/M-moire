@@ -9,6 +9,12 @@ async function miniPressAndRelease(locator) {
   await locator.dispatchEvent('mouseup', { button: 0, clientX: x, clientY: y });
 }
 
+async function expectCloseWithAnimation(page) {
+  await expect(page.getByTestId('expanded-layer')).toBeVisible();
+  await page.waitForTimeout(320);
+  await expect(page.getByTestId('expanded-layer')).toHaveCount(0);
+}
+
 test('drag ne doit pas ouvrir d overlay', async ({ page }) => {
   await page.goto('/index.html');
   await page.waitForTimeout(200);
@@ -34,7 +40,7 @@ test('clic ouvre l overlay puis clic exterieur referme', async ({ page }) => {
   await miniPressAndRelease(miniB);
   await expect(page.getByTestId('expanded-card')).toBeVisible();
   await page.getByTestId('expanded-layer').click({ position: { x: 12, y: 12 }, force: true });
-  await expect(page.getByTestId('expanded-layer')).toHaveCount(0);
+  await expectCloseWithAnimation(page);
 });
 
 test('clic dans la fiche ouverte la referme', async ({ page }) => {
@@ -44,7 +50,7 @@ test('clic dans la fiche ouverte la referme', async ({ page }) => {
   await miniPressAndRelease(miniC);
   await expect(page.getByTestId('expanded-card')).toBeVisible();
   await page.getByTestId('expanded-card').click({ position: { x: 20, y: 20 }, force: true });
-  await expect(page.getByTestId('expanded-layer')).toHaveCount(0);
+  await expectCloseWithAnimation(page);
 });
 
 test.describe('mobile emulation', () => {
@@ -64,6 +70,6 @@ test.describe('mobile emulation', () => {
     await expect(page.getByTestId('expanded-card')).toBeVisible();
 
     await page.getByTestId('expanded-layer').click({ position: { x: 16, y: 16 }, force: true });
-    await expect(page.getByTestId('expanded-layer')).toHaveCount(0);
+    await expectCloseWithAnimation(page);
   });
 });
