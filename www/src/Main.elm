@@ -2,6 +2,7 @@ port module Main exposing (main)
 
 import Animator
 import Animator.Inline
+import BoardLogic
 import Browser
 import Browser.Dom as Dom
 import Browser.Events
@@ -277,39 +278,21 @@ update msg model =
             case ( model.dragging, model.boardRect ) of
                 ( Just dragState, Just rect ) ->
                     let
-                        safeWidth =
-                            if rect.width <= 0 then
-                                1
-
-                            else
-                                rect.width
-
-                        safeHeight =
-                            if rect.height <= 0 then
-                                1
-
-                            else
-                                rect.height
-
-                        deltaX =
-                            (clientX - dragState.startMouseX) / safeWidth
-
-                        deltaY =
-                            (clientY - dragState.startMouseY) / safeHeight
-
-                        marginX =
-                            ((miniatureWidth * miniScale) / 2) / safeWidth
-
-                        marginY =
-                            ((miniatureHeight * miniScale) / 2) / safeHeight
-
                         nextPos =
-                            { x = clamp marginX (1 - marginX) (dragState.startCardX + deltaX)
-                            , y = clamp marginY (1 - marginY) (dragState.startCardY + deltaY)
-                            }
+                            BoardLogic.nextClampedPosition
+                                miniatureWidth
+                                miniatureHeight
+                                miniScale
+                                rect
+                                dragState.startMouseX
+                                dragState.startMouseY
+                                dragState.startCardX
+                                dragState.startCardY
+                                clientX
+                                clientY
 
                         movedNow =
-                            dragState.moved || distance dragState.startMouseX dragState.startMouseY clientX clientY > 4
+                            dragState.moved || BoardLogic.movedBeyond 4 dragState.startMouseX dragState.startMouseY clientX clientY
                     in
                     ( { model
                         | propositions = updatePropositionPosition dragState.propositionId nextPos model.propositions
@@ -452,11 +435,6 @@ animateZoomTo zoomState timeline =
     Animator.go (Animator.millis 220) zoomState timeline
 
 
-distance : Float -> Float -> Float -> Float -> Float
-distance x1 y1 x2 y2 =
-    sqrt (((x2 - x1) ^ 2) + ((y2 - y1) ^ 2))
-
-
 updatePropositionPosition : Int -> Position -> List Proposition -> List Proposition
 updatePropositionPosition propositionId newPos propositions =
     List.map
@@ -499,18 +477,6 @@ currentOverlayId model =
 
         Nothing ->
             model.closingPropositionId
-
-
-clamp : Float -> Float -> Float -> Float
-clamp minVal maxVal value =
-    if value < minVal then
-        minVal
-
-    else if value > maxVal then
-        maxVal
-
-    else
-        value
 
 
 view : Model -> Html Msg
@@ -584,6 +550,7 @@ boardView model =
     in
     div
         [ id "board"
+        , attribute "data-testid" "board"
         , onBoardTouchMove
         , onBoardTouchEnd
         , onBoardTouchCancel
@@ -725,6 +692,7 @@ viewMiniature model item =
                     , style "user-select" "none"
                     , style "touch-action" "none"
                     , style "outline" "none"
+                    , attribute "data-testid" ("mini-" ++ item.badge)
                     ]
                     [ notchBadge item.badge
                     , div [ style "margin-left" "48px" ]
@@ -759,6 +727,7 @@ viewExpandedLayer model =
                         , style "align-items" "center"
                         , style "justify-content" "center"
                         , style "pointer-events" "auto"
+                        , attribute "data-testid" "expanded-layer"
                         , onClick CloseExpanded
                         ]
                         [ viewExpandedCard model item ]
@@ -768,6 +737,7 @@ viewExpandedCard : Model -> Proposition -> Html Msg
 viewExpandedCard model item =
     div
         [ stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
+        , attribute "data-testid" "expanded-card"
         , Animator.Inline.scale model.focusTimeline
             (\zoom ->
                 case zoom of
@@ -790,6 +760,7 @@ viewExpandedCard model item =
         ]
         [ button
             [ onClick CloseExpanded
+            , attribute "data-testid" "close-expanded"
             , style "position" "absolute"
             , style "top" "10px"
             , style "right" "10px"

@@ -6985,10 +6985,6 @@ var $elm$core$Task$attempt = F2(
 							$elm$core$Result$Ok),
 						task))));
 	});
-var $author$project$Main$clamp = F3(
-	function (minVal, maxVal, value) {
-		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
-	});
 var $author$project$Main$currentOverlayId = function (model) {
 	var _v0 = model.expandedPropositionId;
 	if (_v0.$ === 'Just') {
@@ -6998,18 +6994,58 @@ var $author$project$Main$currentOverlayId = function (model) {
 		return model.closingPropositionId;
 	}
 };
-var $elm$core$Basics$pow = _Basics_pow;
-var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$Main$distance = F4(
-	function (x1, y1, x2, y2) {
-		return $elm$core$Basics$sqrt(
-			A2($elm$core$Basics$pow, x2 - x1, 2) + A2($elm$core$Basics$pow, y2 - y1, 2));
-	});
 var $elm$browser$Browser$Dom$getElement = _Browser_getElement;
 var $author$project$Main$miniScale = 0.68;
 var $author$project$Main$miniatureHeight = 206;
 var $author$project$Main$miniatureWidth = 320;
+var $elm$core$Basics$pow = _Basics_pow;
+var $elm$core$Basics$sqrt = _Basics_sqrt;
+var $author$project$BoardLogic$distance = F4(
+	function (x1, y1, x2, y2) {
+		return $elm$core$Basics$sqrt(
+			A2($elm$core$Basics$pow, x2 - x1, 2) + A2($elm$core$Basics$pow, y2 - y1, 2));
+	});
+var $author$project$BoardLogic$movedBeyond = F5(
+	function (threshold, startX, startY, currentX, currentY) {
+		return _Utils_cmp(
+			A4($author$project$BoardLogic$distance, startX, startY, currentX, currentY),
+			threshold) > 0;
+	});
 var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$BoardLogic$clamp = F3(
+	function (minVal, maxVal, value) {
+		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
+	});
+var $author$project$BoardLogic$nextClampedPosition = function (miniatureWidth) {
+	return function (miniatureHeight) {
+		return function (miniScale) {
+			return function (rect) {
+				return function (startMouseX) {
+					return function (startMouseY) {
+						return function (startCardX) {
+							return function (startCardY) {
+								return function (clientX) {
+									return function (clientY) {
+										var safeWidth = (rect.width <= 0) ? 1 : rect.width;
+										var safeHeight = (rect.height <= 0) ? 1 : rect.height;
+										var marginY = ((miniatureHeight * miniScale) / 2) / safeHeight;
+										var marginX = ((miniatureWidth * miniScale) / 2) / safeWidth;
+										var deltaY = (clientY - startMouseY) / safeHeight;
+										var deltaX = (clientX - startMouseX) / safeWidth;
+										return {
+											x: A3($author$project$BoardLogic$clamp, marginX, 1 - marginX, startCardX + deltaX),
+											y: A3($author$project$BoardLogic$clamp, marginY, 1 - marginY, startCardY + deltaY)
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
@@ -7109,17 +7145,8 @@ var $author$project$Main$update = F2(
 				if ((_v1.a.$ === 'Just') && (_v1.b.$ === 'Just')) {
 					var dragState = _v1.a.a;
 					var rect = _v1.b.a;
-					var safeWidth = (rect.width <= 0) ? 1 : rect.width;
-					var safeHeight = (rect.height <= 0) ? 1 : rect.height;
-					var movedNow = dragState.moved || (A4($author$project$Main$distance, dragState.startMouseX, dragState.startMouseY, clientX, clientY) > 4);
-					var marginY = (($author$project$Main$miniatureHeight * $author$project$Main$miniScale) / 2) / safeHeight;
-					var marginX = (($author$project$Main$miniatureWidth * $author$project$Main$miniScale) / 2) / safeWidth;
-					var deltaY = (clientY - dragState.startMouseY) / safeHeight;
-					var deltaX = (clientX - dragState.startMouseX) / safeWidth;
-					var nextPos = {
-						x: A3($author$project$Main$clamp, marginX, 1 - marginX, dragState.startCardX + deltaX),
-						y: A3($author$project$Main$clamp, marginY, 1 - marginY, dragState.startCardY + deltaY)
-					};
+					var nextPos = $author$project$BoardLogic$nextClampedPosition($author$project$Main$miniatureWidth)($author$project$Main$miniatureHeight)($author$project$Main$miniScale)(rect)(dragState.startMouseX)(dragState.startMouseY)(dragState.startCardX)(dragState.startCardY)(clientX)(clientY);
+					var movedNow = dragState.moved || A5($author$project$BoardLogic$movedBeyond, 4, dragState.startMouseX, dragState.startMouseY, clientX, clientY);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7294,6 +7321,14 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $author$project$Main$CloseExpanded = {$: 'CloseExpanded'};
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
@@ -7637,7 +7672,8 @@ var $author$project$Main$viewMiniature = F2(
 								A2($elm$html$Html$Attributes$style, 'cursor', cursorStyle),
 								A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
 								A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
-								A2($elm$html$Html$Attributes$style, 'outline', 'none')
+								A2($elm$html$Html$Attributes$style, 'outline', 'none'),
+								A2($elm$html$Html$Attributes$attribute, 'data-testid', 'mini-' + item.badge)
 							]),
 						_List_fromArray(
 							[
@@ -7732,6 +7768,7 @@ var $author$project$Main$boardView = function (model) {
 		_List_fromArray(
 			[
 				$elm$html$Html$Attributes$id('board'),
+				A2($elm$html$Html$Attributes$attribute, 'data-testid', 'board'),
 				$author$project$Main$onBoardTouchMove,
 				$author$project$Main$onBoardTouchEnd,
 				$author$project$Main$onBoardTouchCancel,
@@ -9083,6 +9120,7 @@ var $author$project$Main$viewExpandedCard = F2(
 					'click',
 					$elm$json$Json$Decode$succeed(
 						_Utils_Tuple2($author$project$Main$NoOp, true))),
+					A2($elm$html$Html$Attributes$attribute, 'data-testid', 'expanded-card'),
 					A2(
 					$mdgriffith$elm_animator$Animator$Inline$scale,
 					model.focusTimeline,
@@ -9117,6 +9155,7 @@ var $author$project$Main$viewExpandedCard = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
+							A2($elm$html$Html$Attributes$attribute, 'data-testid', 'close-expanded'),
 							A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 							A2($elm$html$Html$Attributes$style, 'top', '10px'),
 							A2($elm$html$Html$Attributes$style, 'right', '10px'),
@@ -9266,6 +9305,7 @@ var $author$project$Main$viewExpandedLayer = function (model) {
 						A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
 						A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
 						A2($elm$html$Html$Attributes$style, 'pointer-events', 'auto'),
+						A2($elm$html$Html$Attributes$attribute, 'data-testid', 'expanded-layer'),
 						$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded)
 					]),
 				_List_fromArray(

@@ -1,0 +1,19 @@
+{
+  "name": "memoire-prototype-tests",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build:main": "cd www && npx elm make src/Main.elm --output=../docs/main.js && npx elm make src/Main.elm --output=main.js",
+    "test:logic": "cd www && npx elm-test",
+    "test:e2e:prepare": "bash scripts/patch-playwright-firefox.sh",
+    "test:e2e": "npm run test:e2e:prepare && PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 npx playwright test",
+    "test:e2e:install": "npx playwright install firefox",
+    "test:all": "npm run test:logic && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "elm": "^0.19.1-6",
+    "elm-format": "^0.8.8",
+    "elm-test": "^0.19.1-revision16"
+  }
+}

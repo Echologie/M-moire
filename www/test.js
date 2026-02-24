@@ -5159,7 +5159,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Test$Mini = {$: 'Mini'};
+var $author$project$DemoCard$Mini = {$: 'Mini'};
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
 	return {$: 'Timeline', a: a};
 };
@@ -5195,7 +5195,7 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Test$init = function (_v0) {
+var $author$project$DemoCard$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			cardX: 0.5,
@@ -5204,15 +5204,15 @@ var $author$project$Test$init = function (_v0) {
 			suppressNextOpen: false,
 			viewportHeight: 800,
 			viewportWidth: 1200,
-			zoomTimeline: $mdgriffith$elm_animator$Animator$init($author$project$Test$Mini)
+			zoomTimeline: $mdgriffith$elm_animator$Animator$init($author$project$DemoCard$Mini)
 		},
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Test$AnimatorTick = function (a) {
+var $author$project$DemoCard$AnimatorTick = function (a) {
 	return {$: 'AnimatorTick', a: a};
 };
-var $author$project$Test$GlobalMouseUp = {$: 'GlobalMouseUp'};
-var $author$project$Test$WindowResized = F2(
+var $author$project$DemoCard$GlobalMouseUp = {$: 'GlobalMouseUp'};
+var $author$project$DemoCard$WindowResized = F2(
 	function (a, b) {
 		return {$: 'WindowResized', a: a, b: b};
 	});
@@ -6074,7 +6074,7 @@ var $mdgriffith$elm_animator$Animator$watching = F3(
 						newModel);
 				}));
 	});
-var $author$project$Test$animator = A3(
+var $author$project$DemoCard$animator = A3(
 	$mdgriffith$elm_animator$Animator$watching,
 	function ($) {
 		return $.zoomTimeline;
@@ -6087,15 +6087,15 @@ var $author$project$Test$animator = A3(
 		}),
 	$mdgriffith$elm_animator$Animator$animator);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $author$project$Test$GlobalMouseMove = F2(
+var $author$project$DemoCard$GlobalMouseMove = F2(
 	function (a, b) {
 		return {$: 'GlobalMouseMove', a: a, b: b};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $author$project$Test$mouseMoveDecoder = A3(
+var $author$project$DemoCard$mouseMoveDecoder = A3(
 	$elm$json$Json$Decode$map2,
-	$author$project$Test$GlobalMouseMove,
+	$author$project$DemoCard$GlobalMouseMove,
 	A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
 	A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float));
 var $elm$browser$Browser$Events$Document = {$: 'Document'};
@@ -6650,18 +6650,18 @@ var $mdgriffith$elm_animator$Animator$toSubscription = F3(
 		var isRunning = _v0.a;
 		return isRunning(model) ? $elm$browser$Browser$Events$onAnimationFrame(toMsg) : $elm$core$Platform$Sub$none;
 	});
-var $author$project$Test$subscriptions = function (model) {
+var $author$project$DemoCard$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Test$AnimatorTick, model, $author$project$Test$animator),
-				$elm$browser$Browser$Events$onMouseMove($author$project$Test$mouseMoveDecoder),
+				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$DemoCard$AnimatorTick, model, $author$project$DemoCard$animator),
+				$elm$browser$Browser$Events$onMouseMove($author$project$DemoCard$mouseMoveDecoder),
 				$elm$browser$Browser$Events$onMouseUp(
-				$elm$json$Json$Decode$succeed($author$project$Test$GlobalMouseUp)),
-				$elm$browser$Browser$Events$onResize($author$project$Test$WindowResized)
+				$elm$json$Json$Decode$succeed($author$project$DemoCard$GlobalMouseUp)),
+				$elm$browser$Browser$Events$onResize($author$project$DemoCard$WindowResized)
 			]));
 };
-var $author$project$Test$Maxi = {$: 'Maxi'};
+var $author$project$DemoCard$Maxi = {$: 'Maxi'};
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
 		return {$: 'TransitionTo', a: a, b: b};
@@ -6838,7 +6838,7 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 				]),
 			timeline);
 	});
-var $author$project$Test$animateZoom = F2(
+var $author$project$DemoCard$animateZoom = F2(
 	function (target, timeline) {
 		return A3(
 			$mdgriffith$elm_animator$Animator$go,
@@ -6846,13 +6846,13 @@ var $author$project$Test$animateZoom = F2(
 			target,
 			timeline);
 	});
-var $author$project$Test$clamp = F3(
+var $author$project$DemoCard$clamp = F3(
 	function (minVal, maxVal, value) {
 		return (_Utils_cmp(value, minVal) < 0) ? minVal : ((_Utils_cmp(value, maxVal) > 0) ? maxVal : value);
 	});
 var $elm$core$Basics$pow = _Basics_pow;
 var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$Test$distance = F4(
+var $author$project$DemoCard$distance = F4(
 	function (x1, y1, x2, y2) {
 		return $elm$core$Basics$sqrt(
 			A2($elm$core$Basics$pow, x2 - x1, 2) + A2($elm$core$Basics$pow, y2 - y1, 2));
@@ -6862,7 +6862,7 @@ var $mdgriffith$elm_animator$Animator$update = F3(
 		var updateModel = _v0.b;
 		return A2(updateModel, newTime, model);
 	});
-var $author$project$Test$update = F2(
+var $author$project$DemoCard$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'Open':
@@ -6874,7 +6874,7 @@ var $author$project$Test$update = F2(
 					_Utils_update(
 						model,
 						{
-							zoomTimeline: A2($author$project$Test$animateZoom, $author$project$Test$Maxi, model.zoomTimeline)
+							zoomTimeline: A2($author$project$DemoCard$animateZoom, $author$project$DemoCard$Maxi, model.zoomTimeline)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'Close':
@@ -6882,7 +6882,7 @@ var $author$project$Test$update = F2(
 					_Utils_update(
 						model,
 						{
-							zoomTimeline: A2($author$project$Test$animateZoom, $author$project$Test$Mini, model.zoomTimeline)
+							zoomTimeline: A2($author$project$DemoCard$animateZoom, $author$project$DemoCard$Mini, model.zoomTimeline)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'StartDrag':
@@ -6906,12 +6906,12 @@ var $author$project$Test$update = F2(
 				} else {
 					var dragState = _v1.a;
 					var widthFloat = A2($elm$core$Basics$max, 1, model.viewportWidth);
-					var movedNow = dragState.moved || (A4($author$project$Test$distance, dragState.startMouseX, dragState.startMouseY, mouseX, mouseY) > 4);
+					var movedNow = dragState.moved || (A4($author$project$DemoCard$distance, dragState.startMouseX, dragState.startMouseY, mouseX, mouseY) > 4);
 					var heightFloat = A2($elm$core$Basics$max, 1, model.viewportHeight);
 					var deltaY = (mouseY - dragState.startMouseY) / heightFloat;
-					var nextY = A3($author$project$Test$clamp, 0.08, 0.92, dragState.startCardY + deltaY);
+					var nextY = A3($author$project$DemoCard$clamp, 0.08, 0.92, dragState.startCardY + deltaY);
 					var deltaX = (mouseX - dragState.startMouseX) / widthFloat;
-					var nextX = A3($author$project$Test$clamp, 0.08, 0.92, dragState.startCardX + deltaX);
+					var nextX = A3($author$project$DemoCard$clamp, 0.08, 0.92, dragState.startCardX + deltaX);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -6948,11 +6948,11 @@ var $author$project$Test$update = F2(
 			default:
 				var now = msg.a;
 				return _Utils_Tuple2(
-					A3($mdgriffith$elm_animator$Animator$update, now, $author$project$Test$animator, model),
+					A3($mdgriffith$elm_animator$Animator$update, now, $author$project$DemoCard$animator, model),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Test$Close = {$: 'Close'};
+var $author$project$DemoCard$Close = {$: 'Close'};
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
@@ -6973,8 +6973,8 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Test$Open = {$: 'Open'};
-var $author$project$Test$StartDrag = F2(
+var $author$project$DemoCard$Open = {$: 'Open'};
+var $author$project$DemoCard$StartDrag = F2(
 	function (a, b) {
 		return {$: 'StartDrag', a: a, b: b};
 	});
@@ -7051,7 +7051,7 @@ var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
 	});
-var $author$project$Test$mousePointDecoder = A3(
+var $author$project$DemoCard$mousePointDecoder = A3(
 	$elm$json$Json$Decode$map2,
 	$elm$core$Tuple$pair,
 	A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
@@ -8162,7 +8162,7 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 	});
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Test$viewCard = function (model) {
+var $author$project$DemoCard$viewCard = function (model) {
 	var cursorStyle = (!_Utils_eq(model.dragging, $elm$core$Maybe$Nothing)) ? 'grabbing' : 'grab';
 	return A2(
 		$elm$html$Html$div,
@@ -8177,15 +8177,15 @@ var $author$project$Test$viewCard = function (model) {
 						var x = _v0.a;
 						var y = _v0.b;
 						return _Utils_Tuple2(
-							A2($author$project$Test$StartDrag, x, y),
+							A2($author$project$DemoCard$StartDrag, x, y),
 							true);
 					},
-					$author$project$Test$mousePointDecoder)),
+					$author$project$DemoCard$mousePointDecoder)),
 				A2(
 				$elm$html$Html$Events$stopPropagationOn,
 				'click',
 				$elm$json$Json$Decode$succeed(
-					_Utils_Tuple2($author$project$Test$Open, true))),
+					_Utils_Tuple2($author$project$DemoCard$Open, true))),
 				A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 				A2(
 				$elm$html$Html$Attributes$style,
@@ -8286,7 +8286,7 @@ var $author$project$Test$viewCard = function (model) {
 					]))
 			]));
 };
-var $author$project$Test$view = function (model) {
+var $author$project$DemoCard$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -8298,14 +8298,14 @@ var $author$project$Test$view = function (model) {
 				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 				A2($elm$html$Html$Attributes$style, 'overflow', 'hidden'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Georgia, serif'),
-				$elm$html$Html$Events$onClick($author$project$Test$Close)
+				$elm$html$Html$Events$onClick($author$project$DemoCard$Close)
 			]),
 		_List_fromArray(
 			[
-				$author$project$Test$viewCard(model)
+				$author$project$DemoCard$viewCard(model)
 			]));
 };
-var $author$project$Test$main = $elm$browser$Browser$element(
-	{init: $author$project$Test$init, subscriptions: $author$project$Test$subscriptions, update: $author$project$Test$update, view: $author$project$Test$view});
-_Platform_export({'Test':{'init':$author$project$Test$main(
+var $author$project$DemoCard$main = $elm$browser$Browser$element(
+	{init: $author$project$DemoCard$init, subscriptions: $author$project$DemoCard$subscriptions, update: $author$project$DemoCard$update, view: $author$project$DemoCard$view});
+_Platform_export({'DemoCard':{'init':$author$project$DemoCard$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));

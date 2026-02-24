@@ -1,4 +1,4 @@
-module Test exposing (main)
+module DemoCard exposing (main)
 
 import Animator
 import Animator.Inline
