@@ -39,6 +39,8 @@ test('clic ouvre l overlay puis clic exterieur referme', async ({ page }) => {
   const miniB = page.getByTestId('mini-B');
   await miniPressAndRelease(miniB);
   await expect(page.getByTestId('expanded-card')).toBeVisible();
+  await expect(page.locator('[data-testid^="mini-"]')).toHaveCount(3);
+  await expect(page.locator('[data-testid="expanded-card"]')).toHaveCount(1);
   await page.getByTestId('expanded-layer').click({ position: { x: 12, y: 12 }, force: true });
   await expectCloseWithAnimation(page);
 });

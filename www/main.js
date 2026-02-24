@@ -5159,8 +5159,37 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$GotViewport = function (a) {
+	return {$: 'GotViewport', a: a};
+};
 var $author$project$Main$Mini = {$: 'Mini'};
 var $author$project$Main$RefreshBoardRect = {$: 'RefreshBoardRect'};
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Task$onError = _Scheduler_onError;
+var $elm$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return $elm$core$Task$command(
+			$elm$core$Task$Perform(
+				A2(
+					$elm$core$Task$onError,
+					A2(
+						$elm$core$Basics$composeL,
+						A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+						$elm$core$Result$Err),
+					A2(
+						$elm$core$Task$andThen,
+						A2(
+							$elm$core$Basics$composeL,
+							A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+							$elm$core$Result$Ok),
+						task))));
+	});
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
 	return {$: 'Timeline', a: a};
 };
@@ -5435,12 +5464,17 @@ var $author$project$Main$init = function (_v0) {
 			suppressNextOpen: false,
 			viewport: {height: 800, width: 1200}
 		},
-		A2(
-			$elm$core$Task$perform,
-			function (_v1) {
-				return $author$project$Main$RefreshBoardRect;
-			},
-			$elm$core$Process$sleep(60)));
+		$elm$core$Platform$Cmd$batch(
+			_List_fromArray(
+				[
+					A2(
+					$elm$core$Task$perform,
+					function (_v1) {
+						return $author$project$Main$RefreshBoardRect;
+					},
+					$elm$core$Process$sleep(60)),
+					A2($elm$core$Task$attempt, $author$project$Main$GotViewport, $elm$browser$Browser$Dom$getViewport)
+				])));
 };
 var $author$project$Main$AnimatorTick = function (a) {
 	return {$: 'AnimatorTick', a: a};
@@ -6732,11 +6766,6 @@ var $elm$browser$Browser$AnimationManager$onSelfMsg = F3(
 var $elm$browser$Browser$AnimationManager$Delta = function (a) {
 	return {$: 'Delta', a: a};
 };
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
 var $elm$browser$Browser$AnimationManager$subMap = F2(
 	function (func, sub) {
 		if (sub.$ === 'Time') {
@@ -6960,28 +6989,8 @@ var $author$project$Main$animateZoomTo = F2(
 			zoomState,
 			timeline);
 	});
-var $elm$core$Task$onError = _Scheduler_onError;
-var $elm$core$Task$attempt = F2(
-	function (resultToMessage, task) {
-		return $elm$core$Task$command(
-			$elm$core$Task$Perform(
-				A2(
-					$elm$core$Task$onError,
-					A2(
-						$elm$core$Basics$composeL,
-						A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
-						$elm$core$Result$Err),
-					A2(
-						$elm$core$Task$andThen,
-						A2(
-							$elm$core$Basics$composeL,
-							A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
-							$elm$core$Result$Ok),
-						task))));
-	});
 var $author$project$Main$closeAnimationDurationMs = 240;
 var $elm$core$Basics$neq = _Utils_notEqual;
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$Maxi = {$: 'Maxi'};
 var $author$project$Main$openOverlay = F2(
@@ -7106,6 +7115,7 @@ var $author$project$Main$propositionPosition = F2(
 					},
 					propositions)));
 	});
+var $elm$core$Basics$round = _Basics_round;
 var $mdgriffith$elm_animator$Animator$update = F3(
 	function (newTime, _v0, model) {
 		var updateModel = _v0.b;
@@ -7274,6 +7284,23 @@ var $author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
+			case 'GotViewport':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var viewport = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								viewport: {
+									height: $elm$core$Basics$round(viewport.viewport.height),
+									width: $elm$core$Basics$round(viewport.viewport.width)
+								}
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
 			case 'WindowResized':
 				var width = msg.a;
 				var height = msg.b;
@@ -7285,7 +7312,7 @@ var $author$project$Main$update = F2(
 						}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v7) {
+						function (_v8) {
 							return $author$project$Main$RefreshBoardRect;
 						},
 						$elm$core$Process$sleep(24)));
@@ -9306,7 +9333,6 @@ var $mdgriffith$elm_animator$Internal$Spring$criticalDamping = F2(
 	function (k, m) {
 		return 2 * $elm$core$Basics$sqrt(k * m);
 	});
-var $elm$core$Basics$round = _Basics_round;
 var $elm$core$Basics$e = _Basics_e;
 var $mdgriffith$elm_animator$Internal$Spring$toleranceForSpringSettleTimeCalculation = (-1) * A2($elm$core$Basics$logBase, $elm$core$Basics$e, 0.005);
 var $mdgriffith$elm_animator$Internal$Spring$settlesAt = function (_v0) {
@@ -9784,8 +9810,7 @@ var $author$project$Main$viewExpandedCard = F2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
-					A2($elm$html$Html$Attributes$attribute, 'data-testid', 'expanded-card'),
+					A2($elm$html$Html$Attributes$attribute, 'data-testid', 'expanded-card-shell'),
 					A2(
 					$mdgriffith$elm_animator$Animator$Inline$xy,
 					model.focusTimeline,
@@ -9814,177 +9839,189 @@ var $author$project$Main$viewExpandedCard = F2(
 							};
 						}
 					}),
-					A2(
-					$mdgriffith$elm_animator$Animator$Inline$scale,
-					model.focusTimeline,
-					function (zoom) {
-						if (zoom.$ === 'Mini') {
-							return A2(
-								$mdgriffith$elm_animator$Animator$arriveSmoothly,
-								0.75,
-								$mdgriffith$elm_animator$Animator$at($author$project$Main$overlayStartScale));
-						} else {
-							return A2(
-								$mdgriffith$elm_animator$Animator$arriveSmoothly,
-								0.75,
-								$mdgriffith$elm_animator$Animator$at(1));
-						}
-					}),
 					A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),
-					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-					A2($elm$html$Html$Attributes$style, 'width', 'min(1240px, 95vw)'),
-					A2($elm$html$Html$Attributes$style, 'max-height', '92vh'),
-					A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
-					A2($elm$html$Html$Attributes$style, 'background', 'white'),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '14px'),
-					A2($elm$html$Html$Attributes$style, 'padding', '16px'),
-					A2($elm$html$Html$Attributes$style, 'box-shadow', '0 24px 56px rgba(0,0,0,0.24)')
+					A2($elm$html$Html$Attributes$style, 'position', 'relative')
 				]),
 			_List_fromArray(
 				[
 					A2(
-					$elm$html$Html$button,
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
 							$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
-							A2($elm$html$Html$Attributes$attribute, 'data-testid', 'close-expanded'),
-							A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-							A2($elm$html$Html$Attributes$style, 'top', '10px'),
-							A2($elm$html$Html$Attributes$style, 'right', '10px'),
-							A2($elm$html$Html$Attributes$style, 'border', '1px solid #b7c7e6'),
-							A2($elm$html$Html$Attributes$style, 'background', 'white'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-							A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
-							A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-							A2($elm$html$Html$Attributes$style, 'font-weight', '700')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Fermer')
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
+							A2($elm$html$Html$Attributes$attribute, 'data-testid', 'expanded-card'),
+							A2(
+							$mdgriffith$elm_animator$Animator$Inline$scale,
+							model.focusTimeline,
+							function (zoom) {
+								if (zoom.$ === 'Mini') {
+									return A2(
+										$mdgriffith$elm_animator$Animator$arriveSmoothly,
+										0.75,
+										$mdgriffith$elm_animator$Animator$at($author$project$Main$overlayStartScale));
+								} else {
+									return A2(
+										$mdgriffith$elm_animator$Animator$arriveSmoothly,
+										0.75,
+										$mdgriffith$elm_animator$Animator$at(1));
+								}
+							}),
+							A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),
 							A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-							A2($elm$html$Html$Attributes$style, 'padding-top', '2px')
-						]),
-					_List_fromArray(
-						[
-							$author$project$Main$notchBadge(item.badge)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin-left', '54px'),
-							A2($elm$html$Html$Attributes$style, 'margin-top', '2px')
+							A2($elm$html$Html$Attributes$style, 'width', 'min(1240px, 95vw)'),
+							A2($elm$html$Html$Attributes$style, 'max-height', '92vh'),
+							A2($elm$html$Html$Attributes$style, 'overflow', 'auto'),
+							A2($elm$html$Html$Attributes$style, 'background', 'white'),
+							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c8d6ef'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '14px'),
+							A2($elm$html$Html$Attributes$style, 'padding', '16px'),
+							A2($elm$html$Html$Attributes$style, 'box-shadow', '0 24px 56px rgba(0,0,0,0.24)')
 						]),
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$h2,
+							$elm$html$Html$button,
 							_List_fromArray(
 								[
-									A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px')
+									$elm$html$Html$Events$onClick($author$project$Main$CloseExpanded),
+									A2($elm$html$Html$Attributes$attribute, 'data-testid', 'close-expanded'),
+									A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+									A2($elm$html$Html$Attributes$style, 'top', '10px'),
+									A2($elm$html$Html$Attributes$style, 'right', '10px'),
+									A2($elm$html$Html$Attributes$style, 'border', '1px solid #b7c7e6'),
+									A2($elm$html$Html$Attributes$style, 'background', 'white'),
+									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+									A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
+									A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+									A2($elm$html$Html$Attributes$style, 'font-weight', '700')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text(item.title)
+									$elm$html$Html$text('Fermer')
 								])),
 							A2(
-							$elm$html$Html$p,
+							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									A2($elm$html$Html$Attributes$style, 'margin', '0'),
-									A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
-									A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
+									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+									A2($elm$html$Html$Attributes$style, 'padding-top', '2px')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Version eleve')
+									$author$project$Main$notchBadge(item.badge)
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin-left', '54px'),
+									A2($elm$html$Html$Attributes$style, 'margin-top', '2px')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$h2,
+									_List_fromArray(
+										[
+											A2($elm$html$Html$Attributes$style, 'margin', '0 0 4px')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(item.title)
+										])),
+									A2(
+									$elm$html$Html$p,
+									_List_fromArray(
+										[
+											A2($elm$html$Html$Attributes$style, 'margin', '0'),
+											A2($elm$html$Html$Attributes$style, 'font-size', '13px'),
+											A2($elm$html$Html$Attributes$style, 'color', '#4f6185')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Version eleve')
+										]))
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin-top', '10px'),
+									A2($elm$html$Html$Attributes$style, 'font-size', '18px'),
+									A2($elm$html$Html$Attributes$style, 'color', '#243353')
+								]),
+							_List_fromArray(
+								[
+									$author$project$Main$viewFormulaInline(item.previewFormula)
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin-top', '12px')
+								]),
+							A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
+							A2(
+							$elm$html$Html$h3,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Commentaire')
+								])),
+							A2(
+							$elm$html$Html$textarea,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$rows(5),
+									A2($elm$html$Html$Attributes$style, 'width', '100%'),
+									A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
+									A2($elm$html$Html$Attributes$style, 'padding', '8px'),
+									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+									A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+									$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
+									$elm$html$Html$Attributes$value(item.comment),
+									$elm$html$Html$Events$onInput($author$project$Main$UpdateExpandedComment)
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$h3,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Email (optionnel)')
+								])),
+							A2(
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$type_('email'),
+									$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
+									$elm$html$Html$Attributes$value(model.email),
+									$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
+									A2($elm$html$Html$Attributes$style, 'width', '100%'),
+									A2($elm$html$Html$Attributes$style, 'padding', '10px'),
+									A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
+									A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$small,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'display', 'block'),
+									A2($elm$html$Html$Attributes$style, 'margin-top', '8px'),
+									A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Cliquer hors de la fiche pour la reduire.')
 								]))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin-top', '10px'),
-							A2($elm$html$Html$Attributes$style, 'font-size', '18px'),
-							A2($elm$html$Html$Attributes$style, 'color', '#243353')
-						]),
-					_List_fromArray(
-						[
-							$author$project$Main$viewFormulaInline(item.previewFormula)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin-top', '12px')
-						]),
-					A2($elm$core$List$map, $author$project$Main$viewStep, item.steps)),
-					A2(
-					$elm$html$Html$h3,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '14px 0 8px')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Commentaire')
-						])),
-					A2(
-					$elm$html$Html$textarea,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$rows(5),
-							A2($elm$html$Html$Attributes$style, 'width', '100%'),
-							A2($elm$html$Html$Attributes$style, 'resize', 'vertical'),
-							A2($elm$html$Html$Attributes$style, 'padding', '8px'),
-							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-							$elm$html$Html$Attributes$placeholder('Observations sur cette copie...'),
-							$elm$html$Html$Attributes$value(item.comment),
-							$elm$html$Html$Events$onInput($author$project$Main$UpdateExpandedComment)
-						]),
-					_List_Nil),
-					A2(
-					$elm$html$Html$h3,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'margin', '12px 0 8px')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Email (optionnel)')
-						])),
-					A2(
-					$elm$html$Html$input,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$type_('email'),
-							$elm$html$Html$Attributes$placeholder('nom@exemple.fr'),
-							$elm$html$Html$Attributes$value(model.email),
-							$elm$html$Html$Events$onInput($author$project$Main$UpdateEmail),
-							A2($elm$html$Html$Attributes$style, 'width', '100%'),
-							A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-							A2($elm$html$Html$Attributes$style, 'border', '1px solid #c7d3ea'),
-							A2($elm$html$Html$Attributes$style, 'border-radius', '8px')
-						]),
-					_List_Nil),
-					A2(
-					$elm$html$Html$small,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'display', 'block'),
-							A2($elm$html$Html$Attributes$style, 'margin-top', '8px'),
-							A2($elm$html$Html$Attributes$style, 'color', '#6b7892')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Cliquer hors de la fiche pour la reduire.')
 						]))
 				]));
 	});

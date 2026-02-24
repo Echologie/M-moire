@@ -97,6 +97,7 @@ type Msg
     | UpdateEmail String
     | RefreshBoardRect
     | GotBoardRect (Result Dom.Error Dom.Element)
+    | GotViewport (Result Dom.Error Dom.Viewport)
     | WindowResized Int Int
     | AnimatorTick Time.Posix
 
@@ -153,7 +154,10 @@ init _ =
       , email = ""
       , viewport = { width = 1200, height = 800 }
       }
-    , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
+    , Cmd.batch
+        [ Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
+        , Task.attempt GotViewport Dom.getViewport
+        ]
     )
 
 
@@ -371,6 +375,21 @@ update msg model =
                                 , width = element.element.width
                                 , height = element.element.height
                                 }
+                      }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+        GotViewport result ->
+            case result of
+                Ok viewport ->
+                    ( { model
+                        | viewport =
+                            { width = round viewport.viewport.width
+                            , height = round viewport.viewport.height
+                            }
                       }
                     , Cmd.none
                     )
@@ -719,8 +738,7 @@ viewExpandedCard model item =
             overlaySourceOffset model item
     in
     div
-        [ onClick CloseExpanded
-        , attribute "data-testid" "expanded-card"
+        [ attribute "data-testid" "expanded-card-shell"
         , Animator.Inline.xy model.focusTimeline
             (\zoom ->
                 case zoom of
@@ -734,74 +752,81 @@ viewExpandedCard model item =
                         , y = Animator.at 0 |> Animator.arriveSmoothly 0.75
                         }
             )
-        , Animator.Inline.scale model.focusTimeline
-            (\zoom ->
-                case zoom of
-                    Mini ->
-                        Animator.at overlayStartScale |> Animator.arriveSmoothly 0.75
-
-                    Maxi ->
-                        Animator.at 1 |> Animator.arriveSmoothly 0.75
-            )
         , style "transform-origin" "center center"
         , style "position" "relative"
-        , style "width" "min(1240px, 95vw)"
-        , style "max-height" "92vh"
-        , style "overflow" "auto"
-        , style "background" "white"
-        , style "border" "1px solid #c8d6ef"
-        , style "border-radius" "14px"
-        , style "padding" "16px"
-        , style "box-shadow" "0 24px 56px rgba(0,0,0,0.24)"
         ]
-        [ button
+        [ div
             [ onClick CloseExpanded
-            , attribute "data-testid" "close-expanded"
-            , style "position" "absolute"
-            , style "top" "10px"
-            , style "right" "10px"
-            , style "border" "1px solid #b7c7e6"
+            , attribute "data-testid" "expanded-card"
+            , Animator.Inline.scale model.focusTimeline
+                (\zoom ->
+                    case zoom of
+                        Mini ->
+                            Animator.at overlayStartScale |> Animator.arriveSmoothly 0.75
+
+                        Maxi ->
+                            Animator.at 1 |> Animator.arriveSmoothly 0.75
+                )
+            , style "transform-origin" "center center"
+            , style "position" "relative"
+            , style "width" "min(1240px, 95vw)"
+            , style "max-height" "92vh"
+            , style "overflow" "auto"
             , style "background" "white"
-            , style "border-radius" "8px"
-            , style "padding" "4px 8px"
-            , style "cursor" "pointer"
-            , style "font-weight" "700"
+            , style "border" "1px solid #c8d6ef"
+            , style "border-radius" "14px"
+            , style "padding" "16px"
+            , style "box-shadow" "0 24px 56px rgba(0,0,0,0.24)"
             ]
-            [ text "Fermer" ]
-        , div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
-        , div [ style "margin-left" "54px", style "margin-top" "2px" ]
-            [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]
-            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
+            [ button
+                [ onClick CloseExpanded
+                , attribute "data-testid" "close-expanded"
+                , style "position" "absolute"
+                , style "top" "10px"
+                , style "right" "10px"
+                , style "border" "1px solid #b7c7e6"
+                , style "background" "white"
+                , style "border-radius" "8px"
+                , style "padding" "4px 8px"
+                , style "cursor" "pointer"
+                , style "font-weight" "700"
+                ]
+                [ text "Fermer" ]
+            , div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
+            , div [ style "margin-left" "54px", style "margin-top" "2px" ]
+                [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]
+                , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
+                ]
+            , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ] [ viewFormulaInline item.previewFormula ]
+            , div [ style "margin-top" "12px" ] (List.map viewStep item.steps)
+            , h3 [ style "margin" "14px 0 8px" ] [ text "Commentaire" ]
+            , textarea
+                [ rows 5
+                , style "width" "100%"
+                , style "resize" "vertical"
+                , style "padding" "8px"
+                , style "border" "1px solid #c7d3ea"
+                , style "border-radius" "8px"
+                , placeholder "Observations sur cette copie..."
+                , value item.comment
+                , onInput UpdateExpandedComment
+                ]
+                []
+            , h3 [ style "margin" "12px 0 8px" ] [ text "Email (optionnel)" ]
+            , input
+                [ type_ "email"
+                , placeholder "nom@exemple.fr"
+                , value model.email
+                , onInput UpdateEmail
+                , style "width" "100%"
+                , style "padding" "10px"
+                , style "border" "1px solid #c7d3ea"
+                , style "border-radius" "8px"
+                ]
+                []
+            , small [ style "display" "block", style "margin-top" "8px", style "color" "#6b7892" ]
+                [ text "Cliquer hors de la fiche pour la reduire." ]
             ]
-        , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ] [ viewFormulaInline item.previewFormula ]
-        , div [ style "margin-top" "12px" ] (List.map viewStep item.steps)
-        , h3 [ style "margin" "14px 0 8px" ] [ text "Commentaire" ]
-        , textarea
-            [ rows 5
-            , style "width" "100%"
-            , style "resize" "vertical"
-            , style "padding" "8px"
-            , style "border" "1px solid #c7d3ea"
-            , style "border-radius" "8px"
-            , placeholder "Observations sur cette copie..."
-            , value item.comment
-            , onInput UpdateExpandedComment
-            ]
-            []
-        , h3 [ style "margin" "12px 0 8px" ] [ text "Email (optionnel)" ]
-        , input
-            [ type_ "email"
-            , placeholder "nom@exemple.fr"
-            , value model.email
-            , onInput UpdateEmail
-            , style "width" "100%"
-            , style "padding" "10px"
-            , style "border" "1px solid #c7d3ea"
-            , style "border-radius" "8px"
-            ]
-            []
-        , small [ style "display" "block", style "margin-top" "8px", style "color" "#6b7892" ]
-            [ text "Cliquer hors de la fiche pour la reduire." ]
         ]
 
 
