@@ -1,4 +1,4 @@
-name: Compile test
+name: Build and interaction tests
 
 on:
   push:
@@ -6,15 +6,43 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  compile:
+  test-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run test:logic
-      - run: npm run build:main
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Elm logic tests
+        run: npm run test:logic
+
+      - name: Compile Elm
+        run: npm run build:main
+
+      - name: Install Playwright Firefox
+        run: npm run test:e2e:install:ci
+
+      - name: Run browser interaction tests
+        run: npm run test:e2e
+
+      - name: Commit compiled JavaScript
+        run: |
+          if git diff --quiet -- docs/main.js www/main.js; then
+            echo "Compiled JavaScript is already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/main.js www/main.js
+          git commit -m "Build compiled Elm [skip ci]"
+          git push
