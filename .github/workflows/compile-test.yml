@@ -1,0 +1,156 @@
+name: Build, test and publish
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect change scope
+        id: scope
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "content_only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! git rev-parse HEAD^ >/dev/null 2>&1; then
+            echo "content_only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          changed="$(git diff --name-only HEAD^ HEAD)"
+          echo "Changed files:"
+          printf '%s\n' "$changed"
+
+          if [[ -n "$changed" ]] && ! printf '%s\n' "$changed" | grep -qvE '^data/[^/]+\.json$'; then
+            echo "content_only=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "content_only=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate content JSON
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob
+          import json
+          import sys
+
+          files = sorted(glob.glob("data/*.json"))
+          if not files:
+              raise SystemExit("No JSON content files found in data/")
+
+          required_production = {
+              "id": int,
+              "badge": str,
+              "title": str,
+              "subtitle": str,
+              "preview": str,
+              "content": str,
+          }
+
+          for path in files:
+              with open(path, encoding="utf-8") as handle:
+                  data = json.load(handle)
+
+              exercise = data.get("exercise")
+              productions = data.get("productions")
+
+              if not isinstance(exercise, dict):
+                  raise ValueError(f"{path}: missing object 'exercise'")
+              for key in ("title", "statement"):
+                  if not isinstance(exercise.get(key), str):
+                      raise ValueError(f"{path}: exercise.{key} must be a string")
+
+              if not isinstance(productions, list) or not productions:
+                  raise ValueError(f"{path}: 'productions' must be a non-empty list")
+
+              ids = set()
+              badges = set()
+              for index, production in enumerate(productions):
+                  if not isinstance(production, dict):
+                      raise ValueError(f"{path}: productions[{index}] must be an object")
+                  for key, expected_type in required_production.items():
+                      if not isinstance(production.get(key), expected_type):
+                          raise ValueError(
+                              f"{path}: productions[{index}].{key} must be {expected_type.__name__}"
+                          )
+
+                  if production["id"] in ids:
+                      raise ValueError(f"{path}: duplicate production id {production['id']}")
+                  if production["badge"] in badges:
+                      raise ValueError(f"{path}: duplicate production badge {production['badge']}")
+                  ids.add(production["id"])
+                  badges.add(production["badge"])
+
+              print(f"{path}: OK ({len(productions)} productions)")
+          PY
+
+      - name: Publish content only
+        if: steps.scope.outputs.content_only == 'true'
+        shell: bash
+        run: |
+          rm -rf docs/data
+          mkdir -p docs/data
+          cp data/*.json docs/data/
+
+      - uses: actions/setup-node@v4
+        if: steps.scope.outputs.content_only != 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.scope.outputs.content_only != 'true'
+        run: npm ci
+
+      - name: Run Elm logic tests
+        if: steps.scope.outputs.content_only != 'true'
+        run: npm run test:logic
+
+      - name: Compile Elm
+        if: steps.scope.outputs.content_only != 'true'
+        run: npm run build:main
+
+      - name: Install Playwright Firefox
+        if: steps.scope.outputs.content_only != 'true'
+        run: npm run test:e2e:install:ci
+
+      - name: Run browser interaction tests
+        if: steps.scope.outputs.content_only != 'true'
+        run: npm run test:e2e
+
+      - name: Commit published assets
+        shell: bash
+        run: |
+          if [[ "${{ steps.scope.outputs.content_only }}" == "true" ]]; then
+            paths=(docs/data)
+            message="Publish content data [skip ci]"
+          else
+            paths=(docs www/main.js)
+            message="Build compiled Elm [skip ci]"
+          fi
+
+          if git diff --quiet -- "${paths[@]}"; then
+            echo "Published assets are already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "${paths[@]}"
+          git commit -m "$message"
+          git push

@@ -1,5 +1,7 @@
 module Main exposing (main)
 
+import Animator
+import Animator.Inline
 import BoardLogic
 import Browser
 import Browser.Dom as Dom
@@ -8,11 +10,11 @@ import Dict exposing (Dict)
 import Html exposing (Html, div, h1, h2, h3, p, span, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, preventDefaultOn, stopPropagationOn)
+import Http
 import Json.Decode as Decode
-import MathML as Math
-import MathML.Attributes as MathAttr
 import Process
 import Task
+import Time
 
 
 type alias Position =
@@ -21,13 +23,26 @@ type alias Position =
     }
 
 
+type alias Exercise =
+    { title : String
+    , statement : String
+    }
+
+
 type alias Proposition =
     { id : Int
     , badge : String
     , title : String
-    , previewFormula : FormulaId
-    , steps : List String
+    , subtitle : String
+    , preview : String
+    , content : String
     , pos : Maybe Position
+    }
+
+
+type alias ContentData =
+    { exercise : Exercise
+    , productions : List Proposition
     }
 
 
@@ -55,17 +70,18 @@ type alias Viewport =
     }
 
 
-type FormulaId
-    = FormulaCosLinear
-    | FormulaQuadratic
-    | FormulaProduct
-    | FormulaGeneral
+type ExpandedState
+    = AllMini
+    | Expanded Int
 
 
 type alias Model =
-    { propositions : List Proposition
+    { exercise : Maybe Exercise
+    , propositions : List Proposition
+    , contentError : Maybe String
     , selectedPropositionId : Maybe Int
     , expandedPropositionId : Maybe Int
+    , zoomTimeline : Animator.Timeline ExpandedState
     , dragging : Maybe DragState
     , suppressNextOpen : Bool
     , boardRect : Maybe BoardRect
@@ -74,16 +90,18 @@ type alias Model =
 
 
 type Msg
-    = StartDrag Int Float Float
+    = GotContent (Result Http.Error ContentData)
+    | StartDrag Int Float Float
     | PointerMove Float Float
     | PointerUp
-    | MiniMouseUp Int
-    | TouchEndOnMini Int
-    | ToggleExpanded Int
+    | OpenCard Int
+    | CloseCard
+    | ClearSuppressNextOpen
     | RefreshBoardRect
     | GotBoardRect (Result Dom.Error Dom.Element)
     | GotViewport (Result Dom.Error Dom.Viewport)
     | WindowResized Int Int
+    | AnimatorTick Time.Posix
 
 
 miniatureWidth : Float
@@ -101,9 +119,19 @@ miniScale =
     0.33
 
 
-expandedScale : Float
-expandedScale =
-    1
+miniCardWidth : Float
+miniCardWidth =
+    miniatureWidth * miniScale
+
+
+miniCardHeight : Float
+miniCardHeight =
+    miniatureHeight * miniScale
+
+
+expandedMargin : Float
+expandedMargin =
+    12
 
 
 main : Program () Model Msg
@@ -118,68 +146,68 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    let
-        seeded =
-            withInitialPositions initialPropositions
-    in
-    ( { propositions = seeded
-      , selectedPropositionId = Just 1
+    ( { exercise = Nothing
+      , propositions = []
+      , contentError = Nothing
+      , selectedPropositionId = Nothing
       , expandedPropositionId = Nothing
+      , zoomTimeline = Animator.init AllMini
       , dragging = Nothing
       , suppressNextOpen = False
       , boardRect = Nothing
       , viewport = { width = 1200, height = 800 }
       }
     , Cmd.batch
-        [ Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
+        [ loadContent
+        , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
         , Task.attempt GotViewport Dom.getViewport
         ]
     )
 
 
-initialPropositions : List Proposition
-initialPropositions =
-    [ proposition
-        1
-        "A"
-        "Copie A"
-        FormulaCosLinear
-        [ "Je remplace par cos(2x)=1-2sin(x)."
-        , "Donc 1-2sin(x)=sin(x) puis 1=3sin(x)."
-        , "Alors sin(x)=1/3, donc x≈0,34 ou x≈2,80."
-        ]
-    , proposition
-        2
-        "B"
-        "Copie B"
-        FormulaQuadratic
-        [ "On part de cos(2x)=1-2sin²(x)."
-        , "On obtient 1-2sin²(x)=sin(x), donc 2sin²(x)+sin(x)-1=0."
-        , "En posant y=sin(x) : 2y²+y-1=0, d'ou y=1/2 ou y=-1."
-        , "Donc x=π/6, 5π/6 ou 3π/2 sur l'intervalle."
-        ]
-    , proposition
-        3
-        "C"
-        "Copie C"
-        FormulaProduct
-        [ "Comme cos(2x)=1-2sin²(x), on a 2sin²(x)+sin(x)-1=0."
-        , "Factorisation : (2sin(x)-1)(sin(x)+1)=0."
-        , "Alors sin(x)=1/2 ou sin(x)=-1."
-        , "Dans [0;2π[ : x appartient a {π/6, 5π/6, 3π/2}."
-        ]
-    , proposition
-        4
-        "D"
-        "Copie D"
-        FormulaGeneral
-        [ "Identite : cos(2x)=1-2sin²(x), donc 2sin²(x)+sin(x)-1=0."
-        , "Produit nul : (2sin(x)-1)(sin(x)+1)=0."
-        , "Cas 1 : sin(x)=1/2, donc x=π/6+2kπ ou x=5π/6+2kπ."
-        , "Cas 2 : sin(x)=-1, donc x=3π/2+2kπ."
-        , "Intersection avec [0;2π[ : S={π/6, 5π/6, 3π/2}."
-        ]
-    ]
+loadContent : Cmd Msg
+loadContent =
+    Http.get
+        { url = "data/exercise-001.json"
+        , expect = Http.expectJson GotContent contentDecoder
+        }
+
+
+contentDecoder : Decode.Decoder ContentData
+contentDecoder =
+    Decode.map2 ContentData
+        (Decode.field "exercise" exerciseDecoder)
+        (Decode.field "productions" (Decode.list propositionDecoder))
+
+
+exerciseDecoder : Decode.Decoder Exercise
+exerciseDecoder =
+    Decode.map2 Exercise
+        (Decode.field "title" Decode.string)
+        (Decode.field "statement" Decode.string)
+
+
+propositionDecoder : Decode.Decoder Proposition
+propositionDecoder =
+    Decode.map6 propositionFromData
+        (Decode.field "id" Decode.int)
+        (Decode.field "badge" Decode.string)
+        (Decode.field "title" Decode.string)
+        (Decode.field "subtitle" Decode.string)
+        (Decode.field "preview" Decode.string)
+        (Decode.field "content" Decode.string)
+
+
+propositionFromData : Int -> String -> String -> String -> String -> String -> Proposition
+propositionFromData id badge title subtitle preview content =
+    { id = id
+    , badge = badge
+    , title = title
+    , subtitle = subtitle
+    , preview = preview
+    , content = content
+    , pos = Nothing
+    }
 
 
 withInitialPositions : List Proposition -> List Proposition
@@ -201,29 +229,59 @@ withInitialPositions propositions =
         propositions
 
 
-proposition : Int -> String -> String -> FormulaId -> List String -> Proposition
-proposition id badge title previewFormula steps =
-    { id = id
-    , badge = badge
-    , title = title
-    , previewFormula = previewFormula
-    , steps = steps
-    , pos = Nothing
-    }
-
-
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Browser.Events.onResize WindowResized
+        [ Animator.toSubscription AnimatorTick model animator
+        , Browser.Events.onResize WindowResized
         , Browser.Events.onMouseMove mouseMoveDecoder
         , Browser.Events.onMouseUp (Decode.succeed PointerUp)
         ]
 
 
+animator : Animator.Animator Model
+animator =
+    Animator.animator
+        |> Animator.watching .zoomTimeline
+            (\newTimeline currentModel ->
+                { currentModel | zoomTimeline = newTimeline }
+            )
+
+
+animateExpanded : ExpandedState -> Animator.Timeline ExpandedState -> Animator.Timeline ExpandedState
+animateExpanded target timeline =
+    Animator.go (Animator.millis 220) target timeline
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        GotContent result ->
+            case result of
+                Ok contentData ->
+                    let
+                        seeded =
+                            withInitialPositions contentData.productions
+
+                        firstId =
+                            seeded
+                                |> List.head
+                                |> Maybe.map .id
+                    in
+                    ( { model
+                        | exercise = Just contentData.exercise
+                        , propositions = seeded
+                        , contentError = Nothing
+                        , selectedPropositionId = firstId
+                      }
+                    , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 24)
+                    )
+
+                Err _ ->
+                    ( { model | contentError = Just "Impossible de charger les données de l'exercice." }
+                    , Cmd.none
+                    )
+
         StartDrag propositionId clientX clientY ->
             let
                 startPosition =
@@ -241,12 +299,6 @@ update msg model =
                         , moved = False
                         }
                 , selectedPropositionId = Just propositionId
-                , expandedPropositionId =
-                    if model.expandedPropositionId == Just propositionId then
-                        Nothing
-
-                    else
-                        model.expandedPropositionId
                 , suppressNextOpen = False
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
@@ -292,27 +344,44 @@ update msg model =
                         | dragging = Nothing
                         , suppressNextOpen = dragState.moved
                       }
+                    , if dragState.moved then
+                        Task.perform (\_ -> ClearSuppressNextOpen) (Process.sleep 120)
+
+                      else
+                        Cmd.none
+                    )
+
+        OpenCard propositionId ->
+            if model.suppressNextOpen then
+                ( { model | suppressNextOpen = False }, Cmd.none )
+
+            else if model.expandedPropositionId == Just propositionId then
+                ( model, Cmd.none )
+
+            else
+                ( { model
+                    | selectedPropositionId = Just propositionId
+                    , expandedPropositionId = Just propositionId
+                    , zoomTimeline = animateExpanded (Expanded propositionId) model.zoomTimeline
+                  }
+                , Cmd.none
+                )
+
+        CloseCard ->
+            case model.expandedPropositionId of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just _ ->
+                    ( { model
+                        | expandedPropositionId = Nothing
+                        , zoomTimeline = animateExpanded AllMini model.zoomTimeline
+                      }
                     , Cmd.none
                     )
 
-        MiniMouseUp propositionId ->
-            finishMiniRelease propositionId model
-
-        TouchEndOnMini propositionId ->
-            finishMiniRelease propositionId model
-
-        ToggleExpanded propositionId ->
-            ( { model
-                | selectedPropositionId = Just propositionId
-                , expandedPropositionId =
-                    if model.expandedPropositionId == Just propositionId then
-                        Nothing
-
-                    else
-                        Just propositionId
-              }
-            , Cmd.none
-            )
+        ClearSuppressNextOpen ->
+            ( { model | suppressNextOpen = False }, Cmd.none )
 
         RefreshBoardRect ->
             ( model, Task.attempt GotBoardRect (Dom.getElement "board") )
@@ -355,41 +424,8 @@ update msg model =
             , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 24)
             )
 
-
-finishMiniRelease : Int -> Model -> ( Model, Cmd Msg )
-finishMiniRelease propositionId model =
-    case model.dragging of
-        Just dragState ->
-            if dragState.propositionId /= propositionId then
-                ( model, Cmd.none )
-
-            else if dragState.moved then
-                ( { model | dragging = Nothing, suppressNextOpen = False }, Cmd.none )
-
-            else
-                toggleCard propositionId { model | dragging = Nothing }
-
-        Nothing ->
-            toggleCard propositionId model
-
-
-toggleCard : Int -> Model -> ( Model, Cmd Msg )
-toggleCard propositionId model =
-    if model.suppressNextOpen then
-        ( { model | suppressNextOpen = False }, Cmd.none )
-
-    else
-        ( { model
-            | selectedPropositionId = Just propositionId
-            , expandedPropositionId =
-                if model.expandedPropositionId == Just propositionId then
-                    Nothing
-
-                else
-                    Just propositionId
-          }
-        , Cmd.none
-        )
+        AnimatorTick now ->
+            ( Animator.update now animator model, Cmd.none )
 
 
 updatePropositionPosition : Int -> Position -> List Proposition -> List Proposition
@@ -416,9 +452,12 @@ propositionPosition propositionId propositions =
 view : Model -> Html Msg
 view model =
     div
-        [ style "margin" "0"
-        , style "min-height" "100vh"
-        , style "height" "100vh"
+        [ attribute "data-testid" "app-root"
+        , style "margin" "0"
+        , style "height" "100dvh"
+        , style "min-height" "0"
+        , style "max-height" "100dvh"
+        , style "overflow" "hidden"
         , style "padding" "12px"
         , style "display" "flex"
         , style "flex-direction" "column"
@@ -433,31 +472,44 @@ view model =
 topHeader : Model -> Html msg
 topHeader model =
     div
-        [ style "padding" "10px 12px"
+        [ attribute "data-testid" "header"
+        , style "padding" "10px 12px"
         , style "border" "1px solid #d5deef"
         , style "border-radius" "10px"
         , style "background" "white"
         , style "margin-bottom" "10px"
+        , style "flex-shrink" "0"
+        , style "position" "relative"
+        , style "z-index" "1"
         ]
-        [ h1 [ style "margin" "0", style "font-size" "24px" ] [ text "Evaluation de productions d'eleves" ]
-        , p [ style "margin" "6px 0 0", style "color" "#33425f" ]
-            [ text "Exercice : resoudre "
-            , span [ style "font-weight" "700" ] [ viewExerciseEquation ]
-            , text " sur "
-            , span [ style "font-weight" "700" ] [ viewInterval ]
-            , text "."
-            ]
-        , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
-            [ text
-                ("Selection : "
-                    ++ selectedBadgeLabel model.selectedPropositionId
-                    ++ " | Placees : "
-                    ++ String.fromInt (placedCount model.propositions)
-                    ++ "/"
-                    ++ String.fromInt (List.length model.propositions)
-                )
-            ]
-        ]
+        (case model.exercise of
+            Just exercise ->
+                [ h1 [ style "margin" "0", style "font-size" "24px" ] [ text exercise.title ]
+                , div [ style "margin" "6px 0 0", style "color" "#33425f" ]
+                    [ richText exercise.statement ]
+                , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
+                    [ text
+                        ("Selection : "
+                            ++ selectedBadgeLabel model.selectedPropositionId model.propositions
+                            ++ " | Placees : "
+                            ++ String.fromInt (placedCount model.propositions)
+                            ++ "/"
+                            ++ String.fromInt (List.length model.propositions)
+                        )
+                    ]
+                ]
+
+            Nothing ->
+                [ h1 [ style "margin" "0", style "font-size" "24px" ] [ text "Evaluation de productions d'eleves" ]
+                , p [ style "margin" "6px 0 0", style "color" "#4f6185" ]
+                    [ text
+                        (Maybe.withDefault
+                            "Chargement des productions..."
+                            model.contentError
+                        )
+                    ]
+                ]
+        )
 
 
 placedCount : List Proposition -> Int
@@ -469,21 +521,47 @@ placedCount propositions =
 
 boardView : Model -> Html Msg
 boardView model =
+    let
+        touchMoveAttributes =
+            case model.dragging of
+                Just _ ->
+                    [ onBoardTouchMove ]
+
+                Nothing ->
+                    []
+    in
     div
-        [ id "board"
-        , attribute "data-testid" "board"
-        , onBoardTouchMove
-        , onBoardTouchEnd
-        , onBoardTouchCancel
-        , style "position" "relative"
-        , style "flex" "1"
-        , style "width" "100%"
-        , style "border" "1px solid #b9c9e6"
-        , style "border-radius" "12px"
-        , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
-        , style "overflow" "hidden"
-        , style "touch-action" "none"
-        ]
+        ([ id "board"
+         , attribute "data-testid" "board"
+         , onBoardTouchEnd
+         , onBoardTouchCancel
+         , onClick CloseCard
+         , style "position" "relative"
+         , style "z-index" "2"
+         , style "flex" "1 1 0"
+         , style "min-height" "0"
+         , style "width" "100%"
+         , style "border" "1px solid #b9c9e6"
+         , style "border-radius" "12px"
+         , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
+         , style "overflow"
+            (if boardHasZoomingCard model then
+                "visible"
+
+             else
+                "hidden"
+            )
+         , style "touch-action"
+            (case model.dragging of
+                Just _ ->
+                    "none"
+
+                Nothing ->
+                    "auto"
+            )
+         ]
+            ++ touchMoveAttributes
+        )
         ([ axisLines ]
             ++ List.map (viewCard model) model.propositions
             ++ [ boardLegend ]
@@ -531,6 +609,63 @@ axisLines =
         ]
 
 
+stateContainsCard : Int -> ExpandedState -> Bool
+stateContainsCard propositionId expandedState =
+    case expandedState of
+        Expanded expandedId ->
+            expandedId == propositionId
+
+        AllMini ->
+            False
+
+
+cardIsZooming : Model -> Int -> Bool
+cardIsZooming model propositionId =
+    stateContainsCard propositionId (Animator.current model.zoomTimeline)
+        || stateContainsCard propositionId (Animator.arrived model.zoomTimeline)
+
+
+boardHasZoomingCard : Model -> Bool
+boardHasZoomingCard model =
+    Animator.current model.zoomTimeline /= AllMini
+        || Animator.arrived model.zoomTimeline /= AllMini
+
+
+expandedCenter : Model -> Position
+expandedCenter model =
+    case model.boardRect of
+        Just rect ->
+            if rect.width > 0 && rect.height > 0 then
+                { x = (toFloat model.viewport.width / 2 - rect.x) / rect.width
+                , y = (toFloat model.viewport.height / 2 - rect.y) / rect.height
+                }
+
+            else
+                { x = 0.5, y = 0.5 }
+
+        Nothing ->
+            { x = 0.5, y = 0.5 }
+
+
+expandedCardWidth : Model -> Float
+expandedCardWidth model =
+    Basics.max miniatureWidth (toFloat model.viewport.width - 2 * expandedMargin)
+
+
+expandedCardHeight : Model -> Float
+expandedCardHeight model =
+    Basics.max miniatureHeight (toFloat model.viewport.height - 2 * expandedMargin)
+
+
+cardMovement : Int -> Float -> Float -> ExpandedState -> Animator.Movement
+cardMovement propositionId miniValue expandedValue expandedState =
+    if stateContainsCard propositionId expandedState then
+        Animator.at expandedValue |> Animator.arriveSmoothly 0.75
+
+    else
+        Animator.at miniValue |> Animator.arriveSmoothly 0.75
+
+
 viewCard : Model -> Proposition -> Html Msg
 viewCard model item =
     case item.pos of
@@ -542,6 +677,9 @@ viewCard model item =
                 isExpanded =
                     model.expandedPropositionId == Just item.id
 
+                isSelected =
+                    model.selectedPropositionId == Just item.id
+
                 isDragging =
                     case model.dragging of
                         Just dragState ->
@@ -550,22 +688,18 @@ viewCard model item =
                         Nothing ->
                             False
 
-                cardScale =
-                    if isExpanded then
-                        expandedScale
+                isZooming =
+                    cardIsZooming model item.id
 
-                    else
-                        miniScale
-
-                scaledWidth =
-                    miniatureWidth * cardScale
-
-                scaledHeight =
-                    miniatureHeight * cardScale
+                targetCenter =
+                    expandedCenter model
 
                 cursorStyle =
                     if isExpanded then
                         "zoom-out"
+
+                    else if isZooming then
+                        "default"
 
                     else if isDragging then
                         "grabbing"
@@ -574,10 +708,8 @@ viewCard model item =
                         "grab"
 
                 interactionAttributes =
-                    if isExpanded then
-                        [ onClick (ToggleExpanded item.id)
-                        , onExpandedTouchEnd item.id
-                        ]
+                    if isExpanded || isZooming then
+                        [ stopPropagationOn "click" (Decode.succeed ( CloseCard, True )) ]
 
                     else
                         [ preventDefaultOn "mousedown"
@@ -585,37 +717,57 @@ viewCard model item =
                                 (\( x, y ) -> ( StartDrag item.id x y, True ))
                                 mousePointDecoder
                             )
-                        , onMiniMouseUp item.id
                         , onMiniTouchStart item.id
-                        , onMiniTouchEnd item.id
+                        , stopPropagationOn "click" (Decode.succeed ( OpenCard item.id, True ))
                         ]
             in
             div
                 [ style "position" "absolute"
-                , style "left" (String.fromFloat (pos.x * 100) ++ "%")
-                , style "top" (String.fromFloat (pos.y * 100) ++ "%")
-                , style "transform" "translate(-50%, -50%)"
-                , style "width" (String.fromFloat scaledWidth ++ "px")
-                , style "height" (String.fromFloat scaledHeight ++ "px")
+                , Animator.Inline.style model.zoomTimeline
+                    "left"
+                    (\value -> String.fromFloat value ++ "%")
+                    (cardMovement item.id (pos.x * 100) (targetCenter.x * 100))
+                , Animator.Inline.style model.zoomTimeline
+                    "top"
+                    (\value -> String.fromFloat value ++ "%")
+                    (cardMovement item.id (pos.y * 100) (targetCenter.y * 100))
+                , style "width" "0"
+                , style "height" "0"
+                , style "display" "flex"
+                , style "align-items" "center"
+                , style "justify-content" "center"
                 , style "overflow" "visible"
+                , style "pointer-events" "none"
                 , style "z-index"
-                    (if isDragging then
+                    (if isZooming then
+                        "100"
+
+                     else if isDragging then
                         "80"
 
-                     else if isExpanded then
-                        "70"
+                     else if isSelected then
+                        "40"
 
                      else
                         "30"
                     )
+                , attribute "data-testid" ("anchor-" ++ item.badge)
                 ]
                 [ div
                     (interactionAttributes
-                        ++ [ style "transform" ("scale(" ++ String.fromFloat cardScale ++ ")")
-                           , style "transform-origin" "top left"
+                        ++ [ Animator.Inline.scale model.zoomTimeline
+                                (cardMovement item.id miniScale 1)
+                           , Animator.Inline.style model.zoomTimeline
+                                "width"
+                                (\value -> String.fromFloat value ++ "px")
+                                (cardMovement item.id miniatureWidth (expandedCardWidth model))
+                           , Animator.Inline.style model.zoomTimeline
+                                "height"
+                                (\value -> String.fromFloat value ++ "px")
+                                (cardMovement item.id miniatureHeight (expandedCardHeight model))
+                           , style "transform-origin" "center center"
+                           , style "flex" "0 0 auto"
                            , style "position" "relative"
-                           , style "width" (String.fromFloat miniatureWidth ++ "px")
-                           , style "height" (String.fromFloat miniatureHeight ++ "px")
                            , style "border"
                                 (if isDragging then
                                     "2px solid #2563eb"
@@ -626,18 +778,40 @@ viewCard model item =
                            , style "border-radius" "12px"
                            , style "background" "#fbfdff"
                            , style "box-shadow"
-                                (if isDragging then
+                                (if isZooming then
+                                    "0 18px 60px rgba(15,34,80,0.30)"
+
+                                 else if isDragging then
                                     "0 12px 24px rgba(15,34,80,0.25)"
 
                                  else
                                     "0 4px 12px rgba(0,0,0,0.14)"
                                 )
                            , style "padding" "12px"
-                           , style "overflow" "hidden"
+                           , style "overflow"
+                                (if isZooming then
+                                    "auto"
+
+                                 else
+                                    "hidden"
+                                )
                            , style "cursor" cursorStyle
-                           , style "user-select" "none"
-                           , style "touch-action" "none"
+                           , style "user-select"
+                                (if isExpanded then
+                                    "text"
+
+                                 else
+                                    "none"
+                                )
+                           , style "touch-action"
+                                (if isExpanded then
+                                    "pan-y"
+
+                                 else
+                                    "none"
+                                )
                            , style "outline" "none"
+                           , style "pointer-events" "auto"
                            , attribute "data-testid" ("card-" ++ item.badge)
                            , attribute "data-state"
                                 (if isExpanded then
@@ -646,7 +820,13 @@ viewCard model item =
                                  else
                                     "mini"
                                 )
-                           , style "transition" "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)"
+                           , attribute "data-zooming"
+                                (if isZooming then
+                                    "true"
+
+                                 else
+                                    "false"
+                                )
                            ]
                     )
                     [ viewCardContent item ]
@@ -659,146 +839,22 @@ viewCardContent item =
         [ div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
         , div [ style "margin-left" "54px", style "margin-top" "2px" ]
             [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]
-            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
+            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text item.subtitle ]
             ]
-        , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ] [ viewFormulaInline item.previewFormula ]
-        , div [ style "margin-top" "12px" ] (List.map viewStep item.steps)
+        , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ]
+            [ richText item.preview ]
+        , div [ style "margin-top" "12px", style "color" "#1f2a44" ]
+            [ richText item.content ]
         ]
 
 
-viewExerciseEquation : Html msg
-viewExerciseEquation =
-    mathInline
-        [ Math.mrow []
-            [ Math.mi [] [ text "cos" ]
-            , Math.mo [] [ text "(" ]
-            , Math.mn [] [ text "2" ]
-            , Math.mi [] [ text "x" ]
-            , Math.mo [] [ text ")" ]
-            , Math.mo [] [ text "=" ]
-            , Math.mi [] [ text "sin" ]
-            , Math.mo [] [ text "(" ]
-            , Math.mi [] [ text "x" ]
-            , Math.mo [] [ text ")" ]
-            ]
+richText : String -> Html msg
+richText source =
+    Html.node "rich-text"
+        [ attribute "content" source
+        , style "display" "block"
         ]
-
-
-viewInterval : Html msg
-viewInterval =
-    mathInline
-        [ Math.mrow []
-            [ Math.mo [] [ text "[" ]
-            , Math.mn [] [ text "0" ]
-            , Math.mo [] [ text ";" ]
-            , Math.mn [] [ text "2" ]
-            , Math.mi [] [ text "π" ]
-            , Math.mo [] [ text "[" ]
-            ]
-        ]
-
-
-viewFormulaInline : FormulaId -> Html msg
-viewFormulaInline formulaId =
-    case formulaId of
-        FormulaCosLinear ->
-            mathInline
-                [ Math.mrow []
-                    [ Math.mi [] [ text "cos" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mn [] [ text "2" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "=" ]
-                    , Math.mn [] [ text "1" ]
-                    , Math.mo [] [ text "-" ]
-                    , Math.mn [] [ text "2" ]
-                    , Math.mi [] [ text "sin" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    ]
-                ]
-
-        FormulaQuadratic ->
-            mathInline
-                [ Math.mrow []
-                    [ Math.mn [] [ text "2" ]
-                    , Math.msup []
-                        [ Math.mrow []
-                            [ Math.mi [] [ text "sin" ]
-                            , Math.mo [] [ text "(" ]
-                            , Math.mi [] [ text "x" ]
-                            , Math.mo [] [ text ")" ]
-                            ]
-                        , Math.mn [] [ text "2" ]
-                        ]
-                    , Math.mo [] [ text "+" ]
-                    , Math.mi [] [ text "sin" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "-" ]
-                    , Math.mn [] [ text "1" ]
-                    , Math.mo [] [ text "=" ]
-                    , Math.mn [] [ text "0" ]
-                    ]
-                ]
-
-        FormulaProduct ->
-            mathInline
-                [ Math.mrow []
-                    [ Math.mo [] [ text "(" ]
-                    , Math.mn [] [ text "2" ]
-                    , Math.mi [] [ text "sin" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "-" ]
-                    , Math.mn [] [ text "1" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "sin" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "+" ]
-                    , Math.mn [] [ text "1" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "=" ]
-                    , Math.mn [] [ text "0" ]
-                    ]
-                ]
-
-        FormulaGeneral ->
-            mathInline
-                [ Math.mrow []
-                    [ Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text "=" ]
-                    , Math.mfrac []
-                        [ Math.mi [] [ text "π" ]
-                        , Math.mn [] [ text "6" ]
-                        ]
-                    , Math.mo [] [ text "+" ]
-                    , Math.mn [] [ text "2" ]
-                    , Math.mi [] [ text "k" ]
-                    , Math.mi [] [ text "π" ]
-                    ]
-                ]
-
-
-mathInline : List (Html msg) -> Html msg
-mathInline nodes =
-    Math.math
-        [ MathAttr.display "inline"
-        , MathAttr.xmlns "http://www.w3.org/1998/Math/MathML"
-        ]
-        nodes
-
-
-viewStep : String -> Html msg
-viewStep stepText =
-    p [ style "margin" "6px 0", style "line-height" "1.35", style "color" "#1f2a44" ] [ text stepText ]
+        []
 
 
 notchBadge : String -> Html msg
@@ -823,28 +879,12 @@ notchBadge badge =
         [ text badge ]
 
 
-selectedBadgeLabel : Maybe Int -> String
-selectedBadgeLabel maybeId =
-    case maybeId of
-        Just propositionId ->
-            case propositionId of
-                1 ->
-                    "A"
-
-                2 ->
-                    "B"
-
-                3 ->
-                    "C"
-
-                4 ->
-                    "D"
-
-                _ ->
-                    "?"
-
-        Nothing ->
-            "aucune"
+selectedBadgeLabel : Maybe Int -> List Proposition -> String
+selectedBadgeLabel maybeId propositions =
+    maybeId
+        |> Maybe.andThen (\propositionId -> propositionById propositionId propositions)
+        |> Maybe.map .badge
+        |> Maybe.withDefault "aucune"
 
 
 propositionById : Int -> List Proposition -> Maybe Proposition
@@ -856,26 +896,11 @@ propositionById propositionId propositions =
 
 onMiniTouchStart : Int -> Html.Attribute Msg
 onMiniTouchStart propositionId =
-    preventDefaultOn "touchstart"
+    on "touchstart"
         (Decode.map
-            (\( clientX, clientY ) -> ( StartDrag propositionId clientX clientY, True ))
+            (\( clientX, clientY ) -> StartDrag propositionId clientX clientY)
             touchPointDecoder
         )
-
-
-onMiniMouseUp : Int -> Html.Attribute Msg
-onMiniMouseUp propositionId =
-    stopPropagationOn "mouseup" (Decode.succeed ( MiniMouseUp propositionId, True ))
-
-
-onMiniTouchEnd : Int -> Html.Attribute Msg
-onMiniTouchEnd propositionId =
-    stopPropagationOn "touchend" (Decode.succeed ( TouchEndOnMini propositionId, True ))
-
-
-onExpandedTouchEnd : Int -> Html.Attribute Msg
-onExpandedTouchEnd propositionId =
-    stopPropagationOn "touchend" (Decode.succeed ( ToggleExpanded propositionId, True ))
 
 
 onBoardTouchMove : Html.Attribute Msg

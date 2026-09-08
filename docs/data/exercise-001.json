@@ -1,0 +1,40 @@
+{
+    "exercise": {
+        "title": "Évaluation de productions d'élèves",
+        "statement": "Exercice : résoudre $\\cos(2x)=\\sin(x)$ sur $[0;2\\pi[$."
+    },
+    "productions": [
+        {
+            "id": 1,
+            "badge": "A",
+            "title": "Copie A",
+            "subtitle": "Version élève",
+            "preview": "$\\cos(2x)=1-2\\sin(x)$",
+            "content": "Je remplace par $\\cos(2x)=1-2\\sin(x)$.\n\nDonc $1-2\\sin(x)=\\sin(x)$ puis $1=3\\sin(x)$.\n\nAlors $\\sin(x)=\\frac{1}{3}$, donc $x\\approx0{,}34$ ou $x\\approx2{,}80$."
+        },
+        {
+            "id": 2,
+            "badge": "B",
+            "title": "Copie B",
+            "subtitle": "Version élève",
+            "preview": "$2\\sin^2(x)+\\sin(x)-1=0$",
+            "content": "On part de $\\cos(2x)=1-2\\sin^2(x)$.\n\nOn obtient $1-2\\sin^2(x)=\\sin(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.\n\nEn posant $y=\\sin(x)$ : $2y^2+y-1=0$, d'où $y=\\frac12$ ou $y=-1$.\n\nDonc $x=\\frac{\\pi}{6}$, $\\frac{5\\pi}{6}$ ou $\\frac{3\\pi}{2}$ sur l'intervalle."
+        },
+        {
+            "id": 3,
+            "badge": "C",
+            "title": "Copie C",
+            "subtitle": "Version élève",
+            "preview": "$(2\\sin(x)-1)(\\sin(x)+1)=0$",
+            "content": "Comme $\\cos(2x)=1-2\\sin^2(x)$, on a $2\\sin^2(x)+\\sin(x)-1=0$.\n\nFactorisation : $(2\\sin(x)-1)(\\sin(x)+1)=0$.\n\nAlors $\\sin(x)=\\frac12$ ou $\\sin(x)=-1$.\n\nDans $[0;2\\pi[$ : $x\\in\\left\\{\\frac{\\pi}{6},\\frac{5\\pi}{6},\\frac{3\\pi}{2}\\right\\}$."
+        },
+        {
+            "id": 4,
+            "badge": "D",
+            "title": "Copie D",
+            "subtitle": "Version élève",
+            "preview": "$x=\\frac{\\pi}{6}+2k\\pi$",
+            "content": "Identité : $\\cos(2x)=1-2\\sin^2(x)$, donc $2\\sin^2(x)+\\sin(x)-1=0$.\n\nProduit nul : $(2\\sin(x)-1)(\\sin(x)+1)=0$.\n\n- Cas 1 : $\\sin(x)=\\frac12$, donc $x=\\frac{\\pi}{6}+2k\\pi$ ou $x=\\frac{5\\pi}{6}+2k\\pi$.\n- Cas 2 : $\\sin(x)=-1$, donc $x=\\frac{3\\pi}{2}+2k\\pi$.\n\nIntersection avec $[0;2\\pi[$ :\n\n$$S=\\left\\{\\frac{\\pi}{6},\\frac{5\\pi}{6},\\frac{3\\pi}{2}\\right\\}.$$"
+        }
+    ]
+}

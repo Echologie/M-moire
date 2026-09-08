@@ -3,11 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "build:main": "cd www && npx elm make src/Main.elm --output=../docs/main.js && npx elm make src/Main.elm --output=main.js",
+    "build:main": "cd www && npx elm make src/Main.elm --output=../docs/main.js && npx elm make src/Main.elm --output=main.js && mkdir -p ../docs/data && cp ../data/*.json ../docs/data/ && cp rich-text.js ../docs/rich-text.js && cp index.html ../docs/index.html",
     "test:logic": "cd www && npx elm-test",
-    "test:e2e:prepare": "bash scripts/patch-playwright-firefox.sh",
-    "test:e2e": "npm run test:e2e:prepare && PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 npx playwright test",
+    "test:e2e": "npx playwright test",
+    "test:e2e:guix": "bash scripts/patch-playwright-firefox.sh && PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 npx playwright test",
     "test:e2e:install": "npx playwright install firefox",
+    "test:e2e:install:ci": "npx playwright install --with-deps firefox",
     "test:all": "npm run test:logic && npm run test:e2e"
   },
   "devDependencies": {
