@@ -1,5 +1,7 @@
 module Main exposing (main)
 
+import Animator
+import Animator.Inline
 import BoardLogic
 import Browser
 import Browser.Dom as Dom
@@ -13,6 +15,7 @@ import MathML as Math
 import MathML.Attributes as MathAttr
 import Process
 import Task
+import Time
 
 
 type alias Position =
@@ -55,6 +58,11 @@ type alias Viewport =
     }
 
 
+type ExpandedState
+    = AllMini
+    | Expanded Int
+
+
 type FormulaId
     = FormulaCosLinear
     | FormulaQuadratic
@@ -66,6 +74,7 @@ type alias Model =
     { propositions : List Proposition
     , selectedPropositionId : Maybe Int
     , expandedPropositionId : Maybe Int
+    , zoomTimeline : Animator.Timeline ExpandedState
     , dragging : Maybe DragState
     , suppressNextOpen : Bool
     , boardRect : Maybe BoardRect
@@ -77,13 +86,14 @@ type Msg
     = StartDrag Int Float Float
     | PointerMove Float Float
     | PointerUp
-    | MiniMouseUp Int
-    | TouchEndOnMini Int
-    | ToggleExpanded Int
+    | OpenCard Int
+    | CloseCard
+    | ClearSuppressNextOpen
     | RefreshBoardRect
     | GotBoardRect (Result Dom.Error Dom.Element)
     | GotViewport (Result Dom.Error Dom.Viewport)
     | WindowResized Int Int
+    | AnimatorTick Time.Posix
 
 
 miniatureWidth : Float
@@ -99,11 +109,6 @@ miniatureHeight =
 miniScale : Float
 miniScale =
     0.33
-
-
-expandedScale : Float
-expandedScale =
-    1
 
 
 main : Program () Model Msg
@@ -125,6 +130,7 @@ init _ =
     ( { propositions = seeded
       , selectedPropositionId = Just 1
       , expandedPropositionId = Nothing
+      , zoomTimeline = Animator.init AllMini
       , dragging = Nothing
       , suppressNextOpen = False
       , boardRect = Nothing
@@ -215,10 +221,25 @@ proposition id badge title previewFormula steps =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Browser.Events.onResize WindowResized
+        [ Animator.toSubscription AnimatorTick model animator
+        , Browser.Events.onResize WindowResized
         , Browser.Events.onMouseMove mouseMoveDecoder
         , Browser.Events.onMouseUp (Decode.succeed PointerUp)
         ]
+
+
+animator : Animator.Animator Model
+animator =
+    Animator.animator
+        |> Animator.watching .zoomTimeline
+            (\newTimeline currentModel ->
+                { currentModel | zoomTimeline = newTimeline }
+            )
+
+
+animateExpanded : ExpandedState -> Animator.Timeline ExpandedState -> Animator.Timeline ExpandedState
+animateExpanded target timeline =
+    Animator.go (Animator.millis 220) target timeline
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -241,12 +262,6 @@ update msg model =
                         , moved = False
                         }
                 , selectedPropositionId = Just propositionId
-                , expandedPropositionId =
-                    if model.expandedPropositionId == Just propositionId then
-                        Nothing
-
-                    else
-                        model.expandedPropositionId
                 , suppressNextOpen = False
               }
             , Task.attempt GotBoardRect (Dom.getElement "board")
@@ -292,27 +307,44 @@ update msg model =
                         | dragging = Nothing
                         , suppressNextOpen = dragState.moved
                       }
+                    , if dragState.moved then
+                        Task.perform (\_ -> ClearSuppressNextOpen) (Process.sleep 120)
+
+                      else
+                        Cmd.none
+                    )
+
+        OpenCard propositionId ->
+            if model.suppressNextOpen then
+                ( { model | suppressNextOpen = False }, Cmd.none )
+
+            else if model.expandedPropositionId == Just propositionId then
+                ( model, Cmd.none )
+
+            else
+                ( { model
+                    | selectedPropositionId = Just propositionId
+                    , expandedPropositionId = Just propositionId
+                    , zoomTimeline = animateExpanded (Expanded propositionId) model.zoomTimeline
+                  }
+                , Cmd.none
+                )
+
+        CloseCard ->
+            case model.expandedPropositionId of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just _ ->
+                    ( { model
+                        | expandedPropositionId = Nothing
+                        , zoomTimeline = animateExpanded AllMini model.zoomTimeline
+                      }
                     , Cmd.none
                     )
 
-        MiniMouseUp propositionId ->
-            finishMiniRelease propositionId model
-
-        TouchEndOnMini propositionId ->
-            finishMiniRelease propositionId model
-
-        ToggleExpanded propositionId ->
-            ( { model
-                | selectedPropositionId = Just propositionId
-                , expandedPropositionId =
-                    if model.expandedPropositionId == Just propositionId then
-                        Nothing
-
-                    else
-                        Just propositionId
-              }
-            , Cmd.none
-            )
+        ClearSuppressNextOpen ->
+            ( { model | suppressNextOpen = False }, Cmd.none )
 
         RefreshBoardRect ->
             ( model, Task.attempt GotBoardRect (Dom.getElement "board") )
@@ -355,41 +387,8 @@ update msg model =
             , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 24)
             )
 
-
-finishMiniRelease : Int -> Model -> ( Model, Cmd Msg )
-finishMiniRelease propositionId model =
-    case model.dragging of
-        Just dragState ->
-            if dragState.propositionId /= propositionId then
-                ( model, Cmd.none )
-
-            else if dragState.moved then
-                ( { model | dragging = Nothing, suppressNextOpen = False }, Cmd.none )
-
-            else
-                toggleCard propositionId { model | dragging = Nothing }
-
-        Nothing ->
-            toggleCard propositionId model
-
-
-toggleCard : Int -> Model -> ( Model, Cmd Msg )
-toggleCard propositionId model =
-    if model.suppressNextOpen then
-        ( { model | suppressNextOpen = False }, Cmd.none )
-
-    else
-        ( { model
-            | selectedPropositionId = Just propositionId
-            , expandedPropositionId =
-                if model.expandedPropositionId == Just propositionId then
-                    Nothing
-
-                else
-                    Just propositionId
-          }
-        , Cmd.none
-        )
+        AnimatorTick now ->
+            ( Animator.update now animator model, Cmd.none )
 
 
 updatePropositionPosition : Int -> Position -> List Proposition -> List Proposition
@@ -475,6 +474,7 @@ boardView model =
         , onBoardTouchMove
         , onBoardTouchEnd
         , onBoardTouchCancel
+        , onClick CloseCard
         , style "position" "relative"
         , style "flex" "1"
         , style "width" "100%"
@@ -542,6 +542,9 @@ viewCard model item =
                 isExpanded =
                     model.expandedPropositionId == Just item.id
 
+                isSelected =
+                    model.selectedPropositionId == Just item.id
+
                 isDragging =
                     case model.dragging of
                         Just dragState ->
@@ -549,19 +552,6 @@ viewCard model item =
 
                         Nothing ->
                             False
-
-                cardScale =
-                    if isExpanded then
-                        expandedScale
-
-                    else
-                        miniScale
-
-                scaledWidth =
-                    miniatureWidth * cardScale
-
-                scaledHeight =
-                    miniatureHeight * cardScale
 
                 cursorStyle =
                     if isExpanded then
@@ -575,9 +565,7 @@ viewCard model item =
 
                 interactionAttributes =
                     if isExpanded then
-                        [ onClick (ToggleExpanded item.id)
-                        , onExpandedTouchEnd item.id
-                        ]
+                        [ stopPropagationOn "click" (Decode.succeed ( OpenCard item.id, True )) ]
 
                     else
                         [ preventDefaultOn "mousedown"
@@ -585,9 +573,8 @@ viewCard model item =
                                 (\( x, y ) -> ( StartDrag item.id x y, True ))
                                 mousePointDecoder
                             )
-                        , onMiniMouseUp item.id
                         , onMiniTouchStart item.id
-                        , onMiniTouchEnd item.id
+                        , stopPropagationOn "click" (Decode.succeed ( OpenCard item.id, True ))
                         ]
             in
             div
@@ -595,9 +582,10 @@ viewCard model item =
                 , style "left" (String.fromFloat (pos.x * 100) ++ "%")
                 , style "top" (String.fromFloat (pos.y * 100) ++ "%")
                 , style "transform" "translate(-50%, -50%)"
-                , style "width" (String.fromFloat scaledWidth ++ "px")
-                , style "height" (String.fromFloat scaledHeight ++ "px")
+                , style "width" (String.fromFloat miniatureWidth ++ "px")
+                , style "height" (String.fromFloat miniatureHeight ++ "px")
                 , style "overflow" "visible"
+                , style "pointer-events" "none"
                 , style "z-index"
                     (if isDragging then
                         "80"
@@ -605,14 +593,29 @@ viewCard model item =
                      else if isExpanded then
                         "70"
 
+                     else if isSelected then
+                        "40"
+
                      else
                         "30"
                     )
                 ]
                 [ div
                     (interactionAttributes
-                        ++ [ style "transform" ("scale(" ++ String.fromFloat cardScale ++ ")")
-                           , style "transform-origin" "top left"
+                        ++ [ Animator.Inline.scale model.zoomTimeline
+                                (\expandedState ->
+                                    case expandedState of
+                                        Expanded propositionId ->
+                                            if propositionId == item.id then
+                                                Animator.at 1 |> Animator.arriveSmoothly 0.75
+
+                                            else
+                                                Animator.at miniScale |> Animator.arriveSmoothly 0.75
+
+                                        AllMini ->
+                                            Animator.at miniScale |> Animator.arriveSmoothly 0.75
+                                )
+                           , style "transform-origin" "center center"
                            , style "position" "relative"
                            , style "width" (String.fromFloat miniatureWidth ++ "px")
                            , style "height" (String.fromFloat miniatureHeight ++ "px")
@@ -633,11 +636,18 @@ viewCard model item =
                                     "0 4px 12px rgba(0,0,0,0.14)"
                                 )
                            , style "padding" "12px"
-                           , style "overflow" "hidden"
+                           , style "overflow"
+                                (if isExpanded then
+                                    "auto"
+
+                                 else
+                                    "hidden"
+                                )
                            , style "cursor" cursorStyle
                            , style "user-select" "none"
                            , style "touch-action" "none"
                            , style "outline" "none"
+                           , style "pointer-events" "auto"
                            , attribute "data-testid" ("card-" ++ item.badge)
                            , attribute "data-state"
                                 (if isExpanded then
@@ -646,12 +656,10 @@ viewCard model item =
                                  else
                                     "mini"
                                 )
-                           , style "transition" "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)"
                            ]
                     )
                     [ viewCardContent item ]
                 ]
-
 
 viewCardContent : Proposition -> Html msg
 viewCardContent item =
@@ -856,26 +864,11 @@ propositionById propositionId propositions =
 
 onMiniTouchStart : Int -> Html.Attribute Msg
 onMiniTouchStart propositionId =
-    preventDefaultOn "touchstart"
+    on "touchstart"
         (Decode.map
-            (\( clientX, clientY ) -> ( StartDrag propositionId clientX clientY, True ))
+            (\( clientX, clientY ) -> StartDrag propositionId clientX clientY)
             touchPointDecoder
         )
-
-
-onMiniMouseUp : Int -> Html.Attribute Msg
-onMiniMouseUp propositionId =
-    stopPropagationOn "mouseup" (Decode.succeed ( MiniMouseUp propositionId, True ))
-
-
-onMiniTouchEnd : Int -> Html.Attribute Msg
-onMiniTouchEnd propositionId =
-    stopPropagationOn "touchend" (Decode.succeed ( TouchEndOnMini propositionId, True ))
-
-
-onExpandedTouchEnd : Int -> Html.Attribute Msg
-onExpandedTouchEnd propositionId =
-    stopPropagationOn "touchend" (Decode.succeed ( ToggleExpanded propositionId, True ))
 
 
 onBoardTouchMove : Html.Attribute Msg
