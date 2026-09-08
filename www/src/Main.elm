@@ -649,12 +649,12 @@ expandedCenter model =
 
 expandedCardWidth : Model -> Float
 expandedCardWidth model =
-    max miniatureWidth (toFloat model.viewport.width - 2 * expandedMargin)
+    Basics.max miniatureWidth (toFloat model.viewport.width - 2 * expandedMargin)
 
 
 expandedCardHeight : Model -> Float
 expandedCardHeight model =
-    max miniatureHeight (toFloat model.viewport.height - 2 * expandedMargin)
+    Basics.max miniatureHeight (toFloat model.viewport.height - 2 * expandedMargin)
 
 
 cardMovement : Int -> Float -> Float -> ExpandedState -> Animator.Movement
