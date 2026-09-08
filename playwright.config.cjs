@@ -1,8 +1,5 @@
 const { defineConfig, devices } = require('@playwright/test');
 
-const runtimeLibPath =
-  '/gnu/store/z1kd5nisk0mqacsyrdbzm0cbp6wvgsrs-profile/lib:/gnu/store/zzpbp6rr43smwxzvzd4qd317z5j7qblj-gcc-11.4.0-lib/lib';
-
 module.exports = defineConfig({
   testDir: './tests/e2e',
   timeout: 30000,
@@ -26,13 +23,7 @@ module.exports = defineConfig({
       name: 'firefox',
       use: {
         ...devices['Desktop Firefox'],
-        browserName: 'firefox',
-        launchOptions: {
-          env: {
-            ...process.env,
-            LD_LIBRARY_PATH: runtimeLibPath
-          }
-        }
+        browserName: 'firefox'
       }
     }
   ]
