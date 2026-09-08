@@ -15,6 +15,7 @@
             "mdgriffith/elm-animator": "1.1.1"
         },
         "indirect": {
+            "avh4/elm-color": "1.0.0",
             "elm/bytes": "1.0.8",
             "elm/file": "1.0.5",
             "elm/url": "1.0.0",
