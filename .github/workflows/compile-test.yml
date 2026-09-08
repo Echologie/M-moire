@@ -3,7 +3,7 @@ name: Compile test
 on:
   push:
     branches:
-      - compile-test-20260908
+      - master
   workflow_dispatch:
 
 jobs:
