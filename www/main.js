@@ -8099,7 +8099,6 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$CloseCard = {$: 'CloseCard'};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -8108,6 +8107,7 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $author$project$Main$CloseCard = {$: 'CloseCard'};
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
@@ -8141,228 +8141,6 @@ var $author$project$Main$axisLines = A2(
 				]),
 			_List_Nil)
 		]));
-var $elm$html$Html$span = _VirtualDom_node('span');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$boardLegend = A2(
-	$elm$html$Html$div,
-	_List_fromArray(
-		[
-			A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-			A2($elm$html$Html$Attributes$style, 'left', '10px'),
-			A2($elm$html$Html$Attributes$style, 'right', '10px'),
-			A2($elm$html$Html$Attributes$style, 'bottom', '8px'),
-			A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-			A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between'),
-			A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
-			A2($elm$html$Html$Attributes$style, 'color', '#4c5d7f')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$span,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Precision faible')
-				])),
-			A2(
-			$elm$html$Html$span,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Rigueur elevee')
-				]))
-		]));
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $author$project$Main$onBoardTouchCancel = A2(
-	$elm$html$Html$Events$on,
-	'touchcancel',
-	$elm$json$Json$Decode$succeed($author$project$Main$PointerUp));
-var $author$project$Main$onBoardTouchEnd = A2(
-	$elm$html$Html$Events$on,
-	'touchend',
-	$elm$json$Json$Decode$succeed($author$project$Main$PointerUp));
-var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
-	return {$: 'MayPreventDefault', a: a};
-};
-var $elm$html$Html$Events$preventDefaultOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
-	});
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$json$Json$Decode$oneOf = _Json_oneOf;
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
-var $author$project$Main$touchPointDecoder = $elm$json$Json$Decode$oneOf(
-	_List_fromArray(
-		[
-			A3(
-			$elm$json$Json$Decode$map2,
-			$elm$core$Tuple$pair,
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['touches', '0', 'clientX']),
-				$elm$json$Json$Decode$float),
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['touches', '0', 'clientY']),
-				$elm$json$Json$Decode$float)),
-			A3(
-			$elm$json$Json$Decode$map2,
-			$elm$core$Tuple$pair,
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['changedTouches', '0', 'clientX']),
-				$elm$json$Json$Decode$float),
-			A2(
-				$elm$json$Json$Decode$at,
-				_List_fromArray(
-					['changedTouches', '0', 'clientY']),
-				$elm$json$Json$Decode$float))
-		]));
-var $author$project$Main$onBoardTouchMove = A2(
-	$elm$html$Html$Events$preventDefaultOn,
-	'touchmove',
-	A2(
-		$elm$json$Json$Decode$map,
-		function (_v0) {
-			var clientX = _v0.a;
-			var clientY = _v0.b;
-			return _Utils_Tuple2(
-				A2($author$project$Main$PointerMove, clientX, clientY),
-				true);
-		},
-		$author$project$Main$touchPointDecoder));
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $author$project$Main$OpenCard = function (a) {
-	return {$: 'OpenCard', a: a};
-};
-var $author$project$Main$StartDrag = F3(
-	function (a, b, c) {
-		return {$: 'StartDrag', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
-	return {$: 'Specified', a: a};
-};
-var $mdgriffith$elm_animator$Internal$Interpolate$Oscillate = F3(
-	function (a, b, c) {
-		return {$: 'Oscillate', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
-	function (a, b) {
-		return {$: 'Position', a: a, b: b};
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault = function (a) {
-	return {$: 'PartialDefault', a: a};
-};
-var $mdgriffith$elm_animator$Internal$Interpolate$Default = {$: 'Default'};
-var $mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults = {arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Default, arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, departLate: $mdgriffith$elm_animator$Internal$Interpolate$Default, departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, wobbliness: $mdgriffith$elm_animator$Internal$Interpolate$Default};
-var $mdgriffith$elm_animator$Animator$withDefault = F2(
-	function (toDef, currentDefault) {
-		if (currentDefault.$ === 'FullDefault') {
-			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
-				toDef($mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults));
-		} else {
-			var thing = currentDefault.a;
-			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
-				toDef(thing));
-		}
-	});
-var $mdgriffith$elm_animator$Animator$applyOption = F2(
-	function (toOption, movement) {
-		if (movement.$ === 'Position') {
-			var personality = movement.a;
-			var pos = movement.b;
-			return A2(
-				$mdgriffith$elm_animator$Internal$Interpolate$Position,
-				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
-				pos);
-		} else {
-			var personality = movement.a;
-			var dur = movement.b;
-			var fn = movement.c;
-			return A3(
-				$mdgriffith$elm_animator$Internal$Interpolate$Oscillate,
-				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
-				dur,
-				fn);
-		}
-	});
-var $elm$core$Basics$clamp = F3(
-	function (low, high, number) {
-		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
-	});
-var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
-	function (s, movement) {
-		return A2(
-			$mdgriffith$elm_animator$Animator$applyOption,
-			function (def) {
-				return _Utils_update(
-					def,
-					{
-						arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
-							A3($elm$core$Basics$clamp, 0, 1, s))
-					});
-			},
-			movement);
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
-var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $author$project$Main$mousePointDecoder = A3(
-	$elm$json$Json$Decode$map2,
-	$elm$core$Tuple$pair,
-	A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float));
-var $author$project$Main$onMiniTouchStart = function (propositionId) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'touchstart',
-		A2(
-			$elm$json$Json$Decode$map,
-			function (_v0) {
-				var clientX = _v0.a;
-				var clientY = _v0.b;
-				return A3($author$project$Main$StartDrag, propositionId, clientX, clientY);
-			},
-			$author$project$Main$touchPointDecoder));
-};
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 	function (_v0, _v1) {
 		var y = _v0.a;
@@ -8719,6 +8497,335 @@ var $mdgriffith$elm_animator$Internal$Timeline$foldp = F3(
 			return A7($mdgriffith$elm_animator$Internal$Timeline$overLines, fn, lookup, timelineDetails, $elm$core$Maybe$Nothing, firstLine, remainingLines, start);
 		}
 	});
+var $mdgriffith$elm_animator$Internal$Timeline$linearDefault = {arriveEarly: 0, arriveSlowly: 0, departLate: 0, departSlowly: 0, wobbliness: 0};
+var $mdgriffith$elm_animator$Internal$Timeline$arrived = function (timeline) {
+	var details = timeline.a;
+	return A3(
+		$mdgriffith$elm_animator$Internal$Timeline$foldp,
+		$elm$core$Basics$identity,
+		{
+			adjustor: function (_v0) {
+				return $mdgriffith$elm_animator$Internal$Timeline$linearDefault;
+			},
+			dwellPeriod: function (_v1) {
+				return $elm$core$Maybe$Nothing;
+			},
+			lerp: F7(
+				function (_v2, _v3, _v4, _v5, _v6, _v7, state) {
+					return state;
+				}),
+			start: function (_v8) {
+				return details.initial;
+			},
+			visit: F5(
+				function (lookup, target, targetTime, maybeLookAhead, state) {
+					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
+				})
+		},
+		timeline);
+};
+var $mdgriffith$elm_animator$Animator$arrived = $mdgriffith$elm_animator$Internal$Timeline$arrived;
+var $mdgriffith$elm_animator$Internal$Timeline$current = function (timeline) {
+	var details = timeline.a;
+	return A3(
+		$mdgriffith$elm_animator$Internal$Timeline$foldp,
+		$elm$core$Basics$identity,
+		{
+			adjustor: function (_v0) {
+				return $mdgriffith$elm_animator$Internal$Timeline$linearDefault;
+			},
+			dwellPeriod: function (_v1) {
+				return $elm$core$Maybe$Nothing;
+			},
+			lerp: F7(
+				function (_v2, _v3, target, _v4, _v5, _v6, _v7) {
+					return target;
+				}),
+			start: function (_v8) {
+				return details.initial;
+			},
+			visit: F5(
+				function (lookup, target, targetTime, maybeLookAhead, state) {
+					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
+				})
+		},
+		timeline);
+};
+var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
+var $author$project$Main$boardHasZoomingCard = function (model) {
+	return (!_Utils_eq(
+		$mdgriffith$elm_animator$Animator$current(model.zoomTimeline),
+		$author$project$Main$AllMini)) || (!_Utils_eq(
+		$mdgriffith$elm_animator$Animator$arrived(model.zoomTimeline),
+		$author$project$Main$AllMini));
+};
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$boardLegend = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+			A2($elm$html$Html$Attributes$style, 'left', '10px'),
+			A2($elm$html$Html$Attributes$style, 'right', '10px'),
+			A2($elm$html$Html$Attributes$style, 'bottom', '8px'),
+			A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+			A2($elm$html$Html$Attributes$style, 'justify-content', 'space-between'),
+			A2($elm$html$Html$Attributes$style, 'font-size', '12px'),
+			A2($elm$html$Html$Attributes$style, 'color', '#4c5d7f')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$span,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Precision faible')
+				])),
+			A2(
+			$elm$html$Html$span,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Rigueur elevee')
+				]))
+		]));
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $author$project$Main$onBoardTouchCancel = A2(
+	$elm$html$Html$Events$on,
+	'touchcancel',
+	$elm$json$Json$Decode$succeed($author$project$Main$PointerUp));
+var $author$project$Main$onBoardTouchEnd = A2(
+	$elm$html$Html$Events$on,
+	'touchend',
+	$elm$json$Json$Decode$succeed($author$project$Main$PointerUp));
+var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var $elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$Main$touchPointDecoder = $elm$json$Json$Decode$oneOf(
+	_List_fromArray(
+		[
+			A3(
+			$elm$json$Json$Decode$map2,
+			$elm$core$Tuple$pair,
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['touches', '0', 'clientX']),
+				$elm$json$Json$Decode$float),
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['touches', '0', 'clientY']),
+				$elm$json$Json$Decode$float)),
+			A3(
+			$elm$json$Json$Decode$map2,
+			$elm$core$Tuple$pair,
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['changedTouches', '0', 'clientX']),
+				$elm$json$Json$Decode$float),
+			A2(
+				$elm$json$Json$Decode$at,
+				_List_fromArray(
+					['changedTouches', '0', 'clientY']),
+				$elm$json$Json$Decode$float))
+		]));
+var $author$project$Main$onBoardTouchMove = A2(
+	$elm$html$Html$Events$preventDefaultOn,
+	'touchmove',
+	A2(
+		$elm$json$Json$Decode$map,
+		function (_v0) {
+			var clientX = _v0.a;
+			var clientY = _v0.b;
+			return _Utils_Tuple2(
+				A2($author$project$Main$PointerMove, clientX, clientY),
+				true);
+		},
+		$author$project$Main$touchPointDecoder));
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $author$project$Main$OpenCard = function (a) {
+	return {$: 'OpenCard', a: a};
+};
+var $author$project$Main$StartDrag = F3(
+	function (a, b, c) {
+		return {$: 'StartDrag', a: a, b: b, c: c};
+	});
+var $author$project$Main$stateContainsCard = F2(
+	function (propositionId, expandedState) {
+		if (expandedState.$ === 'Expanded') {
+			var expandedId = expandedState.a;
+			return _Utils_eq(expandedId, propositionId);
+		} else {
+			return false;
+		}
+	});
+var $author$project$Main$cardIsZooming = F2(
+	function (model, propositionId) {
+		return A2(
+			$author$project$Main$stateContainsCard,
+			propositionId,
+			$mdgriffith$elm_animator$Animator$current(model.zoomTimeline)) || A2(
+			$author$project$Main$stateContainsCard,
+			propositionId,
+			$mdgriffith$elm_animator$Animator$arrived(model.zoomTimeline));
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
+	return {$: 'Specified', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Oscillate = F3(
+	function (a, b, c) {
+		return {$: 'Oscillate', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
+	function (a, b) {
+		return {$: 'Position', a: a, b: b};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault = function (a) {
+	return {$: 'PartialDefault', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Default = {$: 'Default'};
+var $mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults = {arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Default, arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, departLate: $mdgriffith$elm_animator$Internal$Interpolate$Default, departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, wobbliness: $mdgriffith$elm_animator$Internal$Interpolate$Default};
+var $mdgriffith$elm_animator$Animator$withDefault = F2(
+	function (toDef, currentDefault) {
+		if (currentDefault.$ === 'FullDefault') {
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef($mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults));
+		} else {
+			var thing = currentDefault.a;
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef(thing));
+		}
+	});
+var $mdgriffith$elm_animator$Animator$applyOption = F2(
+	function (toOption, movement) {
+		if (movement.$ === 'Position') {
+			var personality = movement.a;
+			var pos = movement.b;
+			return A2(
+				$mdgriffith$elm_animator$Internal$Interpolate$Position,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				pos);
+		} else {
+			var personality = movement.a;
+			var dur = movement.b;
+			var fn = movement.c;
+			return A3(
+				$mdgriffith$elm_animator$Internal$Interpolate$Oscillate,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				dur,
+				fn);
+		}
+	});
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
+	function (s, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, s))
+					});
+			},
+			movement);
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
+var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
+var $author$project$Main$cardMovement = F4(
+	function (propositionId, miniValue, expandedValue, expandedState) {
+		return A2($author$project$Main$stateContainsCard, propositionId, expandedState) ? A2(
+			$mdgriffith$elm_animator$Animator$arriveSmoothly,
+			0.75,
+			$mdgriffith$elm_animator$Animator$at(expandedValue)) : A2(
+			$mdgriffith$elm_animator$Animator$arriveSmoothly,
+			0.75,
+			$mdgriffith$elm_animator$Animator$at(miniValue));
+	});
+var $author$project$Main$expandedMargin = 12;
+var $author$project$Main$expandedCardHeight = function (model) {
+	return A2($elm$core$Basics$max, $author$project$Main$miniatureHeight, model.viewport.height - (2 * $author$project$Main$expandedMargin));
+};
+var $author$project$Main$expandedCardWidth = function (model) {
+	return A2($elm$core$Basics$max, $author$project$Main$miniatureWidth, model.viewport.width - (2 * $author$project$Main$expandedMargin));
+};
+var $author$project$Main$expandedCenter = function (model) {
+	var _v0 = model.boardRect;
+	if (_v0.$ === 'Just') {
+		var rect = _v0.a;
+		return ((rect.width > 0) && (rect.height > 0)) ? {x: ((model.viewport.width / 2) - rect.x) / rect.width, y: ((model.viewport.height / 2) - rect.y) / rect.height} : {x: 0.5, y: 0.5};
+	} else {
+		return {x: 0.5, y: 0.5};
+	}
+};
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $author$project$Main$mousePointDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$elm$core$Tuple$pair,
+	A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float));
+var $author$project$Main$onMiniTouchStart = function (propositionId) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'touchstart',
+		A2(
+			$elm$json$Json$Decode$map,
+			function (_v0) {
+				var clientX = _v0.a;
+				var clientY = _v0.b;
+				return A3($author$project$Main$StartDrag, propositionId, clientX, clientY);
+			},
+			$author$project$Main$touchPointDecoder));
+};
 var $mdgriffith$elm_animator$Internal$Interpolate$dwellPeriod = function (movement) {
 	if (movement.$ === 'Pos') {
 		return $elm$core$Maybe$Nothing;
@@ -9580,6 +9687,8 @@ var $author$project$Main$viewCard = F2(
 			return $elm$html$Html$text('');
 		} else {
 			var pos = _v0.a;
+			var targetCenter = $author$project$Main$expandedCenter(model);
+			var isZooming = A2($author$project$Main$cardIsZooming, model, item.id);
 			var isSelected = _Utils_eq(
 				model.selectedPropositionId,
 				$elm$core$Maybe$Just(item.id));
@@ -9587,23 +9696,21 @@ var $author$project$Main$viewCard = F2(
 				model.expandedPropositionId,
 				$elm$core$Maybe$Just(item.id));
 			var isDragging = function () {
-				var _v3 = model.dragging;
-				if (_v3.$ === 'Just') {
-					var dragState = _v3.a;
+				var _v2 = model.dragging;
+				if (_v2.$ === 'Just') {
+					var dragState = _v2.a;
 					return _Utils_eq(dragState.propositionId, item.id);
 				} else {
 					return false;
 				}
 			}();
-			var interactionAttributes = isExpanded ? _List_fromArray(
+			var interactionAttributes = (isExpanded || isZooming) ? _List_fromArray(
 				[
 					A2(
 					$elm$html$Html$Events$stopPropagationOn,
 					'click',
 					$elm$json$Json$Decode$succeed(
-						_Utils_Tuple2(
-							$author$project$Main$OpenCard(item.id),
-							true)))
+						_Utils_Tuple2($author$project$Main$CloseCard, true)))
 				]) : _List_fromArray(
 				[
 					A2(
@@ -9611,9 +9718,9 @@ var $author$project$Main$viewCard = F2(
 					'mousedown',
 					A2(
 						$elm$json$Json$Decode$map,
-						function (_v2) {
-							var x = _v2.a;
-							var y = _v2.b;
+						function (_v1) {
+							var x = _v1.a;
+							var y = _v1.b;
 							return _Utils_Tuple2(
 								A3($author$project$Main$StartDrag, item.id, x, y),
 								true);
@@ -9628,35 +9735,40 @@ var $author$project$Main$viewCard = F2(
 							$author$project$Main$OpenCard(item.id),
 							true)))
 				]);
-			var cursorStyle = isExpanded ? 'zoom-out' : (isDragging ? 'grabbing' : 'grab');
+			var cursorStyle = isExpanded ? 'zoom-out' : (isZooming ? 'default' : (isDragging ? 'grabbing' : 'grab'));
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
 						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-						A2(
-						$elm$html$Html$Attributes$style,
+						A4(
+						$mdgriffith$elm_animator$Animator$Inline$style,
+						model.zoomTimeline,
 						'left',
-						$elm$core$String$fromFloat(pos.x * 100) + '%'),
-						A2(
-						$elm$html$Html$Attributes$style,
+						function (value) {
+							return $elm$core$String$fromFloat(value) + '%';
+						},
+						A3($author$project$Main$cardMovement, item.id, pos.x * 100, targetCenter.x * 100)),
+						A4(
+						$mdgriffith$elm_animator$Animator$Inline$style,
+						model.zoomTimeline,
 						'top',
-						$elm$core$String$fromFloat(pos.y * 100) + '%'),
-						A2($elm$html$Html$Attributes$style, 'transform', 'translate(-50%, -50%)'),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'width',
-						$elm$core$String$fromFloat($author$project$Main$miniatureWidth) + 'px'),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'height',
-						$elm$core$String$fromFloat($author$project$Main$miniatureHeight) + 'px'),
+						function (value) {
+							return $elm$core$String$fromFloat(value) + '%';
+						},
+						A3($author$project$Main$cardMovement, item.id, pos.y * 100, targetCenter.y * 100)),
+						A2($elm$html$Html$Attributes$style, 'width', '0'),
+						A2($elm$html$Html$Attributes$style, 'height', '0'),
+						A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+						A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+						A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
 						A2($elm$html$Html$Attributes$style, 'overflow', 'visible'),
 						A2($elm$html$Html$Attributes$style, 'pointer-events', 'none'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'z-index',
-						isDragging ? '80' : (isExpanded ? '70' : (isSelected ? '40' : '30')))
+						isZooming ? '100' : (isDragging ? '80' : (isSelected ? '40' : '30'))),
+						A2($elm$html$Html$Attributes$attribute, 'data-testid', 'anchor-' + item.badge)
 					]),
 				_List_fromArray(
 					[
@@ -9669,33 +9781,34 @@ var $author$project$Main$viewCard = F2(
 									A2(
 									$mdgriffith$elm_animator$Animator$Inline$scale,
 									model.zoomTimeline,
-									function (expandedState) {
-										if (expandedState.$ === 'Expanded') {
-											var propositionId = expandedState.a;
-											return _Utils_eq(propositionId, item.id) ? A2(
-												$mdgriffith$elm_animator$Animator$arriveSmoothly,
-												0.75,
-												$mdgriffith$elm_animator$Animator$at(1)) : A2(
-												$mdgriffith$elm_animator$Animator$arriveSmoothly,
-												0.75,
-												$mdgriffith$elm_animator$Animator$at($author$project$Main$miniScale));
-										} else {
-											return A2(
-												$mdgriffith$elm_animator$Animator$arriveSmoothly,
-												0.75,
-												$mdgriffith$elm_animator$Animator$at($author$project$Main$miniScale));
-										}
-									}),
-									A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),
-									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-									A2(
-									$elm$html$Html$Attributes$style,
+									A3($author$project$Main$cardMovement, item.id, $author$project$Main$miniScale, 1)),
+									A4(
+									$mdgriffith$elm_animator$Animator$Inline$style,
+									model.zoomTimeline,
 									'width',
-									$elm$core$String$fromFloat($author$project$Main$miniatureWidth) + 'px'),
-									A2(
-									$elm$html$Html$Attributes$style,
+									function (value) {
+										return $elm$core$String$fromFloat(value) + 'px';
+									},
+									A3(
+										$author$project$Main$cardMovement,
+										item.id,
+										$author$project$Main$miniatureWidth,
+										$author$project$Main$expandedCardWidth(model))),
+									A4(
+									$mdgriffith$elm_animator$Animator$Inline$style,
+									model.zoomTimeline,
 									'height',
-									$elm$core$String$fromFloat($author$project$Main$miniatureHeight) + 'px'),
+									function (value) {
+										return $elm$core$String$fromFloat(value) + 'px';
+									},
+									A3(
+										$author$project$Main$cardMovement,
+										item.id,
+										$author$project$Main$miniatureHeight,
+										$author$project$Main$expandedCardHeight(model))),
+									A2($elm$html$Html$Attributes$style, 'transform-origin', 'center center'),
+									A2($elm$html$Html$Attributes$style, 'flex', '0 0 auto'),
+									A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 									A2(
 									$elm$html$Html$Attributes$style,
 									'border',
@@ -9705,22 +9818,32 @@ var $author$project$Main$viewCard = F2(
 									A2(
 									$elm$html$Html$Attributes$style,
 									'box-shadow',
-									isDragging ? '0 12px 24px rgba(15,34,80,0.25)' : '0 4px 12px rgba(0,0,0,0.14)'),
+									isZooming ? '0 18px 60px rgba(15,34,80,0.30)' : (isDragging ? '0 12px 24px rgba(15,34,80,0.25)' : '0 4px 12px rgba(0,0,0,0.14)')),
 									A2($elm$html$Html$Attributes$style, 'padding', '12px'),
 									A2(
 									$elm$html$Html$Attributes$style,
 									'overflow',
-									isExpanded ? 'auto' : 'hidden'),
+									isZooming ? 'auto' : 'hidden'),
 									A2($elm$html$Html$Attributes$style, 'cursor', cursorStyle),
-									A2($elm$html$Html$Attributes$style, 'user-select', 'none'),
-									A2($elm$html$Html$Attributes$style, 'touch-action', 'none'),
+									A2(
+									$elm$html$Html$Attributes$style,
+									'user-select',
+									isExpanded ? 'text' : 'none'),
+									A2(
+									$elm$html$Html$Attributes$style,
+									'touch-action',
+									isExpanded ? 'pan-y' : 'none'),
 									A2($elm$html$Html$Attributes$style, 'outline', 'none'),
 									A2($elm$html$Html$Attributes$style, 'pointer-events', 'auto'),
 									A2($elm$html$Html$Attributes$attribute, 'data-testid', 'card-' + item.badge),
 									A2(
 									$elm$html$Html$Attributes$attribute,
 									'data-state',
-									isExpanded ? 'expanded' : 'mini')
+									isExpanded ? 'expanded' : 'mini'),
+									A2(
+									$elm$html$Html$Attributes$attribute,
+									'data-zooming',
+									isZooming ? 'true' : 'false')
 								])),
 						_List_fromArray(
 							[
@@ -9730,25 +9853,50 @@ var $author$project$Main$viewCard = F2(
 		}
 	});
 var $author$project$Main$boardView = function (model) {
+	var touchMoveAttributes = function () {
+		var _v1 = model.dragging;
+		if (_v1.$ === 'Just') {
+			return _List_fromArray(
+				[$author$project$Main$onBoardTouchMove]);
+		} else {
+			return _List_Nil;
+		}
+	}();
 	return A2(
 		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$id('board'),
-				A2($elm$html$Html$Attributes$attribute, 'data-testid', 'board'),
-				$author$project$Main$onBoardTouchMove,
-				$author$project$Main$onBoardTouchEnd,
-				$author$project$Main$onBoardTouchCancel,
-				$elm$html$Html$Events$onClick($author$project$Main$CloseCard),
-				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-				A2($elm$html$Html$Attributes$style, 'flex', '1'),
-				A2($elm$html$Html$Attributes$style, 'width', '100%'),
-				A2($elm$html$Html$Attributes$style, 'border', '1px solid #b9c9e6'),
-				A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
-				A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)'),
-				A2($elm$html$Html$Attributes$style, 'overflow', 'hidden'),
-				A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
-			]),
+		_Utils_ap(
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$id('board'),
+					A2($elm$html$Html$Attributes$attribute, 'data-testid', 'board'),
+					$author$project$Main$onBoardTouchEnd,
+					$author$project$Main$onBoardTouchCancel,
+					$elm$html$Html$Events$onClick($author$project$Main$CloseCard),
+					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+					A2($elm$html$Html$Attributes$style, 'z-index', '2'),
+					A2($elm$html$Html$Attributes$style, 'flex', '1 1 0'),
+					A2($elm$html$Html$Attributes$style, 'min-height', '0'),
+					A2($elm$html$Html$Attributes$style, 'width', '100%'),
+					A2($elm$html$Html$Attributes$style, 'border', '1px solid #b9c9e6'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+					A2($elm$html$Html$Attributes$style, 'background', 'linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'overflow',
+					$author$project$Main$boardHasZoomingCard(model) ? 'visible' : 'hidden'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'touch-action',
+					function () {
+						var _v0 = model.dragging;
+						if (_v0.$ === 'Just') {
+							return 'none';
+						} else {
+							return 'auto';
+						}
+					}())
+				]),
+			touchMoveAttributes),
 		_Utils_ap(
 			_List_fromArray(
 				[$author$project$Main$axisLines]),
@@ -9802,11 +9950,15 @@ var $author$project$Main$topHeader = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
+				A2($elm$html$Html$Attributes$attribute, 'data-testid', 'header'),
 				A2($elm$html$Html$Attributes$style, 'padding', '10px 12px'),
 				A2($elm$html$Html$Attributes$style, 'border', '1px solid #d5deef'),
 				A2($elm$html$Html$Attributes$style, 'border-radius', '10px'),
 				A2($elm$html$Html$Attributes$style, 'background', 'white'),
-				A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
+				A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px'),
+				A2($elm$html$Html$Attributes$style, 'flex-shrink', '0'),
+				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+				A2($elm$html$Html$Attributes$style, 'z-index', '1')
 			]),
 		function () {
 			var _v0 = model.exercise;
@@ -9887,9 +10039,12 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
+				A2($elm$html$Html$Attributes$attribute, 'data-testid', 'app-root'),
 				A2($elm$html$Html$Attributes$style, 'margin', '0'),
-				A2($elm$html$Html$Attributes$style, 'min-height', '100vh'),
-				A2($elm$html$Html$Attributes$style, 'height', '100vh'),
+				A2($elm$html$Html$Attributes$style, 'height', '100dvh'),
+				A2($elm$html$Html$Attributes$style, 'min-height', '0'),
+				A2($elm$html$Html$Attributes$style, 'max-height', '100dvh'),
+				A2($elm$html$Html$Attributes$style, 'overflow', 'hidden'),
 				A2($elm$html$Html$Attributes$style, 'padding', '12px'),
 				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
 				A2($elm$html$Html$Attributes$style, 'flex-direction', 'column'),
