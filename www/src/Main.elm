@@ -751,7 +751,7 @@ viewCard model item =
                      else
                         "30"
                     )
-                , attribute "data-testid" ("card-anchor-" ++ item.badge)
+                , attribute "data-testid" ("anchor-" ++ item.badge)
                 ]
                 [ div
                     (interactionAttributes
