@@ -119,6 +119,21 @@ miniScale =
     0.33
 
 
+miniCardWidth : Float
+miniCardWidth =
+    miniatureWidth * miniScale
+
+
+miniCardHeight : Float
+miniCardHeight =
+    miniatureHeight * miniScale
+
+
+expandedMargin : Float
+expandedMargin =
+    12
+
+
 main : Program () Model Msg
 main =
     Browser.element
@@ -437,9 +452,12 @@ propositionPosition propositionId propositions =
 view : Model -> Html Msg
 view model =
     div
-        [ style "margin" "0"
-        , style "min-height" "100vh"
-        , style "height" "100vh"
+        [ attribute "data-testid" "app-root"
+        , style "margin" "0"
+        , style "height" "100dvh"
+        , style "min-height" "0"
+        , style "max-height" "100dvh"
+        , style "overflow" "hidden"
         , style "padding" "12px"
         , style "display" "flex"
         , style "flex-direction" "column"
@@ -454,11 +472,15 @@ view model =
 topHeader : Model -> Html msg
 topHeader model =
     div
-        [ style "padding" "10px 12px"
+        [ attribute "data-testid" "header"
+        , style "padding" "10px 12px"
         , style "border" "1px solid #d5deef"
         , style "border-radius" "10px"
         , style "background" "white"
         , style "margin-bottom" "10px"
+        , style "flex-shrink" "0"
+        , style "position" "relative"
+        , style "z-index" "1"
         ]
         (case model.exercise of
             Just exercise ->
@@ -499,22 +521,47 @@ placedCount propositions =
 
 boardView : Model -> Html Msg
 boardView model =
+    let
+        touchMoveAttributes =
+            case model.dragging of
+                Just _ ->
+                    [ onBoardTouchMove ]
+
+                Nothing ->
+                    []
+    in
     div
-        [ id "board"
-        , attribute "data-testid" "board"
-        , onBoardTouchMove
-        , onBoardTouchEnd
-        , onBoardTouchCancel
-        , onClick CloseCard
-        , style "position" "relative"
-        , style "flex" "1"
-        , style "width" "100%"
-        , style "border" "1px solid #b9c9e6"
-        , style "border-radius" "12px"
-        , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
-        , style "overflow" "hidden"
-        , style "touch-action" "none"
-        ]
+        ([ id "board"
+         , attribute "data-testid" "board"
+         , onBoardTouchEnd
+         , onBoardTouchCancel
+         , onClick CloseCard
+         , style "position" "relative"
+         , style "z-index" "2"
+         , style "flex" "1 1 0"
+         , style "min-height" "0"
+         , style "width" "100%"
+         , style "border" "1px solid #b9c9e6"
+         , style "border-radius" "12px"
+         , style "background" "linear-gradient(180deg, #f9fbff 0%, #f2f6ff 100%)"
+         , style "overflow"
+            (if boardHasZoomingCard model then
+                "visible"
+
+             else
+                "hidden"
+            )
+         , style "touch-action"
+            (case model.dragging of
+                Just _ ->
+                    "none"
+
+                Nothing ->
+                    "auto"
+            )
+         ]
+            ++ touchMoveAttributes
+        )
         ([ axisLines ]
             ++ List.map (viewCard model) model.propositions
             ++ [ boardLegend ]
@@ -562,6 +609,63 @@ axisLines =
         ]
 
 
+stateContainsCard : Int -> ExpandedState -> Bool
+stateContainsCard propositionId expandedState =
+    case expandedState of
+        Expanded expandedId ->
+            expandedId == propositionId
+
+        AllMini ->
+            False
+
+
+cardIsZooming : Model -> Int -> Bool
+cardIsZooming model propositionId =
+    stateContainsCard propositionId (Animator.current model.zoomTimeline)
+        || stateContainsCard propositionId (Animator.arrived model.zoomTimeline)
+
+
+boardHasZoomingCard : Model -> Bool
+boardHasZoomingCard model =
+    Animator.current model.zoomTimeline /= AllMini
+        || Animator.arrived model.zoomTimeline /= AllMini
+
+
+expandedCenter : Model -> Position
+expandedCenter model =
+    case model.boardRect of
+        Just rect ->
+            if rect.width > 0 && rect.height > 0 then
+                { x = (toFloat model.viewport.width / 2 - rect.x) / rect.width
+                , y = (toFloat model.viewport.height / 2 - rect.y) / rect.height
+                }
+
+            else
+                { x = 0.5, y = 0.5 }
+
+        Nothing ->
+            { x = 0.5, y = 0.5 }
+
+
+expandedCardWidth : Model -> Float
+expandedCardWidth model =
+    max miniatureWidth (toFloat model.viewport.width - 2 * expandedMargin)
+
+
+expandedCardHeight : Model -> Float
+expandedCardHeight model =
+    max miniatureHeight (toFloat model.viewport.height - 2 * expandedMargin)
+
+
+cardMovement : Int -> Float -> Float -> ExpandedState -> Animator.Movement
+cardMovement propositionId miniValue expandedValue expandedState =
+    if stateContainsCard propositionId expandedState then
+        Animator.at expandedValue |> Animator.arriveSmoothly 0.75
+
+    else
+        Animator.at miniValue |> Animator.arriveSmoothly 0.75
+
+
 viewCard : Model -> Proposition -> Html Msg
 viewCard model item =
     case item.pos of
@@ -584,9 +688,18 @@ viewCard model item =
                         Nothing ->
                             False
 
+                isZooming =
+                    cardIsZooming model item.id
+
+                targetCenter =
+                    expandedCenter model
+
                 cursorStyle =
                     if isExpanded then
                         "zoom-out"
+
+                    else if isZooming then
+                        "default"
 
                     else if isDragging then
                         "grabbing"
@@ -595,8 +708,8 @@ viewCard model item =
                         "grab"
 
                 interactionAttributes =
-                    if isExpanded then
-                        [ stopPropagationOn "click" (Decode.succeed ( OpenCard item.id, True )) ]
+                    if isExpanded || isZooming then
+                        [ stopPropagationOn "click" (Decode.succeed ( CloseCard, True )) ]
 
                     else
                         [ preventDefaultOn "mousedown"
@@ -610,19 +723,27 @@ viewCard model item =
             in
             div
                 [ style "position" "absolute"
-                , style "left" (String.fromFloat (pos.x * 100) ++ "%")
-                , style "top" (String.fromFloat (pos.y * 100) ++ "%")
-                , style "transform" "translate(-50%, -50%)"
-                , style "width" (String.fromFloat miniatureWidth ++ "px")
-                , style "height" (String.fromFloat miniatureHeight ++ "px")
+                , Animator.Inline.style model.zoomTimeline
+                    "left"
+                    (\value -> String.fromFloat value ++ "%")
+                    (cardMovement item.id (pos.x * 100) (targetCenter.x * 100))
+                , Animator.Inline.style model.zoomTimeline
+                    "top"
+                    (\value -> String.fromFloat value ++ "%")
+                    (cardMovement item.id (pos.y * 100) (targetCenter.y * 100))
+                , style "width" "0"
+                , style "height" "0"
+                , style "display" "flex"
+                , style "align-items" "center"
+                , style "justify-content" "center"
                 , style "overflow" "visible"
                 , style "pointer-events" "none"
                 , style "z-index"
-                    (if isDragging then
-                        "80"
+                    (if isZooming then
+                        "100"
 
-                     else if isExpanded then
-                        "70"
+                     else if isDragging then
+                        "80"
 
                      else if isSelected then
                         "40"
@@ -630,26 +751,23 @@ viewCard model item =
                      else
                         "30"
                     )
+                , attribute "data-testid" ("card-anchor-" ++ item.badge)
                 ]
                 [ div
                     (interactionAttributes
                         ++ [ Animator.Inline.scale model.zoomTimeline
-                                (\expandedState ->
-                                    case expandedState of
-                                        Expanded propositionId ->
-                                            if propositionId == item.id then
-                                                Animator.at 1 |> Animator.arriveSmoothly 0.75
-
-                                            else
-                                                Animator.at miniScale |> Animator.arriveSmoothly 0.75
-
-                                        AllMini ->
-                                            Animator.at miniScale |> Animator.arriveSmoothly 0.75
-                                )
+                                (cardMovement item.id miniScale 1)
+                           , Animator.Inline.style model.zoomTimeline
+                                "width"
+                                (\value -> String.fromFloat value ++ "px")
+                                (cardMovement item.id miniatureWidth (expandedCardWidth model))
+                           , Animator.Inline.style model.zoomTimeline
+                                "height"
+                                (\value -> String.fromFloat value ++ "px")
+                                (cardMovement item.id miniatureHeight (expandedCardHeight model))
                            , style "transform-origin" "center center"
+                           , style "flex" "0 0 auto"
                            , style "position" "relative"
-                           , style "width" (String.fromFloat miniatureWidth ++ "px")
-                           , style "height" (String.fromFloat miniatureHeight ++ "px")
                            , style "border"
                                 (if isDragging then
                                     "2px solid #2563eb"
@@ -660,7 +778,10 @@ viewCard model item =
                            , style "border-radius" "12px"
                            , style "background" "#fbfdff"
                            , style "box-shadow"
-                                (if isDragging then
+                                (if isZooming then
+                                    "0 18px 60px rgba(15,34,80,0.30)"
+
+                                 else if isDragging then
                                     "0 12px 24px rgba(15,34,80,0.25)"
 
                                  else
@@ -668,15 +789,27 @@ viewCard model item =
                                 )
                            , style "padding" "12px"
                            , style "overflow"
-                                (if isExpanded then
+                                (if isZooming then
                                     "auto"
 
                                  else
                                     "hidden"
                                 )
                            , style "cursor" cursorStyle
-                           , style "user-select" "none"
-                           , style "touch-action" "none"
+                           , style "user-select"
+                                (if isExpanded then
+                                    "text"
+
+                                 else
+                                    "none"
+                                )
+                           , style "touch-action"
+                                (if isExpanded then
+                                    "pan-y"
+
+                                 else
+                                    "none"
+                                )
                            , style "outline" "none"
                            , style "pointer-events" "auto"
                            , attribute "data-testid" ("card-" ++ item.badge)
@@ -687,10 +820,18 @@ viewCard model item =
                                  else
                                     "mini"
                                 )
+                           , attribute "data-zooming"
+                                (if isZooming then
+                                    "true"
+
+                                 else
+                                    "false"
+                                )
                            ]
                     )
                     [ viewCardContent item ]
                 ]
+
 
 viewCardContent : Proposition -> Html msg
 viewCardContent item =
