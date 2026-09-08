@@ -10,9 +10,8 @@ import Dict exposing (Dict)
 import Html exposing (Html, div, h1, h2, h3, p, span, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, preventDefaultOn, stopPropagationOn)
+import Http
 import Json.Decode as Decode
-import MathML as Math
-import MathML.Attributes as MathAttr
 import Process
 import Task
 import Time
@@ -24,13 +23,26 @@ type alias Position =
     }
 
 
+type alias Exercise =
+    { title : String
+    , statement : String
+    }
+
+
 type alias Proposition =
     { id : Int
     , badge : String
     , title : String
-    , previewFormula : FormulaId
-    , steps : List String
+    , subtitle : String
+    , preview : String
+    , content : String
     , pos : Maybe Position
+    }
+
+
+type alias ContentData =
+    { exercise : Exercise
+    , productions : List Proposition
     }
 
 
@@ -63,15 +75,10 @@ type ExpandedState
     | Expanded Int
 
 
-type FormulaId
-    = FormulaCosLinear
-    | FormulaQuadratic
-    | FormulaProduct
-    | FormulaGeneral
-
-
 type alias Model =
-    { propositions : List Proposition
+    { exercise : Maybe Exercise
+    , propositions : List Proposition
+    , contentError : Maybe String
     , selectedPropositionId : Maybe Int
     , expandedPropositionId : Maybe Int
     , zoomTimeline : Animator.Timeline ExpandedState
@@ -83,7 +90,8 @@ type alias Model =
 
 
 type Msg
-    = StartDrag Int Float Float
+    = GotContent (Result Http.Error ContentData)
+    | StartDrag Int Float Float
     | PointerMove Float Float
     | PointerUp
     | OpenCard Int
@@ -123,12 +131,10 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    let
-        seeded =
-            withInitialPositions initialPropositions
-    in
-    ( { propositions = seeded
-      , selectedPropositionId = Just 1
+    ( { exercise = Nothing
+      , propositions = []
+      , contentError = Nothing
+      , selectedPropositionId = Nothing
       , expandedPropositionId = Nothing
       , zoomTimeline = Animator.init AllMini
       , dragging = Nothing
@@ -137,55 +143,56 @@ init _ =
       , viewport = { width = 1200, height = 800 }
       }
     , Cmd.batch
-        [ Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
+        [ loadContent
+        , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 60)
         , Task.attempt GotViewport Dom.getViewport
         ]
     )
 
 
-initialPropositions : List Proposition
-initialPropositions =
-    [ proposition
-        1
-        "A"
-        "Copie A"
-        FormulaCosLinear
-        [ "Je remplace par cos(2x)=1-2sin(x)."
-        , "Donc 1-2sin(x)=sin(x) puis 1=3sin(x)."
-        , "Alors sin(x)=1/3, donc x≈0,34 ou x≈2,80."
-        ]
-    , proposition
-        2
-        "B"
-        "Copie B"
-        FormulaQuadratic
-        [ "On part de cos(2x)=1-2sin²(x)."
-        , "On obtient 1-2sin²(x)=sin(x), donc 2sin²(x)+sin(x)-1=0."
-        , "En posant y=sin(x) : 2y²+y-1=0, d'ou y=1/2 ou y=-1."
-        , "Donc x=π/6, 5π/6 ou 3π/2 sur l'intervalle."
-        ]
-    , proposition
-        3
-        "C"
-        "Copie C"
-        FormulaProduct
-        [ "Comme cos(2x)=1-2sin²(x), on a 2sin²(x)+sin(x)-1=0."
-        , "Factorisation : (2sin(x)-1)(sin(x)+1)=0."
-        , "Alors sin(x)=1/2 ou sin(x)=-1."
-        , "Dans [0;2π[ : x appartient a {π/6, 5π/6, 3π/2}."
-        ]
-    , proposition
-        4
-        "D"
-        "Copie D"
-        FormulaGeneral
-        [ "Identite : cos(2x)=1-2sin²(x), donc 2sin²(x)+sin(x)-1=0."
-        , "Produit nul : (2sin(x)-1)(sin(x)+1)=0."
-        , "Cas 1 : sin(x)=1/2, donc x=π/6+2kπ ou x=5π/6+2kπ."
-        , "Cas 2 : sin(x)=-1, donc x=3π/2+2kπ."
-        , "Intersection avec [0;2π[ : S={π/6, 5π/6, 3π/2}."
-        ]
-    ]
+loadContent : Cmd Msg
+loadContent =
+    Http.get
+        { url = "data/exercise-001.json"
+        , expect = Http.expectJson GotContent contentDecoder
+        }
+
+
+contentDecoder : Decode.Decoder ContentData
+contentDecoder =
+    Decode.map2 ContentData
+        (Decode.field "exercise" exerciseDecoder)
+        (Decode.field "productions" (Decode.list propositionDecoder))
+
+
+exerciseDecoder : Decode.Decoder Exercise
+exerciseDecoder =
+    Decode.map2 Exercise
+        (Decode.field "title" Decode.string)
+        (Decode.field "statement" Decode.string)
+
+
+propositionDecoder : Decode.Decoder Proposition
+propositionDecoder =
+    Decode.map6 propositionFromData
+        (Decode.field "id" Decode.int)
+        (Decode.field "badge" Decode.string)
+        (Decode.field "title" Decode.string)
+        (Decode.field "subtitle" Decode.string)
+        (Decode.field "preview" Decode.string)
+        (Decode.field "content" Decode.string)
+
+
+propositionFromData : Int -> String -> String -> String -> String -> String -> Proposition
+propositionFromData id badge title subtitle preview content =
+    { id = id
+    , badge = badge
+    , title = title
+    , subtitle = subtitle
+    , preview = preview
+    , content = content
+    , pos = Nothing
+    }
 
 
 withInitialPositions : List Proposition -> List Proposition
@@ -205,17 +212,6 @@ withInitialPositions propositions =
             { item | pos = Dict.get item.id layout }
         )
         propositions
-
-
-proposition : Int -> String -> String -> FormulaId -> List String -> Proposition
-proposition id badge title previewFormula steps =
-    { id = id
-    , badge = badge
-    , title = title
-    , previewFormula = previewFormula
-    , steps = steps
-    , pos = Nothing
-    }
 
 
 subscriptions : Model -> Sub Msg
@@ -245,6 +241,32 @@ animateExpanded target timeline =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        GotContent result ->
+            case result of
+                Ok contentData ->
+                    let
+                        seeded =
+                            withInitialPositions contentData.productions
+
+                        firstId =
+                            seeded
+                                |> List.head
+                                |> Maybe.map .id
+                    in
+                    ( { model
+                        | exercise = Just contentData.exercise
+                        , propositions = seeded
+                        , contentError = Nothing
+                        , selectedPropositionId = firstId
+                      }
+                    , Task.perform (\_ -> RefreshBoardRect) (Process.sleep 24)
+                    )
+
+                Err _ ->
+                    ( { model | contentError = Just "Impossible de charger les données de l'exercice." }
+                    , Cmd.none
+                    )
+
         StartDrag propositionId clientX clientY ->
             let
                 startPosition =
@@ -438,25 +460,34 @@ topHeader model =
         , style "background" "white"
         , style "margin-bottom" "10px"
         ]
-        [ h1 [ style "margin" "0", style "font-size" "24px" ] [ text "Evaluation de productions d'eleves" ]
-        , p [ style "margin" "6px 0 0", style "color" "#33425f" ]
-            [ text "Exercice : resoudre "
-            , span [ style "font-weight" "700" ] [ viewExerciseEquation ]
-            , text " sur "
-            , span [ style "font-weight" "700" ] [ viewInterval ]
-            , text "."
-            ]
-        , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
-            [ text
-                ("Selection : "
-                    ++ selectedBadgeLabel model.selectedPropositionId
-                    ++ " | Placees : "
-                    ++ String.fromInt (placedCount model.propositions)
-                    ++ "/"
-                    ++ String.fromInt (List.length model.propositions)
-                )
-            ]
-        ]
+        (case model.exercise of
+            Just exercise ->
+                [ h1 [ style "margin" "0", style "font-size" "24px" ] [ text exercise.title ]
+                , div [ style "margin" "6px 0 0", style "color" "#33425f" ]
+                    [ richText exercise.statement ]
+                , p [ style "margin" "4px 0 0", style "font-size" "13px", style "color" "#4f6185" ]
+                    [ text
+                        ("Selection : "
+                            ++ selectedBadgeLabel model.selectedPropositionId model.propositions
+                            ++ " | Placees : "
+                            ++ String.fromInt (placedCount model.propositions)
+                            ++ "/"
+                            ++ String.fromInt (List.length model.propositions)
+                        )
+                    ]
+                ]
+
+            Nothing ->
+                [ h1 [ style "margin" "0", style "font-size" "24px" ] [ text "Evaluation de productions d'eleves" ]
+                , p [ style "margin" "6px 0 0", style "color" "#4f6185" ]
+                    [ text
+                        (Maybe.withDefault
+                            "Chargement des productions..."
+                            model.contentError
+                        )
+                    ]
+                ]
+        )
 
 
 placedCount : List Proposition -> Int
@@ -667,146 +698,22 @@ viewCardContent item =
         [ div [ style "position" "relative", style "padding-top" "2px" ] [ notchBadge item.badge ]
         , div [ style "margin-left" "54px", style "margin-top" "2px" ]
             [ h2 [ style "margin" "0 0 4px" ] [ text item.title ]
-            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text "Version eleve" ]
+            , p [ style "margin" "0", style "font-size" "13px", style "color" "#4f6185" ] [ text item.subtitle ]
             ]
-        , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ] [ viewFormulaInline item.previewFormula ]
-        , div [ style "margin-top" "12px" ] (List.map viewStep item.steps)
+        , div [ style "margin-top" "10px", style "font-size" "18px", style "color" "#243353" ]
+            [ richText item.preview ]
+        , div [ style "margin-top" "12px", style "color" "#1f2a44" ]
+            [ richText item.content ]
         ]
 
 
-viewExerciseEquation : Html msg
-viewExerciseEquation =
-    mathInline
-        [ Math.mrow []
-            [ Math.mi [] [ text "cos" ]
-            , Math.mo [] [ text "(" ]
-            , Math.mn [] [ text "2" ]
-            , Math.mi [] [ text "x" ]
-            , Math.mo [] [ text ")" ]
-            , Math.mo [] [ text "=" ]
-            , Math.mi [] [ text "sin" ]
-            , Math.mo [] [ text "(" ]
-            , Math.mi [] [ text "x" ]
-            , Math.mo [] [ text ")" ]
-            ]
+richText : String -> Html msg
+richText source =
+    Html.node "rich-text"
+        [ attribute "content" source
+        , style "display" "block"
         ]
-
-
-viewInterval : Html msg
-viewInterval =
-    mathInline
-        [ Math.mrow []
-            [ Math.mo [] [ text "[" ]
-            , Math.mn [] [ text "0" ]
-            , Math.mo [] [ text ";" ]
-            , Math.mn [] [ text "2" ]
-            , Math.mi [] [ text "π" ]
-            , Math.mo [] [ text "[" ]
-            ]
-        ]
-
-
-viewFormulaInline : FormulaId -> Html msg
-viewFormulaInline formulaId =
-    case formulaId of
-        FormulaCosLinear ->
-            mathInline
-                [ Math.mrow []
-                    [ Math.mi [] [ text "cos" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mn [] [ text "2" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "=" ]
-                    , Math.mn [] [ text "1" ]
-                    , Math.mo [] [ text "-" ]
-                    , Math.mn [] [ text "2" ]
-                    , Math.mi [] [ text "sin" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    ]
-                ]
-
-        FormulaQuadratic ->
-            mathInline
-                [ Math.mrow []
-                    [ Math.mn [] [ text "2" ]
-                    , Math.msup []
-                        [ Math.mrow []
-                            [ Math.mi [] [ text "sin" ]
-                            , Math.mo [] [ text "(" ]
-                            , Math.mi [] [ text "x" ]
-                            , Math.mo [] [ text ")" ]
-                            ]
-                        , Math.mn [] [ text "2" ]
-                        ]
-                    , Math.mo [] [ text "+" ]
-                    , Math.mi [] [ text "sin" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "-" ]
-                    , Math.mn [] [ text "1" ]
-                    , Math.mo [] [ text "=" ]
-                    , Math.mn [] [ text "0" ]
-                    ]
-                ]
-
-        FormulaProduct ->
-            mathInline
-                [ Math.mrow []
-                    [ Math.mo [] [ text "(" ]
-                    , Math.mn [] [ text "2" ]
-                    , Math.mi [] [ text "sin" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "-" ]
-                    , Math.mn [] [ text "1" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "sin" ]
-                    , Math.mo [] [ text "(" ]
-                    , Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "+" ]
-                    , Math.mn [] [ text "1" ]
-                    , Math.mo [] [ text ")" ]
-                    , Math.mo [] [ text "=" ]
-                    , Math.mn [] [ text "0" ]
-                    ]
-                ]
-
-        FormulaGeneral ->
-            mathInline
-                [ Math.mrow []
-                    [ Math.mi [] [ text "x" ]
-                    , Math.mo [] [ text "=" ]
-                    , Math.mfrac []
-                        [ Math.mi [] [ text "π" ]
-                        , Math.mn [] [ text "6" ]
-                        ]
-                    , Math.mo [] [ text "+" ]
-                    , Math.mn [] [ text "2" ]
-                    , Math.mi [] [ text "k" ]
-                    , Math.mi [] [ text "π" ]
-                    ]
-                ]
-
-
-mathInline : List (Html msg) -> Html msg
-mathInline nodes =
-    Math.math
-        [ MathAttr.display "inline"
-        , MathAttr.xmlns "http://www.w3.org/1998/Math/MathML"
-        ]
-        nodes
-
-
-viewStep : String -> Html msg
-viewStep stepText =
-    p [ style "margin" "6px 0", style "line-height" "1.35", style "color" "#1f2a44" ] [ text stepText ]
+        []
 
 
 notchBadge : String -> Html msg
@@ -831,28 +738,12 @@ notchBadge badge =
         [ text badge ]
 
 
-selectedBadgeLabel : Maybe Int -> String
-selectedBadgeLabel maybeId =
-    case maybeId of
-        Just propositionId ->
-            case propositionId of
-                1 ->
-                    "A"
-
-                2 ->
-                    "B"
-
-                3 ->
-                    "C"
-
-                4 ->
-                    "D"
-
-                _ ->
-                    "?"
-
-        Nothing ->
-            "aucune"
+selectedBadgeLabel : Maybe Int -> List Proposition -> String
+selectedBadgeLabel maybeId propositions =
+    maybeId
+        |> Maybe.andThen (\propositionId -> propositionById propositionId propositions)
+        |> Maybe.map .badge
+        |> Maybe.withDefault "aucune"
 
 
 propositionById : Int -> List Proposition -> Maybe Proposition

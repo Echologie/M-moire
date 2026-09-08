@@ -134,3 +134,23 @@ test.describe('mobile emulation', () => {
     await expect(page.locator('[data-testid^="card-"]')).toHaveCount(4);
   });
 });
+
+
+test('contenu externe Markdown + LaTeX charge et rendu par KaTeX', async ({ page, request }) => {
+  const response = await request.get('/data/exercise-001.json');
+  expect(response.ok()).toBe(true);
+
+  const data = await response.json();
+  expect(data.productions).toHaveLength(4);
+  expect(data.productions[1].content).toContain('\\frac');
+  expect(data.productions[3].content).toContain('$$');
+
+  await page.goto('/index.html');
+  await expect(page.getByTestId('card-A')).toBeVisible();
+  await expect(page.locator('rich-text')).toHaveCount(9);
+  await expect(page.locator('.katex').first()).toBeVisible();
+
+  const renderedText = await page.getByTestId('card-B').innerText();
+  expect(renderedText).toContain('Copie B');
+  expect(renderedText).toContain('On part de');
+});
