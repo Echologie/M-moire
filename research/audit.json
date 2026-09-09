@@ -1,0 +1,52 @@
+{
+  "questions": 40,
+  "productions": 160,
+  "formulas": 502,
+  "levels": {
+    "3e": 7,
+    "4e": 3,
+    "5e": 2,
+    "2de": 7,
+    "1re spé": 4,
+    "Tle spé": 5,
+    "Sup 1": 12
+  },
+  "targetOccurrences": {
+    "REF": 37,
+    "ECO": 14,
+    "UNIT": 1,
+    "EXPL": 19,
+    "REC": 7,
+    "NAME": 14,
+    "CIRC": 6,
+    "EQ": 8,
+    "CALC": 6,
+    "EXH": 12,
+    "CONNECT": 1,
+    "LOG": 18,
+    "GEN": 5,
+    "EMP": 7,
+    "REGISTER": 10,
+    "DOMAIN": 10,
+    "APPROX": 2,
+    "TASK": 7,
+    "FIG": 2,
+    "MODEL": 4,
+    "BOUND": 1,
+    "LIMIT": 2,
+    "INIT": 2,
+    "QUANT": 6,
+    "EXIST": 2,
+    "TYPE": 2,
+    "SCOPE": 3
+  },
+  "checks": [
+    "Unique stable IDs",
+    "Four variants per question",
+    "Public data without research annotations",
+    "Valid KaTeX syntax",
+    "Published assets synchronized",
+    "Local resource links",
+    "Identical cross-level pair"
+  ]
+}
