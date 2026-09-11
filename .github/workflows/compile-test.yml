@@ -7,7 +7,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   publish:
@@ -35,7 +37,7 @@ jobs:
           echo "Changed files:"
           printf '%s\n' "$changed"
 
-          if [[ -n "$changed" ]] && ! printf '%s\n' "$changed" | grep -qvE '^data/[^/]+\.json$'; then
+          if [[ -n "$changed" ]] && ! printf '%s\n' "$changed" | grep -qvE '^docs/data/[^/]+\.json$'; then
             echo "content_only=true" >> "$GITHUB_OUTPUT"
           else
             echo "content_only=false" >> "$GITHUB_OUTPUT"
@@ -49,9 +51,9 @@ jobs:
           import json
           import sys
 
-          files = sorted(glob.glob("data/*.json"))
+          files = sorted(glob.glob("docs/data/*.json"))
           if not files:
-              raise SystemExit("No JSON content files found in data/")
+              raise SystemExit("No JSON content files found in docs/data/")
 
           required_production = {
               "id": int,
@@ -103,60 +105,51 @@ jobs:
         if: steps.scope.outputs.content_only == 'true'
         shell: bash
         run: |
-          mkdir -p docs/data
-          cp data/*.json docs/data/
+          mkdir -p docs/site/data
+          cp docs/data/*.json docs/site/data/
 
       - uses: actions/setup-node@v4
         if: steps.scope.outputs.content_only != 'true'
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: docs/package-lock.json
 
       - name: Install dependencies
         if: steps.scope.outputs.content_only != 'true'
-        run: npm ci
+        run: npm --prefix docs ci
 
       - name: Validate survey bank and session logic
         if: steps.scope.outputs.content_only != 'true'
         run: |
-          python3 scripts/build-bank.py
-          node scripts/validate-bank.cjs
-          node scripts/test-survey.cjs
+          python3 docs/scripts/build-bank.py
+          node docs/scripts/validate-bank.cjs
+          node docs/scripts/test-survey.cjs
 
       - name: Run Elm logic tests
         if: steps.scope.outputs.content_only != 'true'
-        run: npm run test:logic
+        run: npm --prefix docs run test:logic
 
       - name: Compile Elm
         if: steps.scope.outputs.content_only != 'true'
-        run: npm run build:main
+        run: npm --prefix docs run build:main
 
       - name: Install Playwright Firefox
         if: steps.scope.outputs.content_only != 'true'
-        run: npm run test:e2e:install:ci
+        run: npm --prefix docs run test:e2e:install:ci
 
       - name: Run browser interaction tests
         if: steps.scope.outputs.content_only != 'true'
-        run: npm run test:e2e
+        run: npm --prefix docs run test:e2e
 
-      - name: Commit published assets
-        shell: bash
-        run: |
-          if [[ "${{ steps.scope.outputs.content_only }}" == "true" ]]; then
-            paths=(docs/data)
-            message="Publish content data [skip ci]"
-          else
-            paths=(docs)
-            message="Build compiled Elm [skip ci]"
-          fi
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
-          if git diff --quiet -- "${paths[@]}"; then
-            echo "Published assets are already up to date."
-            exit 0
-          fi
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/site
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "${paths[@]}"
-          git commit -m "$message"
-          git push
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

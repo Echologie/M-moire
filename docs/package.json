@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "build:main": "npx elm make src/Main.elm --output=docs/main.js && mkdir -p docs/data && cp data/*.json docs/data/",
+    "build:main": "npx elm make src/Main.elm --output=site/main.js && mkdir -p site/data && cp data/*.json site/data/",
     "test:logic": "npx elm-test",
     "test:e2e": "npx playwright test",
     "test:e2e:guix": "bash scripts/patch-playwright-firefox.sh && PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 npx playwright test",

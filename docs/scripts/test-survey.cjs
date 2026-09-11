@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
-const noop=()=>{};const element={addEventListener:noop};const context={document:{querySelector:()=>element},window:{addEventListener:noop},fetch:()=>new Promise(()=>{}),setTimeout,console,assert,bankInput:JSON.parse(fs.readFileSync('docs/data/bank.json'))};vm.createContext(context);vm.runInContext(fs.readFileSync('docs/enquete.js','utf8'),context);
+const noop=()=>{};const element={addEventListener:noop};const context={document:{querySelector:()=>element},window:{addEventListener:noop},fetch:()=>new Promise(()=>{}),setTimeout,console,assert,bankInput:JSON.parse(fs.readFileSync('docs/site/data/bank.json'))};vm.createContext(context);vm.runInContext(fs.readFileSync('docs/site/enquete.js','utf8'),context);
 vm.runInContext(`
 render=()=>{};showHelp=()=>{};bank=bankInput;
 for(let repeat=0;repeat<100;repeat++){

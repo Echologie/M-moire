@@ -1,5 +1,5 @@
 import json,pathlib
-ROOT=pathlib.Path(__file__).resolve().parents[1]
+ROOT=pathlib.Path(__file__).resolve().parents[2]
 questions=[]
 def q(level,domain,title,statement,answer,variants,family=None):
  i=f'Q{len(questions)+1:02}'
@@ -220,7 +220,7 @@ questions[36]['productions'][0]['research']=dict(targets=['CALC'],analysis='Omis
 assert len(questions)==40,len(questions)
 (ROOT/'research/bank.json').write_text(json.dumps({'version':'0.1.0','status':'Banque exploratoire à prétester','questions':questions},ensure_ascii=False,indent=2)+'\n')
 public={'version':'0.1.0','questions':[{k:v for k,v in q.items() if k not in ('referenceAnswer','family','productions')}|{'family':q['family'],'productions':[{'id':p['id'],'content':p['content']} for p in q['productions']]} for q in questions]}
-for folder in ['docs/data','www/data']:
+for folder in [x27docs/site/datax27,x27docs/site/datax27]:
  (ROOT/folder).mkdir(exist_ok=True)
  (ROOT/folder/'bank.json').write_text(json.dumps(public,ensure_ascii=False,indent=2)+'\n')
 print(len(questions),'questions;',sum(len(q['productions']) for q in questions),'rédactions')
