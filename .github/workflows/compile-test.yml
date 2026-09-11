@@ -146,7 +146,7 @@ jobs:
             paths=(docs/data)
             message="Publish content data [skip ci]"
           else
-            paths=(docs www/main.js)
+            paths=(docs)
             message="Build compiled Elm [skip ci]"
           fi
 

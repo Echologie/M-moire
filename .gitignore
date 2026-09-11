@@ -1,7 +1,4 @@
-www/elm-stuff/
-docs/elm-stuff/
-docs/src/
-docs/elm.json
+elm-stuff/
 node_modules/
 playwright-report/
 test-results/
