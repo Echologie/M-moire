@@ -224,9 +224,9 @@ for folder in [x27docs/site/datax27,x27docs/site/datax27]:
  (ROOT/folder).mkdir(exist_ok=True)
  (ROOT/folder/'bank.json').write_text(json.dumps(public,ensure_ascii=False,indent=2)+'\n')
 print(len(questions),'questions;',sum(len(q['productions']) for q in questions),'rédactions')
-lines=['# Notices de conception — 40 questions, 160 rédactions','','Les codes sont définis dans `codebook.json`. Une cible ne signifie pas nécessairement une violation : lire l’analyse. Les codes non cités ne sont pas réputés automatiquement respectés.','']
+lines=['* Notices de conception — 40 questions, 160 rédactions','','Les codes sont définis dans `codebook.json`. Une cible ne signifie pas nécessairement une violation : lire l’analyse. Les codes non cités ne sont pas réputés automatiquement respectés.','']
 for item in questions:
- lines += [f"## {item['id']} — {item['level']} — {item['title']}",'',item['statement'],'',f"Réponse de référence : {item['referenceAnswer']}",'',f"Famille de comparaison : {item['family']}",'']
+ lines += [f"** {item['id']} — {item['level']} — {item['title']}",'',item['statement'],'',f"Réponse de référence : {item['referenceAnswer']}",'',f"Famille de comparaison : {item['family']}",'']
  for prod in item['productions']:
-  lines += [f"### {prod['id']}",'',prod['content'],'','Cibles / contrôles : '+', '.join(prod['research']['targets'])+'.','',prod['research']['analysis'],'']
-(ROOT/'research/notices.md').write_text('\n'.join(lines))
+  lines += [f"*** {prod['id']}",'',prod['content'],'','Cibles / contrôles : '+', '.join(prod['research']['targets'])+'.','',prod['research']['analysis'],'']
+(ROOT/'research/notices.org').write_text('\n'.join(lines))
