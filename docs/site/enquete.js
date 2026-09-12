@@ -1,6 +1,7 @@
 /* Browser integration only. Survey state and coordinate invariants live in Elm. */
-import { prepareSession, createSeed, axes } from './session.js';
-import './space.js';
+import { prepareSession, createSeed, axes } from './session.js?v=44fc617998f1';
+import './space.js?v=f9c78f330fea';
+import './sliders.js?v=d1aca0615a7c';
 const root = document.getElementById('app');
 let application, bank, seed, startedAt;
 let events = [], seen = new Set();
@@ -36,7 +37,7 @@ class ReadingCard extends HTMLElement {
       this.closest('.reader-layer').style.paddingTop = `${top}px`;
     };
     this.resize = new ResizeObserver(this.layout);
-    this.resize.observe(document.querySelector('#question-panel'));
+    const questionPanel = document.querySelector('#question-panel'); if (questionPanel) this.resize.observe(questionPanel);
     window.addEventListener('resize', this.layout);
     window.addEventListener('regards-layout', this.layout);
     this.onKey = e => {
@@ -86,7 +87,17 @@ class SpotlightGuide extends HTMLElement {
     this.ring = document.createElement('div'); this.ring.className = 'spotlight-ring'; document.body.append(this.ring); this.schedule();
   }
   attributeChangedCallback() { this.schedule(); }
-  schedule() { cancelAnimationFrame(this.frame); this.frame = requestAnimationFrame(() => this.position()); }
+  schedule() {
+    cancelAnimationFrame(this.frame);
+    this.frame = requestAnimationFrame(() => {
+      const target = document.querySelector(this.getAttribute('target'));
+      if (target && !document.querySelector('reading-card')) {
+        const r = target.getBoundingClientRect(), questionBottom = document.querySelector('#question-panel')?.getBoundingClientRect().bottom || 0;
+        if (r.top < questionBottom + 12 || r.bottom > innerHeight - 100) target.scrollIntoView({ block: 'center', behavior: 'instant' });
+      }
+      this.position();
+    });
+  }
   position() {
     if (!this.isConnected || !this.panels) return;
     const target = document.querySelector(this.getAttribute('target')), coach = this.querySelector('.coach-card');
@@ -144,7 +155,7 @@ try {
       case 'event': { const { type, ...entry } = message; events.push({ ...entry, at: new Date().toISOString(), elapsedMs: Date.now() - Date.parse(startedAt) }); if (entry.event === 'question' || entry.event === 'skip') seen.add(entry.questionId); if (['question', 'open', 'reveal', 'compare'].includes(entry.event)) showQuestion(); break; }
       case 'export': {
         const { type, ...data } = message;
-        const result = { schemaVersion: 2, ...data, randomization: { algorithm: 'mulberry32-fisher-yates-v1', seed }, axes, gradeScale: { min: 0, max: 3, step: .25 }, startedAt, exportedAt: new Date().toISOString(), events };
+        const result = { schemaVersion: 2, interactionMode: 'axis-sliders', ...data, randomization: { algorithm: 'mulberry32-fisher-yates-v1', seed }, axes, gradeScale: { min: 0, max: 3, step: .25 }, startedAt, exportedAt: new Date().toISOString(), events };
         const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' }));
         const link = document.createElement('a'); link.href = url; link.download = 'regards-redactions.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); break;
       }

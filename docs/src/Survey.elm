@@ -33,7 +33,6 @@ type alias Model =
     , selected : String
     , exposed : Dict String Int
     , answers : Dict String Answer
-    , plane : String
     , reader : Bool
     , closing : Bool
     , compare : Bool
@@ -52,8 +51,7 @@ type Msg
     | Grade String
     | Close
     | Closed
-    | SelectPlane String
-    | Place String Point
+    | Place String String Float Bool
     | Confirm
     | Open String
     | NextProduction
@@ -105,7 +103,6 @@ init flags =
       , selected = ""
       , exposed = Dict.empty
       , answers = Dict.empty
-      , plane = "3d"
       , reader = False
       , closing = False
       , compare = False
@@ -222,8 +219,8 @@ update msg m =
                 Ok "orbit" ->
                     ( { m
                         | tour =
-                            if m.tour == 7 then
-                                8
+                            if m.tour == 5 then
+                                6
 
                             else
                                 m.tour
@@ -309,31 +306,7 @@ update msg m =
             , event m "close" []
             )
 
-        SelectPlane plane ->
-            if List.member plane [ "3d", "xy", "xz", "yz" ] then
-                ( { m
-                    | plane = plane
-                    , message = ""
-                    , tour =
-                        if m.tour == 2 && plane == "xy" then
-                            3
-
-                        else if m.tour == 4 && plane == "xz" then
-                            5
-
-                        else if m.tour == 6 && plane == "3d" then
-                            7
-
-                        else
-                            m.tour
-                  }
-                , event m "view" [ ( "plane", E.string plane ) ]
-                )
-
-            else
-                ( m, Cmd.none )
-
-        Place id pos ->
+        Place id axis value committed ->
             let
                 a =
                     getAnswer id m
@@ -342,30 +315,50 @@ update msg m =
                     List.any (\v -> v.id == id) (List.take (Dict.get (current m).id m.exposed |> Maybe.withDefault 1) (current m).productions)
 
                 next =
-                    { a | point = S.move m.plane pos a.point, judged = S.touchPlane m.plane a.judged }
+                    { a
+                        | point = S.move axis value a.point
+                        , judged =
+                            if committed then
+                                S.touchAxis axis a.judged
+
+                            else
+                                a.judged
+                    }
             in
-            if valid && a.note /= Nothing && m.plane /= "3d" && not m.reader then
+            if valid && List.member axis [ "x", "y", "z" ] && a.note /= Nothing && not m.reader then
                 ( { m
                     | answers = Dict.insert id next m.answers
                     , selected = id
+                    , message = ""
                     , tour =
-                        if m.tour == 3 then
-                            4
-
-                        else if m.tour == 5 then
-                            6
+                        if committed && ((m.tour == 2 && axis == "x") || (m.tour == 3 && axis == "y") || (m.tour == 4 && axis == "z")) then
+                            m.tour + 1
 
                         else
                             m.tour
                   }
-                , event { m | selected = id } "place" [ ( "plane", E.string m.plane ), ( "coordinates", S.encodePoint next.point ) ]
+                , if committed then
+                    event { m | selected = id } "place" [ ( "axis", E.string axis ), ( "coordinates", S.encodePoint next.point ) ]
+
+                  else
+                    Cmd.none
                 )
 
             else
                 ( m, Cmd.none )
 
         Confirm ->
-            update (Place m.selected (getAnswer m.selected m).point) m
+            let
+                a =
+                    getAnswer m.selected m
+            in
+            if a.note /= Nothing && not m.reader && m.mode /= Training then
+                ( { m | answers = Dict.insert m.selected { a | judged = [ "x", "y", "z" ] } m.answers, message = "" }
+                , event m "confirm-position" [ ( "coordinates", S.encodePoint a.point ) ]
+                )
+
+            else
+                ( m, Cmd.none )
 
         Open id ->
             if List.any (\v -> v.id == id) (List.take (Dict.get (current m).id m.exposed |> Maybe.withDefault 1) (current m).productions) then
@@ -375,8 +368,8 @@ update msg m =
                     , closing = False
                     , message = ""
                     , tour =
-                        if m.tour == 8 then
-                            9
+                        if m.tour == 6 then
+                            7
 
                         else
                             m.tour
@@ -399,7 +392,7 @@ update msg m =
                     getAnswer m.selected m
             in
             if a.note == Nothing || List.length a.judged < 3 then
-                ( { m | message = "Placez cette rédaction sur un second plan pour évaluer les trois axes." }, Cmd.none )
+                ( { m | message = "Placez cette rédaction sur les trois axes, ou confirmez sa position." }, Cmd.none )
 
             else if count < List.length q.productions then
                 let
@@ -473,12 +466,12 @@ update msg m =
             )
 
         Help ->
-            ( { m | mode = Training, tour = 0, selected = "practice-1", reader = True, closing = False, plane = "3d", answers = Dict.remove "practice-1" m.answers, exposed = Dict.insert "practice" 1 m.exposed, message = "" }, Cmd.none )
+            ( { m | mode = Training, tour = 0, selected = "practice-1", reader = True, closing = False, answers = Dict.remove "practice-1" m.answers, exposed = Dict.insert "practice" 1 m.exposed, message = "" }, Cmd.none )
 
         TourNext ->
             let
                 next =
-                    openQuestion m.index { m | mode = Running, tour = -1, plane = "xy", answers = Dict.remove "practice-1" m.answers }
+                    openQuestion m.index { m | mode = Running, tour = -1, answers = Dict.remove "practice-1" m.answers }
             in
             ( next, event next "question" [] )
 
@@ -621,56 +614,38 @@ viewWorkspace m =
             , rich q.statement
             , div [ class "question-progress", attribute "aria-label" "Progression de la session" ] [ div [ style "width" (String.fromFloat (100 * toFloat done / toFloat (Basics.max 1 (List.length m.questions))) ++ "%") ] [] ]
             ]
-        , div [ class "space-panel" ]
-            [ div [ class "space-toolbar" ]
-                [ div [ class "view-tabs", attribute "aria-label" "Vues de comparaison" ]
+        , div [ class "evaluation-layout" ]
+            [ section [ class "axes-panel", id "axes-panel", attribute "aria-label" "Placer les rédactions sur les trois axes" ]
+                [ div [ class "axes-heading" ] [ icon "sliders", span [] [ text "Vos repères" ], span [ class "selected-label" ] [ text ("Rédaction " ++ String.fromInt (number m.selected m)) ] ]
+                , div [ class "axis-sliders" ]
                     (List.map
-                        (\( plane, title, subtitle ) ->
-                            button
-                                [ id ("view-" ++ plane)
-                                , classList [ ( "view-tab", True ), ( "active", m.plane == plane ) ]
-                                , onClick (SelectPlane plane)
-                                , attribute "aria-pressed"
-                                    (if m.plane == plane then
-                                        "true"
-
-                                     else
-                                        "false"
-                                    )
+                        (\( axis, _, _ ) ->
+                            Html.node "axis-slider"
+                                [ id ("axis-" ++ axis)
+                                , attribute "axis" axis
+                                , attribute "payload" (spacePayload m shown)
+                                , on "placement" (D.map4 Place (D.at [ "detail", "id" ] D.string) (D.at [ "detail", "axis" ] D.string) (D.at [ "detail", "value" ] D.float) (D.at [ "detail", "committed" ] D.bool))
+                                , on "read" (D.map Open (D.at [ "detail", "id" ] D.string))
                                 ]
-                                [ icon
-                                    (if plane == "3d" then
-                                        "cube"
-
-                                     else
-                                        "plane-" ++ plane
-                                    )
-                                , span [] [ text title, Html.small [] [ text subtitle ] ]
-                                ]
+                                []
                         )
-                        [ ( "3d", "Vue libre", "Tourner autour" ), ( "xy", "Lisibilité · Précision", "Face 1" ), ( "xz", "Lisibilité · Validité", "Face 2" ), ( "yz", "Précision · Validité", "Face 3" ) ]
+                        S.axes
                     )
-                ]
-            , Html.node "evaluation-space"
-                [ id "space"
-                , attribute "payload" (spacePayload m shown)
-                , on "placement" (D.map2 Place (D.at [ "detail", "id" ] D.string) (D.at [ "detail", "point" ] (D.map3 Point (D.field "x" D.float) (D.field "y" D.float) (D.field "z" D.float))))
-                , on "read" (D.map Open (D.at [ "detail", "id" ] D.string))
-                , on "orbit" (D.succeed (Receive (E.object [ ( "type", E.string "orbit" ) ])))
-                ]
-                []
-            , div [ class "space-bottom" ]
-                [ div [ class "coordinate-readout", id "coordinate-readout" ]
-                    [ span [ class "selected-label" ] [ text ("Rédaction " ++ String.fromInt (number m.selected m)) ]
-                    , coord "x" "Lisibilité" a.point.x a.judged
-                    , coord "y" "Précision" a.point.y a.judged
-                    , coord "z" "Validité" a.point.z a.judged
-                    ]
-                , if m.plane /= "3d" then
-                    button [ class "quiet confirm-position", id "confirm-position", onClick Confirm, disabled (a.note == Nothing) ] [ icon "check", text "Conserver cette position" ]
+                , if List.length a.judged < 3 then
+                    button [ class "quiet confirm-position", id "confirm-position", onClick Confirm, disabled (a.note == Nothing || m.mode == Training) ] [ icon "check", text "Conserver cette position" ]
 
                   else
-                    span [ class "space-hint" ] [ icon "hand", text "Faites glisser le fond pour tourner" ]
+                    span [ class "position-ready" ] [ icon "check", text "Les trois repères sont placés" ]
+                ]
+            , div [ class "space-panel" ]
+                [ Html.node "evaluation-space"
+                    [ id "space"
+                    , attribute "payload" (spacePayload m shown)
+                    , on "read" (D.map Open (D.at [ "detail", "id" ] D.string))
+                    , on "orbit" (D.succeed (Receive (E.object [ ( "type", E.string "orbit" ) ])))
+                    ]
+                    []
+                , div [ class "space-bottom" ] [ span [ class "space-hint" ] [ icon "hand", text "Faites glisser pour tourner · touchez une bille pour lire" ] ]
                 ]
             ]
         , div [ class "production-navigation" ]
@@ -745,46 +720,11 @@ viewWorkspace m =
         ]
 
 
-coord : String -> String -> Float -> List String -> Html Msg
-coord axis labelText n judged =
-    span
-        [ class ("coord coord-" ++ axis)
-        , title
-            (labelText
-                ++ " : "
-                ++ (if List.member axis judged then
-                        String.fromFloat n
-
-                    else
-                        "à placer"
-                   )
-            )
-        ]
-        [ Html.small [] [ text labelText ]
-        , Html.strong []
-            [ text
-                (if List.member axis judged then
-                    (if n > 0 then
-                        "+"
-
-                     else
-                        ""
-                    )
-                        ++ String.fromFloat n
-
-                 else
-                    "—"
-                )
-            ]
-        ]
-
-
 spacePayload : Model -> List Production -> String
 spacePayload m shown =
     E.encode 0
         (E.object
-            [ ( "plane", E.string m.plane )
-            , ( "selected", E.string m.selected )
+            [ ( "selected", E.string m.selected )
             , ( "reader", E.bool m.reader )
             , ( "question", E.string (current m).id )
             , ( "points"
@@ -817,7 +757,13 @@ viewReader m =
             , div [ class "reader-footer" ]
                 [ div [ class "rating", id "rating" ]
                     [ label [ for "grade" ] [ text "Quelle note lui donneriez-vous ?" ]
-                    , div [ class "grade-track" ] [ span [] [ text "0" ], input [ id "grade", type_ "range", Html.Attributes.min "0", Html.Attributes.max "3", step "0.25", value (Maybe.withDefault 1.5 a.note |> String.fromFloat), onInput Grade, on "change" (D.map Grade (D.at [ "target", "value" ] D.string)), on "pointerup" (D.map Grade (D.at [ "target", "value" ] D.string)), classList [ ( "ungraded", a.note == Nothing ) ], attribute "aria-label" "Note sur 3", attribute "aria-describedby" "grade-help" ] [], span [] [ text "3" ] ]
+                    , div [ class "grade-track" ]
+                        [ span [] [ text "0" ]
+                        , Html.node "grade-slider"
+                            []
+                            [ input [ id "grade", type_ "range", Html.Attributes.min "0", Html.Attributes.max "3", step "0.25", value (Maybe.withDefault 1.5 a.note |> String.fromFloat), onInput Grade, on "change" (D.map Grade (D.at [ "target", "value" ] D.string)), classList [ ( "ungraded", a.note == Nothing ) ], attribute "aria-label" "Note sur 3", attribute "aria-describedby" "grade-help" ] [] ]
+                        , span [] [ text "3" ]
+                        ]
                     , p [ id "grade-help", class "rating-help" ]
                         [ text
                             (if a.note == Nothing then
@@ -850,31 +796,25 @@ viewTour m =
         ( target, heading, body ) =
             case m.tour of
                 0 ->
-                    ( "#reading-card", "D’abord, votre note", "Lisez cette rédaction, puis déplacez le curseur de 0 à 3. Il avance par quarts de point. Cette note est indépendante de la position dans l’espace." )
+                    ( "#reading-card", "D’abord, votre note", "Lisez cette rédaction, puis attrapez la bille pour lui donner une note. Les deux traits intermédiaires marquent un et deux points. Le déplacement avance par quarts de point, indépendamment des trois axes." )
 
                 1 ->
                     ( "#place-button", "La fiche devient une bille", "Appuyez sur ce bouton. La rédaction se réduit pour rejoindre l’espace de comparaison. Son aperçu vous permettra de la reconnaître." )
 
                 2 ->
-                    ( "#view-xy", "Regardez une première face", "Choisissez Lisibilité · Précision. Cette vue de face permet de placer la bille selon deux axes, sans changer le troisième." )
+                    ( "#axis-x", "Un premier repère", "Attrapez la bille numérotée et faites-la glisser entre Confus et Lisible. Elle part de sa position actuelle, sans saut. Seule la lisibilité change." )
 
                 3 ->
-                    ( "#space", "À vous de la placer", "Faites glisser la bille. Chaque axe va de −10 à +10. Zéro représente ce que vous attendriez ici, pas forcément un idéal. Plus précis peut aussi être trop précis : vous restez libre de votre jugement." )
+                    ( "#axis-y", "Ajustez la précision", "Déplacez cette bille entre Vague et Précis. Le trait du milieu représente ce que vous attendriez ici, pas forcément un idéal. Plus précis peut aussi être trop précis : vous décidez." )
 
                 4 ->
-                    ( "#view-xz", "Changez de point de vue", "Choisissez maintenant Lisibilité · Validité. La précision restera exactement à la position que vous venez de choisir." )
+                    ( "#axis-z", "Puis la validité", "Placez enfin la bille entre Fautif et Valide. Chaque barre règle un seul axe ; les deux autres restent exactement en place. Votre note reste indépendante." )
 
                 5 ->
-                    ( "#space", "Placez la troisième dimension", "Déplacez encore la bille : vous ajustez maintenant la lisibilité et la validité. Les valeurs sous l’espace permettent de vérifier sa position. Les flèches du clavier fonctionnent aussi sur une bille sélectionnée." )
+                    ( "#space", "Tournez autour", "Faites glisser le fond avec le doigt ou la souris. Seul votre point de vue change. Les pointillés relient la bille aux faces et situent la rédaction dans le volume." )
 
                 6 ->
-                    ( "#view-3d", "Prenez un peu de recul", "Choisissez Vue libre pour retrouver vos trois dimensions ensemble." )
-
-                7 ->
-                    ( "#space", "Tournez autour", "Faites glisser le fond avec le doigt ou la souris. La bille reste au même endroit ; seul votre point de vue change. Ses lignes de projection indiquent sa position dans le volume." )
-
-                8 ->
-                    ( "#space", "Retrouvez la rédaction", "Touchez la bille pour la rouvrir. Vous pourrez toujours modifier sa note et sa position, même après avoir lu les suivantes." )
+                    ( "#axis-x", "La même bille, la même rédaction", "Touchez le numéro sur cette barre pour relire la rédaction. Les billes proches se dégageront au-dessus de la barre ; leurs traits indiqueront leur position exacte." )
 
                 _ ->
                     ( "#reading-card", "Vous avez la main", "Chaque nouvelle rédaction s’ouvrira ainsi, en grand. Notez-la, placez-la, puis utilisez « Rédaction suivante ». L’ordre des questions et des rédactions varie d’une session à l’autre." )
@@ -882,10 +822,10 @@ viewTour m =
     Html.node "spotlight-guide"
         [ attribute "target" target, attribute "step" (String.fromInt m.tour) ]
         [ div [ class "coach-card" ]
-            [ div [ class "coach-progress" ] [ span [] [ text ("PRISE EN MAIN · " ++ String.fromInt (m.tour + 1) ++ " / 10") ], div [] (List.range 0 9 |> List.map (\i -> span [ classList [ ( "done", i <= m.tour ) ] ] [])) ]
+            [ div [ class "coach-progress" ] [ span [] [ text ("PRISE EN MAIN · " ++ String.fromInt (m.tour + 1) ++ " / 8") ], div [] (List.range 0 7 |> List.map (\i -> span [ classList [ ( "done", i <= m.tour ) ] ] [])) ]
             , h2 [] [ text heading ]
             , p [] [ text body ]
-            , if m.tour == 9 then
+            , if m.tour == 7 then
                 btn "primary" "Commencer mes questions" TourNext
 
               else

@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "vite",
-    "build:main": "elm make src/Main.elm --output=site/main.js && elm make src/Survey.elm --optimize --output=site/survey.js && python3 scripts/build-bank.py && cp site/index.html site/enquete.html && cp data/exercise-001.json site/data/",
+    "build:main": "elm make src/Main.elm --output=site/main.js && elm make src/Survey.elm --optimize --output=site/survey.js && python3 scripts/build-bank.py && node scripts/version-assets.cjs && cp data/exercise-001.json site/data/",
     "test:logic": "npx elm-test",
     "test:e2e": "npx playwright test",
     "test:e2e:guix": "bash scripts/patch-playwright-firefox.sh && PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 npx playwright test",

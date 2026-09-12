@@ -145,6 +145,15 @@ jobs:
         if: steps.scope.outputs.content_only != 'true'
         run: npm --prefix docs run test:e2e
 
+      - name: Save browser checks
+        if: always() && steps.scope.outputs.content_only != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-checks
+          path: docs/test-results/**/*.png
+          if-no-files-found: ignore
+          retention-days: 3
+
       - name: Configure Pages
         if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
