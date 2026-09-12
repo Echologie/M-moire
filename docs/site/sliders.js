@@ -1,5 +1,5 @@
 import { axes } from './session.js?v=44fc617998f1';
-import { dragValue, layoutThumbs } from './slider-layout.js?v=afb5a9532049';
+import { dragValue, layoutThumbs } from './slider-layout.js?v=32b2b17402a4';
 
 const labels = { x: 'Lisibilité', y: 'Précision', z: 'Validité' };
 const dispatch = (node, name, detail) => node.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }));
@@ -11,22 +11,24 @@ function relativeDrag(node, handlers) {
     if (e.button !== 0 || drag) return;
     const start = handlers.begin(e); if (!start) return;
     e.preventDefault();
-    drag = { ...start, pointer: e.pointerId, x: e.clientX, y: e.clientY, moved: false, current: start.value };
+    drag = { ...start, pointer: e.pointerId, x: e.clientX, y: e.clientY, moved: false, intent: null, current: start.value };
     node.setPointerCapture(e.pointerId);
   };
   const move = e => {
     if (!drag || e.pointerId !== drag.pointer) return;
-    const dx = e.clientX - drag.x;
-    if (Math.hypot(dx, e.clientY - drag.y) > 4) drag.moved = true;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.hypot(dx, dy) > 4) drag.moved = true;
     if (!drag.moved) return;
+    if (!drag.intent) drag.intent = Math.abs(dx) >= Math.abs(dy) ? 'horizontal' : 'vertical';
+    if (drag.intent === 'vertical') return;
     e.preventDefault();
-    drag.current = dragValue(drag.value, dx, drag.width, drag.min, drag.max, drag.step);
-    handlers.move(drag, false);
+    const value = dragValue(drag.value, dx, drag.width, drag.min, drag.max, drag.step);
+    if (value !== drag.current) { drag.current = value; handlers.move(drag, false); }
   };
   const end = e => {
     if (!drag || e.pointerId !== drag.pointer) return;
     const ended = drag; drag = null;
-    const cancelled = e.type !== 'pointerup';
+    const cancelled = e.type !== 'pointerup' || ended.intent === 'vertical';
     if (cancelled && ended.moved) { ended.current = ended.value; handlers.move(ended, false); }
     handlers.end(ended, cancelled);
     if (node.hasPointerCapture(ended.pointer)) node.releasePointerCapture(ended.pointer);
@@ -58,6 +60,7 @@ class AxisSlider extends HTMLElement {
         })[0];
         if (!nearest || nearest.disabled) return;
         const item = this.data.points.find(p => p.id === nearest.dataset.id);
+        this.grabbed = { y: -Number(nearest.dataset.lift), offset: parseFloat(nearest.style.left) - Number(nearest.dataset.anchor), baseline: parseFloat(this.style.getPropertyValue('--rail-y')) };
         this.active = item.id; nearest.focus({ preventScroll: true });
         return { id: item.id, value: item.point[this.axis], width: this.field.clientWidth - 44, min: -10, max: 10, step: .1, direct: Boolean(direct) };
       },
@@ -68,7 +71,7 @@ class AxisSlider extends HTMLElement {
           if (d.moved) this.propose(d.id, d.current, true);
           else if (d.direct) dispatch(this, 'read', { id: d.id });
         }
-        this.active = null; this.draw();
+        this.active = null; this.grabbed = null; this.draw();
       }
     });
     this.read();
@@ -107,8 +110,8 @@ class AxisSlider extends HTMLElement {
   }
   draw() {
     if (!this.data || !this.field.clientWidth) return;
-    const layout = layoutThumbs(this.data.points.map(p => ({ id: p.id, number: p.number, value: p.point[this.axis] })), this.field.clientWidth, this.active || this.data.selected);
-    const lift = Math.max(42, ...layout.map(p => -p.y)), baseline = lift + 22;
+    const layout = layoutThumbs(this.data.points.map(p => ({ id: p.id, number: p.number, value: p.point[this.axis] })), this.field.clientWidth, this.active || this.data.selected, 42, this.grabbed);
+    const lift = Math.max(42, ...layout.map(p => -p.y)), baseline = this.grabbed?.baseline ?? lift + 22;
     this.field.style.height = `${baseline + 24}px`; this.style.setProperty('--rail-y', `${baseline}px`);
     this.leaders.replaceChildren();
     for (const position of layout) {

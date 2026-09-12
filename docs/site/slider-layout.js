@@ -5,12 +5,18 @@ export function dragValue(start, dx, width, min, max, step) {
   return Number(clamp(Math.round(value / step) * step, min, max).toFixed(8));
 }
 
-export function layoutThumbs(points, width, preferred, gap = 42) {
+export function layoutThumbs(points, width, preferred, gap = 42, grabbed = null) {
   const placed = [], inset = 22;
   const ordered = [...points].sort((a, b) => (b.id === preferred) - (a.id === preferred) || a.number - b.number);
   for (const p of ordered) {
     const anchor = inset + (clamp(p.value, -10, 10) + 10) / 20 * Math.max(1, width - inset * 2);
-    let candidate;
+    // Keep the grabbed sphere under the pointer, including its raised row.
+    // Only its neighbours rearrange until the gesture is released.
+    let candidate = p.id === preferred && grabbed ? {
+      ...p, anchor,
+      x: clamp(anchor + grabbed.offset, inset, Math.max(inset, width - inset)),
+      y: grabbed.y
+    } : null;
     for (let level = 0; !candidate; level++) {
       const shifts = level === 0 ? [0] : [0, ...Array.from({ length: points.length }, (_, i) => [-(i + 1) * gap, (i + 1) * gap]).flat()];
       for (const shift of shifts) {
