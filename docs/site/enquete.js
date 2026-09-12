@@ -1,6 +1,6 @@
 /* Browser integration only. Survey state and coordinate invariants live in Elm. */
 import { prepareSession, createSeed, axes } from './session.js?v=44fc617998f1';
-import './space.js?v=ee8de8cf1092';
+import './space.js?v=68e5e5433449';
 import './sliders.js?v=e690453bfce2';
 const root = document.getElementById('app');
 let application, bank, seed, startedAt;

@@ -81,7 +81,7 @@ export class EvaluationSpace extends HTMLElement {
     if (selected) {
       const pos = this.drag?.id === selected.id && this.drag.current ? this.drag.current : selected.point;
       if (free) for (const axis of xyz) {
-        const foot = { ...pos, [axis]: -10 }; this.line(this.guides, pos, foot, { stroke: colors[axis], 'stroke-dasharray': '4 4', 'stroke-width': '1.3', opacity: '.65' }); const p = this.project(foot); this.guides.append(svg('circle', { cx: p.x, cy: p.y, r: '4', fill: colors[axis], opacity: '.3' }));
+        const foot = { ...pos, [axis]: -10 }; this.line(this.guides, pos, foot, { stroke: colors[axis], 'stroke-dasharray': '4 4', 'stroke-width': '1.3', opacity: '.65' });
       }
     }
     const projected = this.data.points.map(item => { const pos = this.drag?.id === item.id && this.drag.current ? this.drag.current : item.point; return { item, pos, screen: this.project(pos) }; });
