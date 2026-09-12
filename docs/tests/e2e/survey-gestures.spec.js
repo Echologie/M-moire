@@ -8,6 +8,23 @@ test.beforeEach(async ({ page }) => {
   page.on('pageerror', error => { throw error; });
 });
 
+test('une prise hésitante de la note et des axes accepte un départ vertical', async ({ page }) => {
+  const d = await driver(page); await start(page, d);
+  const p = await center(page.locator('.grade-knob'));
+  await d.down(p); await d.move({ x: p.x + 2, y: p.y - 9 });
+  await d.move({ x: p.x + 60, y: p.y - 30 }); await d.up();
+  await expect(page.locator('#grade')).not.toHaveClass(/ungraded/);
+  expect(Number(await page.locator('#grade').inputValue())).toBeGreaterThan(1.5);
+  await close(page, d);
+  const x = thumb(page, 'x'), q = await center(x);
+  await d.down(q); await d.move({ x: q.x + 2, y: q.y + 9 });
+  await d.move({ x: q.x + 40, y: q.y + 35 }); await d.up();
+  await expect.poll(async () => Number(await x.getAttribute('data-value'))).toBeGreaterThan(0);
+  await expect(page.locator('reading-card')).toHaveCount(0);
+  await expect(thumb(page, 'y')).toHaveAttribute('data-value', '0');
+  await expect(thumb(page, 'z')).toHaveAttribute('data-value', '0');
+});
+
 test('parcours entier à la souris : suivant valide aussi les coordonnées conservées', async ({ page }) => {
   const d = await driver(page); await start(page, d);
   const answers = new Map();
