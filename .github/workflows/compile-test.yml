@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 permissions:
@@ -143,13 +146,16 @@ jobs:
         run: npm --prefix docs run test:e2e
 
       - name: Configure Pages
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
 
       - name: Upload site
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/site
 
       - name: Deploy Pages
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
         id: deployment
         uses: actions/deploy-pages@v4
