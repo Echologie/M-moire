@@ -390,26 +390,58 @@ update msg m =
 
                 a =
                     getAnswer m.selected m
+
+                confirmed =
+                    { m | answers = Dict.insert m.selected { a | judged = [ "x", "y", "z" ] } m.answers }
+
+                confirmation =
+                    if List.length a.judged < 3 then
+                        event m "confirm-position" [ ( "coordinates", S.encodePoint a.point ), ( "source", E.string "next-production" ) ]
+
+                    else
+                        Cmd.none
             in
-            if a.note == Nothing || List.length a.judged < 3 then
-                ( { m | message = "Placez cette rédaction sur les trois axes, ou confirmez sa position." }, Cmd.none )
+            if m.mode == Training || m.reader || m.closing then
+                ( m, Cmd.none )
+
+            else if a.note == Nothing then
+                ( { m | reader = True, message = "Donnez d’abord une note à cette rédaction." }, Cmd.none )
 
             else if count < List.length q.productions then
                 let
                     id =
                         List.drop count q.productions |> List.head |> Maybe.map .id |> Maybe.withDefault ""
                 in
-                ( { m | selected = id, reader = True, closing = False, exposed = Dict.insert q.id (count + 1) m.exposed, message = "" }, event { m | selected = id } "reveal" [] )
+                ( { confirmed | selected = id, reader = True, closing = False, exposed = Dict.insert q.id (count + 1) m.exposed, message = "" }, Cmd.batch [ confirmation, event { m | selected = id } "reveal" [] ] )
 
-            else if S.complete m.answers q then
-                if m.index + 1 < List.length m.questions then
-                    update (GoQuestion (m.index + 1)) m
+            else if S.complete confirmed.answers q then
+                let
+                    ( advanced, command ) =
+                        if m.index + 1 < List.length m.questions then
+                            update (GoQuestion (m.index + 1)) confirmed
 
-                else
-                    update Finish m
+                        else
+                            update Finish confirmed
+                in
+                ( advanced, Cmd.batch [ confirmation, command ] )
 
             else
-                ( { m | message = "Il reste une rédaction à placer sur les trois axes." }, Cmd.none )
+                let
+                    remaining =
+                        List.filter
+                            (\p ->
+                                let
+                                    answer =
+                                        getAnswer p.id confirmed
+                                in
+                                answer.note == Nothing || List.length answer.judged < 3
+                            )
+                            q.productions
+
+                    id =
+                        List.head remaining |> Maybe.map .id |> Maybe.withDefault m.selected
+                in
+                ( { confirmed | selected = id, reader = True, closing = False, message = "Terminez l’évaluation de cette rédaction pour poursuivre." }, Cmd.batch [ confirmation, event { m | selected = id } "open" [] ] )
 
         GoQuestion idx ->
             if idx >= 0 && idx < List.length m.questions then
@@ -697,7 +729,7 @@ viewWorkspace m =
                         "Cet essai ne fait pas partie de vos réponses."
 
                      else
-                        "Vous pouvez relire et déplacer chaque rédaction à tout moment."
+                        "Passer à la suite valide la position affichée, y compris les repères restés au centre. Vous pourrez la modifier."
                     )
                 ]
             , button [ class "quiet", onClick Skip, disabled (m.mode == Training) ] [ text "Passer cette question" ]
@@ -760,7 +792,15 @@ viewReader m =
                     , div [ class "grade-track" ]
                         [ span [] [ text "0" ]
                         , Html.node "grade-slider"
-                            []
+                            [ attribute "value" (Maybe.withDefault 1.5 a.note |> String.fromFloat)
+                            , attribute "ungraded"
+                                (if a.note == Nothing then
+                                    "true"
+
+                                 else
+                                    "false"
+                                )
+                            ]
                             [ input [ id "grade", type_ "range", Html.Attributes.min "0", Html.Attributes.max "3", step "0.25", value (Maybe.withDefault 1.5 a.note |> String.fromFloat), onInput Grade, on "change" (D.map Grade (D.at [ "target", "value" ] D.string)), classList [ ( "ungraded", a.note == Nothing ) ], attribute "aria-label" "Note sur 3", attribute "aria-describedby" "grade-help" ] [] ]
                         , span [] [ text "3" ]
                         ]
@@ -817,7 +857,7 @@ viewTour m =
                     ( "#axis-x", "La même bille, la même rédaction", "Touchez le numéro sur cette barre pour relire la rédaction. Les billes proches se dégageront au-dessus de la barre ; leurs traits indiqueront leur position exacte." )
 
                 _ ->
-                    ( "#reading-card", "Vous avez la main", "Chaque nouvelle rédaction s’ouvrira ainsi, en grand. Notez-la, placez-la, puis utilisez « Rédaction suivante ». L’ordre des questions et des rédactions varie d’une session à l’autre." )
+                    ( "#reading-card", "Vous avez la main", "Notez chaque rédaction, placez ses billes, puis utilisez « Rédaction suivante » pour valider la position affichée. Vous pouvez garder un repère au centre et revenir modifier vos choix. L’ordre des questions et des rédactions varie à chaque session." )
     in
     Html.node "spotlight-guide"
         [ attribute "target" target, attribute "step" (String.fromInt m.tour) ]

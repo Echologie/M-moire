@@ -137,7 +137,7 @@ jobs:
         if: steps.scope.outputs.content_only != 'true'
         run: npm --prefix docs run build:main
 
-      - name: Install Playwright Firefox
+      - name: Install Playwright browsers
         if: steps.scope.outputs.content_only != 'true'
         run: npm --prefix docs run test:e2e:install:ci
 
@@ -150,9 +150,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: browser-checks
-          path: docs/test-results/**/*.png
+          path: docs/test-results/
           if-no-files-found: ignore
-          retention-days: 3
+          retention-days: 7
 
       - name: Configure Pages
         if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'

@@ -8,8 +8,15 @@ npm run test:e2e:install
 npm run test:e2e
 #+end_src
 
-Playwright lance un serveur statique sur ~docs/site/~ au port 4173, ou réutilise le serveur déjà présent. Firefox est le navigateur de contrôle du workflow GitHub. Les échecs conservent capture, vidéo et trace dans ~test-results/~.
+Playwright lance un serveur statique sur ~docs/site/~ au port 4173, ou réutilise le serveur déjà présent. Le workflow contrôle Firefox, Chromium sur ordinateur et Chromium avec écran portrait et événements tactiles. Les échecs conservent capture, vidéo et trace dans ~test-results/~ ; ce dossier est disponible pendant sept jours dans les artefacts GitHub du contrôle. Une erreur empêche la publication.
 
-~survey.spec.js~ couvre le tutoriel avec gestes réels, les trois curseurs indépendants, la saisie sans saut et les billes proches, l’indépendance de la note, les révisions, l’export et les petits écrans. Les autres tests portent sur le prototype conservé à ~prototype.html~.
+| Fichier | Parcours vérifié |
+| ~survey.spec.js~ | Clavier, animations réduites, coordonnées indépendantes, révisions, export et disposition des petits écrans |
+| ~survey-gestures.spec.js~ | Souris, animations actives, tutoriel puis session entière sans saut de question, coordonnées conservées au centre, maintien d’une bille surélevée sous le pointeur, synchronisation de la note |
+| ~survey.touch.spec.js~ | Gestes tactiles Chromium : tutoriel, glissement horizontal, défilement vertical, annulation de geste, ouverture d’une rédaction et navigation |
+
+Les gestes tactiles sont injectés avec ~Input.dispatchTouchEvent~ : ils passent par le traitement des pointeurs et du défilement du navigateur. Réduire seulement la taille de la fenêtre ne simule pas ces gestes. Les tests attendent la fin des animations de lecture avant de saisir une bille ; ils inspectent aussi sa position *pendant* le glissement. Le parcours complet compare les réponses exportées aux notes et coordonnées observées dans l’interface.
+
+Les autres tests portent sur le prototype conservé à ~prototype.html~. Pour cibler un contrôle : ~npm run test:e2e -- --project=chromium~ ou ~--project=chromium-touch~. Une émulation tactile ne remplace pas une vérification complémentaire sur un téléphone physique.
 
 Sur Guix seulement, ~npm run test:e2e:guix~ applique le correctif Firefox avant les tests. La commande standard ~test:e2e~ n’applique pas ce correctif.

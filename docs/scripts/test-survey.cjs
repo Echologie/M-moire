@@ -23,16 +23,27 @@ const path = require('node:path');
   assert.equal(dragValue(1.5, 0, 200, 0, 3, .25), 1.5, 'A grab must not jump');
   assert.equal(dragValue(1.5, 50, 200, 0, 3, .25), 2.25);
   assert.equal(dragValue(1.5, -500, 200, 0, 3, .25), 0);
-  for (const width of [220, 300, 500]) {
+  for (const width of [132, 220, 300, 500]) {
     for (const values of [[0,0,0,0,0,0], [-10,-10,-9.9,9.9,10,10], [-5,-4.9,0,.1,5,5.1]]) {
       const points = values.map((value, number) => ({ id: String(number), number, value }));
       const before = JSON.stringify(points), layout = layoutThumbs(points, width, '1');
       assert.equal(JSON.stringify(points), before, 'Fanning must not alter coordinates');
-      assert.equal(layout.find(p => p.id === '1').y, 0, 'The grabbed bille stays on the rail');
+      assert.equal(layout.find(p => p.id === '1').y, 0, 'The selected bille rests on the rail');
       for (const [i, p] of layout.entries()) {
         assert.ok(p.x >= 22 && p.x <= width - 22, 'Thumbs stay reachable at both ends');
         assert.equal(p.value, values[Number(p.id)]);
         for (const q of layout.slice(i+1)) assert.ok(Math.hypot(p.x-q.x,p.y-q.y) >= 41.99, 'All billes remain individually reachable');
+      }
+      const raised = layout.find(p => p.y < 0);
+      if (raised) {
+        const held = layoutThumbs(points, width, raised.id, 42, { y: raised.y, offset: raised.x - raised.anchor });
+        const sphere = held.find(p => p.id === raised.id);
+        assert.equal(sphere.y, raised.y, 'Grabbing a raised bille must not change its row');
+        assert.equal(sphere.x, raised.x, 'Grabbing a raised bille must not change its horizontal position');
+        assert.equal(JSON.stringify(points), before);
+        for (const [i, p] of held.entries()) for (const q of held.slice(i+1)) {
+          assert.ok(Math.hypot(p.x-q.x,p.y-q.y) >= 41.99, 'Neighbours must separate around the grabbed bille');
+        }
       }
     }
   }
