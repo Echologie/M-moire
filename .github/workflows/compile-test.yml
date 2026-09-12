@@ -155,7 +155,14 @@ jobs:
         with:
           path: docs/site
 
+  deploy:
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    needs: publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy Pages
-        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
         id: deployment
         uses: actions/deploy-pages@v4
