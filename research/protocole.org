@@ -1,12 +1,12 @@
-* Banque exploratoire de rédactions et protocole — version 0.1
+#+title: Banque de rédactions et protocole — version 0.2
 
-** Objet et statut
+* Objet et statut
 
-40 questions et 160 rédactions originales, quatre par question. Niveaux proposés : 5e, 4e, 3e, seconde, première et terminale spécialité, première année du supérieur. Les niveaux décrivent des contextes didactiques plausibles, pas une certification de conformité à un programme national daté. La première année du supérieur regroupe ici des notions de L1 et de CPGE : il faudra préciser filière et acquis lors du prétest. Le corpus ne représente pas toutes les filières françaises.
+20 questions originales et 80 rédactions, de trois à six par question. Sept contextes sont proposés : 5e, 4e, 3e, seconde, première et terminale spécialité, première année du supérieur. Les niveaux indiquent des acquis plausibles ; ils ne certifient pas la conformité à un programme national daté. La strate supérieure doit encore être précisée par filière lors du prétest.
 
-L’objectif est d’étudier les attentes que les enseignants mobilisent lorsqu’ils évaluent une rédaction. La banque ne fournit ni classement des enseignants ni corrigé normatif des critères. Ses annotations sont des hypothèses de conception, à discuter puis à coder indépendamment ; elles ne sont pas des jugements déjà validés empiriquement.
+L’objectif est d’étudier les attentes mobilisées dans l’évaluation d’une rédaction. Les annotations sont des hypothèses de conception, pas des jugements validés empiriquement. On distingue la vérité du résultat, la validité de l’argument effectivement écrit, sa reconstruction éventuelle par le lecteur et les attentes sur ce qu’un élève doit expliciter. Une baisse de note ne suffit pas à identifier un contrat.
 
-On distingue trois objets : la vérité du résultat ; la possibilité pour un lecteur de reconstruire un argument valide ; les attentes sur ce que l’élève doit effectivement écrire. Une réponse peut être juste avec un raisonnement invalide, valide mais elliptique, ou notationnellement inhabituelle sans faute logique. Une baisse de note ne prouve pas à elle seule l’existence d’un contrat : son motif doit être établi.
+La banque privilégie des tâches comportant plusieurs étapes logiques et pouvant faire l’objet d’une notation globale sur trois points. La question trigonométrique R12 propose six rédactions de la résolution de cos(2x) = sin(3x) sur [−2π, 3π], notamment par congruence, familles paramétrées et encadrement entier. Les réponses ne sont pas toutes construites sur un gabarit de quatre variantes.
 
 ** Appuis bibliographiques examinés
 
@@ -31,69 +31,76 @@ Les pages ci-dessous sont les pages du PDF fourni, couverture comprise ; lorsque
 
 La thèse de Balacheff (1988) est un scan : l’extraction n’a restitué que la couverture, pas le corps. Elle n’est donc pas utilisée pour justifier un passage précis. Le HDR de Roditi (2011) est disponible et son texte a été extrait, mais aucune proposition spécifique de la grille ne repose ici sur une analyse approfondie de ce document. Les seize fichiers n’ont pas été lus intégralement ; les appuis directs sont les passages indiqués. La revue antérieure du dépôt ne doit pas remplacer la vérification des sources primaires.
 
-** Contrats candidats et opérations expérimentales
+* Contrats candidats et construction des contrastes
 
-Le fichier ~codebook.json~ définit les codes. Les annotations par rédaction se trouvent dans ~bank.json~ et dans ~notices.org~. « REF », « ECO », « REGISTER » et « SCOPE » peuvent désigner des contrôles ou des formes valides ; leur présence ne signifie pas une transgression. Les autres codes signalent un point à examiner : son statut exact est dans la notice. Une omission peut être contextuellement acceptable.
+Le vocabulaire des contrats, les références et les analyses restent dans ~research/~. Aucun de ces éléments n’est chargé par l’interface destinée aux enseignants. ~codebook.json~ définit les codes ; ~bank.json~ constitue la source éditoriale et ~notices.org~ sa lecture détaillée générée. Un code désigne un point à examiner ; il ne suffit pas à déclarer une rédaction invalide. En particulier, REF, ECO, REGISTER et SCOPE peuvent désigner des contrôles entièrement licites.
 
-- /Stabilité des désignations/ : un nom désigne un objet à l’intérieur d’une portée donnée ; la réaffectation explicite, la collision simultanée et le renommage d’une variable liée sont trois situations différentes. Q18, Q25, Q29, Q31, Q32, Q37 et Q39 fournissent des contrastes. L’hypothèse d’une norme plus stricte que la nécessité logique vient aussi de notre problématique, pas d’une liste attestée de contrats dans les articles.
-- /Statut des propositions et sens des relations/ : ne pas utiliser le but comme hypothèse ; distinguer implication, équivalence et réciproque. Q02, Q05, Q23, Q28, Q33, Q34, Q38 et Q40. Employer « donc » entre opérations réversibles n’est pas en soi une faute.
-- /Domaines et conditions/ : division par un non-zéro, signe avant élévation au carré, coefficient entier pour la divisibilité, hypothèses d’un contre-exemple. Q14–Q16, Q31, Q36 et Q38.
-- /Portée et dépendance des quantificateurs/ : témoins indépendants ; seuil dépendant d’epsilon ; hypothèse de récurrence locale. Q06, Q22, Q29–Q31.
-- /Suffisance et exhaustivité/ : vérifier une solution n’exclut pas les autres ; une inclusion n’établit pas l’égalité ; un majorant n’est pas nécessairement le supremum. Q04/Q13, Q05, Q12, Q23, Q33 et Q35. La reconstruction possible du lecteur est explicitée.
-- /Nature des preuves/ : un contre-exemple réfute une universelle, une liste d’exemples ne la prouve pas ; une expérience générique n’est pas un simple exemple. Q06, Q07, Q11, Q19, Q22, Q26 et Q36.
-- /Égalité, approximation, limite et type d’objet/ : ne pas écrire une chaîne d’opérations temporelles comme une égalité ; distinguer événement et probabilité, fonction et équation, maximum et supremum. Q03, Q08, Q10, Q20, Q24, Q27, Q28 et Q35.
-- /Explicitation et communication/ : nom du théorème, justification de la règle, unité et clôture. Q01–Q04, Q09, Q17 et Q24. Leur nécessité est à mesurer, pas à décréter.
-- /Accomplissement de la tâche/ : un théorème exact peut ne pas répondre à une demande de démonstration par définition. Q08, Q25, Q29 et Q30.
+| Hypothèse ou distinction | Contrastes de la banque |
+|-------------------------+------------------------|
+| Stabilité des désignations et réaffectation explicite | R03, R09, R16, R19 : paramètres indépendants, réemploi local, discriminants, variables liées. |
+| Portée et dépendance des quantificateurs | R03, R12, R13, R16–R18 : témoins, entiers, récurrence, seuil dépendant d’epsilon et unicité. |
+| Statut des propositions et sens des relations | R04, R05, R08, R13–R15, R20 : réciproque, équivalences, analyse-synthèse, hypothèse et conclusion. |
+| Domaines et conditions opératoires | R05, R07, R08, R12, R13, R15 : facteur nul, signe, racine, paramètre entier et raccordement. |
+| Suffisance, existence et exhaustivité | R01, R05, R08, R11–R15, R20 : étapes omises, solutions, existence versus unicité, deux inclusions. |
+| Généralité et nature de l’argument | R03, R06, R13, R14, R16 : preuve générale, exemples, récurrence et contre-exemple. |
+| Types d’objets et formulations | R02, R07, R09–R12, R17, R19 : transformations, événement/probabilité, point/tangente, congruence et variable liée. |
+| Explicitation, économie et réponse à la tâche | R01, R02, R04, R06, R09, R11, R17–R20 : verbal/symbolique, nom du théorème, concision et preuve par définition. |
 
-La liste est une opérationnalisation provisoire. Elle n’assimile pas tous ces points à des « contrats didactiques » au sens strict de la TSD. Les contraintes de validité, conventions sémiotiques, normes locales et attentes d’évaluation restent distinguées dans l’analyse.
+La liste ne confond pas nécessité logique, convention sémiotique et contrat didactique au sens strict. Les réemplois de lettres sont notamment analysés selon leur portée : utiliser le même nom dans deux contextes locaux n’impose pas que les objets soient identiques. Les comparaisons R09 et R19 rendent cette distinction examinable.
 
-** Mesures proposées
+Certaines variantes sont appariées, d’autres changent aussi la longueur, la méthode ou le registre. Ces dernières ne permettent pas d’attribuer causalement un écart à un seul contrat. Le corpus n’est pas un plan factoriel équilibré ; ~audit.json~ en décrit les effectifs, sans revendiquer d’orthogonalité. Pour une étude causale, préparer des contrastes ne différant que par la manipulation visée et fixer leur affectation avant la collecte.
 
-| Dimension | Question au correcteur | Échelle |
-|-----+-----+-----|
-| Note | Quelle note attribueriez-vous à cette réponse ? | 0–20, indépendamment des autres critères |
-| Justesse du résultat | Le résultat annoncé répond-il correctement à la question ? | 0–4 |
-| Validité du raisonnement | Les arguments établissent-ils la conclusion ? | 0–4 |
-| Précision des formulations | Les notations et formulations désignent-elles sans ambiguïté les objets et les relations ? | 0–4 |
-| Explicitation | Les étapes nécessaires sont-elles suffisamment explicitées pour le niveau annoncé ? | 0–4 |
-| Lisibilité | Le cheminement est-il facile à suivre ? | 0–4 |
+* Quatre mesures indépendantes
 
-Les échelles sont ordinales exploratoires : le déplacement ne rend pas les distances psychométriquement métriques. 0 signifie un jugement minimal sur la dimension, 4 maximal ; les graduations intermédiaires laissent place au jugement du répondant. L’absence de réponse et « non pertinent » sont séparés. Ces ancrages doivent être éprouvés en entretien ; notamment « rigueur » peut recouvrir validité et explicitation. L’interface emploie donc « validité du raisonnement », plus ciblé.
+| Mesure | Présentation | Valeurs |
+|--------+--------------+---------|
+| Note globale | Curseur sur la fiche, pendant la lecture | 0 à 3, par pas de 0,25 |
+| Lisibilité, coordonnée x | Confus ↔ Lisible | −10 à +10 |
+| Précision, coordonnée y | Vague ↔ Précis | −10 à +10 |
+| Validité, coordonnée z | Fautif ↔ Valide | −10 à +10 |
 
-La conviction, l’élégance, l’économie et la compréhension supposée de l’élève ne sont pas ajoutées comme obligations : elles risquent de surcharger l’enquête ou d’inférer un état mental à partir d’un texte. Elles peuvent émerger dans le commentaire libre. Un prétest pourra ajouter une mesure de conviction si elle apporte une information distincte.
+La note n’est jamais calculée à partir des coordonnées. Seules les bornes 0 et 3 sont affichées sur le curseur ; sa valeur reste accessible au clavier et aux technologies d’assistance. La note initiale est celle confirmée lors de la première fermeture de la fiche, après les ajustements du curseur. La note courante peut ensuite être révisée indépendamment.
 
-** Plan des comparaisons et limites
+Pour les trois axes, zéro représente ce que le répondant attendrait dans le contexte de la question. Il ne constitue ni une absence de réponse, ni nécessairement un idéal. Aller vers « plus » peut signifier mieux, ou trop, notamment pour la précision. Le tutoriel explicite cette liberté. Les coordonnées sont arrondies au dixième pour la manipulation ; les flèches déplacent de 0,1, ou de 1 avec Majuscule.
 
-- Q04 et Q13 ont le même énoncé et les mêmes rédactions ; le niveau seul change. Une session ne contient jamais les deux. On ne présuppose pas que collège signifie essais-vérification et lycée équivalences : c’est justement une différence éventuelle à observer.
-- Les lettres A–D sont attribuées dans un ordre aléatoire stable durant la session. Elles ne désignent pas la qualité et ne remplacent pas les identifiants stables d’export.
-- Q08, Q23 et Q37 ne comportent aucune rédaction de référence entièrement satisfaisante. Dans Q23, l’absence de justification complète de l’existence et de l’unicité est commune, avec des causes différentes ; ce facteur commun ne pourra donc pas être estimé à l’intérieur de cette question.
-- Les combinaisons varient : faute de calcul seule, collision de nom seule, omission, argument empirique, puis mélanges (par exemple Q22-3, Q23-3, Q24-4). Les contrôles verbaux et elliptiques rompent l’association « rédaction longue = bonne rédaction ».
-- Quatre réponses par question ne constituent pas un plan factoriel complet. Les différences de méthode et de longueur restent parfois des facteurs confondants. Q01-1/Q01-2, par exemple, ne permettent pas d’isoler le seul effet du nom du théorème. Ces comparaisons sont exploratoires ; pour des effets causaux, produire des variantes appariées ne différant que par une manipulation et les répartir entre répondants.
-- Le plan comporte 12 questions collège, 16 lycée et 12 supérieur. Un enseignant ne reçoit que ses niveaux déclarés ; il peut donc avoir moins de 20 questions. Ne pas compléter artificiellement avec des niveaux jamais enseignés. Pour un enseignant de seule 5e, le stock reste très petit : élargir par strate sera nécessaire avant une enquête répétée à grande échelle.
-- Le choix des questions est aléatoire avec exclusion des doublons de famille, pas un échantillonnage optimisé pour estimer tous les effets. Certaines ruptures sont plus représentées. L’audit fournit les effectifs des codes ; il ne prétend pas à un équilibre orthogonal.
-- Jusqu’à 20 questions × 4 rédactions × 3 mesures retenues donnent 240 jugements, hors critères facultatifs. La durée n’a pas été mesurée. Le prototype tire une paire de critères parmi cinq paires préspécifiées et demande la note en plus ; une version définitive devra équilibrer les blocs entre enseignants et fixer un objectif de durée après prétest.
-- Les critères sont montrés avant la notation : cela peut orienter le jugement. Pour mesurer une note spontanée, prévoir un bloc « note et commentaire libre » avant l’affichage des critères, éventuellement contrebalancé entre participants. Cette séparation n’est pas encore implémentée.
-- Une comparaison simultanée peut modifier les jugements. Pour étudier cet effet, une future version conservera les notes initiales, les révisions et les événements d’ouverture. Le prototype conserve seulement la dernière valeur, pas une chronologie exploitable.
+L’espace géométrique est un dispositif de saisie et de comparaison, pas la preuve d’une métrique psychométrique. Les distances, volumes et voisinages ne doivent pas être interprétés comme des quantités de qualité sans validation. Les trois axes sont montrés dans le tutoriel : la note est donnée avant le placement de chaque rédaction, mais n’est pas une mesure réalisée à l’aveugle des critères.
 
-** Parcours et données
+Une position d’origine non encore évaluée est distinguée d’un zéro choisi par ~evaluatedAxes~. Le bouton « Conserver cette position » permet de valider les deux coordonnées visibles sans déplacer la bille. Une rédaction complète comporte une note et trois axes évalués. Les coordonnées d’axes absents de cette liste doivent être traitées comme non-réponses, même si leur valeur technique vaut zéro. Il n’existe pas de catégorie « non pertinent » dans cette version.
 
-Le nouveau parcours est la page d’entrée ~index.html~, également accessible à ~enquete.html~. Le prototype original reste accessible à ~prototype.html~. Il comporte sélection des niveaux, tutoriel en quatre étapes, changement libre des axes, saisie numérique alternative au déplacement, lecture plein écran, comparaison de deux textes, navigation et bilan. Le prototype Elm original est conservé pour comparaison ; le nouveau parcours est un module JavaScript autonome réutilisant les ressources de rendu mathématique. Une consolidation dans Elm reste une étape d’architecture possible, non réalisée ici.
+* Parcours et interactions
 
-Une nouvelle session privilégie les questions déjà quittées par « Suivante » qui n’ont pas encore été vues pendant l’ouverture de la page. Il n’y a ni cookie, ni compte, ni lien magique, ni enregistrement distant. L’export JSON contient version de banque, niveaux, critères retenus, ordre des questions et des rédactions, scores et commentaires. L’export manuel ne constitue pas un système de collecte.
+Le nouveau parcours Elm est la page ~docs/site/index.html~, identique à ~enquete.html~. L’ancien prototype reste disponible à ~prototype.html~. Les sources du parcours sont séparées en ~Survey.elm~ (état et navigation), ~Survey/Model.elm~ (données et invariants), ~space.js~ (projection et gestes), ~session.js~ (tirage) et ~enquete.js~ (pont navigateur, tutoriel, animation et export).
 
-~research/bank.json~ contient les annotations et les réponses de référence. ~docs/data/bank.json~ et ~www/data/bank.json~ ne contiennent ni corrigé ni annotation. Attention : le dépôt GitHub est public ; la séparation empêche l’affichage des notices dans l’application, elle ne les rend pas confidentielles. Si l’aveuglement exige une véritable confidentialité, les notices devront vivre dans un dépôt privé avant diffusion de l’enquête.
+Après le choix des niveaux, un entraînement distinct des réponses impose des actions réelles : noter, réduire la fiche, choisir une première face, déplacer, choisir une seconde face, déplacer, revenir en vue libre, tourner et rouvrir. Une zone éclairée et une consigne contextualisée accompagnent chaque geste. L’entraînement peut être relancé avec « Mode d’emploi » ; les réponses en cours sont conservées.
 
-** Prétest nécessaire avant collecte de recherche
+Chaque nouvelle rédaction s’ouvre en grand sous la question. Après notation elle se réduit en une bille portant son numéro et un aperçu du texte. Les rédactions déjà rencontrées restent accessibles dans l’espace et dans une barre de rappel. Le bouton « Rédaction suivante » révèle les suivantes progressivement, après évaluation des trois axes. On peut relire, réviser, comparer deux textes, revenir à une question ou la passer.
 
-- Faire relire indépendamment chaque rédaction et son annotation par deux personnes ; discuter spécialement « implicite récupérable » versus « manque de preuve » et vérifier les acquis supposés.
-- Faire passer le parcours à quelques enseignants de profils différents avec verbalisation : ce qu’ils lisent, ce qu’ils réparent, ce qu’ils comprennent par les axes, ce qui motive la note.
-- Mesurer durée, fatigue, abandons et usage des vues ; réduire le nombre de jugements si nécessaire.
-- Réviser les items ambigus involontairement ; conserver les ambiguïtés intentionnelles avec plusieurs codages possibles et justification.
-- Fixer population, strates, conditions d’enseignement, consignes de notation et plan d’affectation avant collecte. Une note sur 20 sans barème de correction commun mesure une décision globale, pas une allocation de points comparable à une épreuve réelle.
-- Pour l’analyse, distinguer résultats descriptifs et inférences : réponses imbriquées dans enseignants, questions et rédactions ; traiter les scores ordinaux comme tels, les « non pertinents » séparément, et les reprises du même participant comme dépendantes quand une identité sera disponible. Ne pas estimer arbitrairement un poids universel de chaque contrat à partir de cette petite banque.
+La vue libre autorise la rotation du point de vue au doigt ou à la souris, sans modifier les données. Les trois faces sont Lisibilité–Précision (xy), Lisibilité–Validité (xz) et Précision–Validité (yz). Un déplacement de face ne change jamais la troisième coordonnée : l’invariant est imposé dans le modèle Elm, indépendamment du rendu. Des projections, graduations et valeurs numériques précisent la position. Les billes superposées en projection sont décalées et reliées par un trait à leur position exacte. Les animations respectent la préférence de réduction des mouvements.
 
-** Vérifications de cette livraison
+* Tirage et historique
 
-Validation locale : 40 énoncés, 160 identifiants distincts, quatre variantes par question, codes connus, paire inter-niveaux identique, absence d’annotations dans les données publiques, ressources locales présentes, synchronisation www/docs et rendu syntaxique de 502 expressions KaTeX. Les tests de logique du parcours vérifient le tirage, l’exclusion des familles communes, les ordres stables, la distinction zéro / absence / non pertinent et l’indépendance des scores. Ces contrôles ne démontrent pas la validité mathématique ni psychométrique des annotations.
+Le tirage est effectué à partir d’une graine aléatoire produite par ~crypto.getRandomValues~, avec Mulberry32 et Fisher–Yates. Questions et rédactions sont mélangées séparément. L’ordre reste stable lors des retours dans une session ; les numéros correspondent uniquement à l’ordre de présentation, jamais à la qualité supposée. Les identifiants Rxx-y sont conservés pour l’analyse.
 
-Trois tests de navigateur ont été ajoutés pour lecture / note / retour, déplacement / comparaison et petit écran / rotation. Ils n’ont pas été exécutés localement dans cet environnement ; le workflow du dépôt les inclut avec les tests du prototype d’origine. Aucun résultat de contrôle visuel n’est revendiqué. Les sources Elm ne sont pas modifiées et n’ont pas été recompilées localement.
+Une session sélectionne au plus 20 questions dans les seuls niveaux déclarés, en excluant les doublons de famille. Les questions non encore rencontrées pendant l’ouverture de la page sont prioritaires. Le stock actuel comporte 6 questions au collège, 9 au lycée et 5 dans le supérieur ; la strate de seule 5e, par exemple, ne comprend que deux questions. Le nombre et la durée doivent être ajustés après prétest, sans compléter avec des niveaux non déclarés. Le maximum actuel, tous niveaux sélectionnés, représente 80 rédactions et 320 valeurs finales ; la durée réelle reste à mesurer.
+
+L’export JSON de schéma 2 contient la version de banque, les niveaux, la graine et l’algorithme de tirage, les ordres exacts des questions et des rédactions, les réponses par identifiant, les notes initiales et courantes, les axes évalués, les questions passées et les événements horodatés. Les événements distinguent ouverture, notation, fermeture, placement, changement de vue, rotation, comparaison et navigation. Les gestes d’entraînement et sa réponse ne sont pas exportés. Le journal décrit l’interaction ; il ne mesure pas directement un temps de réflexion ni un motif de jugement.
+
+Toutes les données restent en mémoire dans la page. Aucun compte, cookie, envoi distant ni collecte automatique n’est ajouté. Le répondant doit télécharger son export avant de fermer ou recharger la page. Le bouton « Nouvelle session » prépare un nouveau tirage. Un export manuel ne constitue pas un dispositif de collecte de recherche opérationnel ; sa réception et son rattachement éventuel à des informations de contexte restent à organiser.
+
+~research/bank.json~ contient les notices et références. Le script de construction produit ~docs/site/data/bank.json~ à partir d’une liste explicite de champs autorisés : identifiant, niveau, domaine, énoncé, famille et textes des rédactions. Ni titre expérimental, ni code, ni corrigé, ni annotation ne sont inclus. Le dépôt GitHub étant public, cette séparation empêche leur affichage et leur chargement par le site, mais ne rend pas les sources de recherche confidentielles. Une confidentialité stricte des notices suppose leur hébergement privé avant diffusion.
+
+* Prétest et analyse
+
+- Faire relire indépendamment chaque rédaction et chaque annotation, notamment les variantes dont la portée des noms ou l’implicite est discutable.
+- Vérifier les acquis supposés, la plausibilité d’une notation sur trois points, les interprétations des trois axes et du zéro attendu auprès d’enseignants.
+- Observer le tutoriel sur téléphone, tablette et ordinateur ; relever hésitations, durée, fatigue, abandons et effets de comparaison.
+- Distinguer erreur involontaire de conception et ambiguïté intentionnelle ; conserver plusieurs codages argumentés si nécessaire.
+- Fixer population, contexte, strates et allocation avant collecte. Sans barème commun, la note mesure ici un jugement global et non l’allocation de points d’une épreuve standardisée.
+- Analyser les révisions et les effets d’ordre grâce aux séquences enregistrées. Une révision ne permet pas, à elle seule, d’en identifier la cause.
+- Respecter l’imbrication des réponses dans les enseignants, questions et rédactions ; ne pas inférer un poids universel de chaque contrat à partir de cette petite banque.
+
+* Vérifications techniques
+
+Le validateur contrôle les identifiants, les codes connus, les effectifs variables, les listes de champs publics et privés, la synchronisation des deux pages d’entrée et le rendu KaTeX de toutes les expressions de la banque. ~audit.json~ contient le résultat de ce contrôle.
+
+Les tests JavaScript portent sur la reproductibilité du tirage, les deux permutations, la sélection des niveaux, les priorités et les exclusions de familles. Les tests Elm vérifient notamment la conservation de la troisième coordonnée, les bornes, la distinction entre note zéro et absence de note et l’évaluation des trois axes. Les tests de navigateur parcourent le tutoriel et vérifient notation, déplacement, révision, export, retour, affichage mobile et rotation d’écran. Le workflow GitHub compile et exécute ces suites avant publication ; ces contrôles techniques n’établissent pas la validité mathématique ou psychométrique de la banque.

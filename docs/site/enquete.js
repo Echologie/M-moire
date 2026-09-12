@@ -1,30 +1,157 @@
-/* Prototype en mémoire : aucune donnée envoyée ni conservée après rechargement. */
-'use strict';
-const AXES={note:{label:'Note',max:20,help:'La note que vous attribueriez à cette réponse, sur 20.'},justesse:{label:'Justesse du résultat',max:4,help:'Le résultat annoncé répond-il correctement à la question ?'},rigueur:{label:'Validité du raisonnement',max:4,help:'Les arguments établissent-ils la conclusion ?'},precision:{label:'Précision des formulations',max:4,help:'Les notations et formulations désignent-elles sans ambiguïté les objets et les relations ?'},explicitation:{label:'Explicitation',max:4,help:'Les étapes nécessaires sont-elles suffisamment explicitées pour le niveau annoncé ?'},lisibilite:{label:'Lisibilité',max:4,help:'Le cheminement de la rédaction est-il facile à suivre ?'}};
-const LEVELS=['5e','4e','3e','2de','1re spé','Tle spé','Sup 1'];
-const app=document.querySelector('#app'),reader=document.querySelector('#reader'),help=document.querySelector('#help');
-let bank,session=[],index=0,answers={},orders={},seen=new Set(),selectedLevels=[],axisX='rigueur',axisY='precision',required=['rigueur','precision'],tour=0;
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function math(node){if(window.renderMathInElement)renderMathInElement(node,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}
-function shuffle(xs){const a=[...xs];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function current(){return session[index];}
-function response(p){return answers[p.id] ||= {scores:{},comment:''};}
-function shown(){return orders[current().id].map(id=>current().productions.find(p=>p.id===id));}
-function value(p,a){return response(p).scores[a];}
-function options(a,chosen){return '<option value="">Non évalué</option>'+Array.from({length:AXES[a].max+1},(_,n)=>`<option value="${n}" ${chosen===n?'selected':''}>${n} / ${AXES[a].max}</option>`).join('')+`<option value="NA" ${chosen==='NA'?'selected':''}>Non pertinent</option>`;}
-function axisOptions(a){return Object.entries(AXES).map(([k,v])=>`<option value="${k}" ${a===k?'selected':''}>${v.label}</option>`).join('');}
-function complete(q){return q.productions.every(p=>['note',...required].every(a=>response(p).scores[a]!==undefined));}
-function setup(){app.innerHTML=`<section class="setup"><span class="badge">Évaluation de rédactions mathématiques</span><h1 style="margin-top:20px">Quels niveaux avez-vous enseignés ?</h1><p>Vous examinerez plusieurs réponses à une même question, dans le contexte du niveau indiqué. Évaluez chaque rédaction selon votre propre jugement.</p><form id="levels"><div class="levels">${LEVELS.map(l=>`<label><input type="checkbox" name="level" value="${esc(l)}" ${selectedLevels.includes(l)?'checked':''}>${esc(l==='Sup 1'?'Supérieur · 1re année':l)}</label>`).join('')}</div><p class="muted">Première et terminale : spécialité mathématiques. Supérieur : questions de L1 ou de CPGE, selon les notions enseignées.</p><button class="primary">Commencer une session</button><p id="selection-error" role="alert"></p></form><details><summary>À propos de cette version</summary><p>Simulation : les réponses restent uniquement dans cette page. Un rechargement les efface. Aucun compte ni adresse mail n’est demandé.</p><p>Une session propose jusqu’à 20 questions parmi les niveaux sélectionnés. Vous pouvez passer une question qui ne correspond pas à votre expérience.</p></details></section>`;document.querySelector('#levels').onsubmit=e=>{e.preventDefault();selectedLevels=[...new FormData(e.target).getAll('level')];if(!selectedLevels.length){document.querySelector('#selection-error').textContent='Sélectionnez au moins un niveau.';return;}start();};}
-function start(){let pool=bank.questions.filter(q=>selectedLevels.includes(q.level));const fresh=pool.filter(q=>!seen.has(q.id));if(fresh.length)pool=fresh;const families=new Set();session=shuffle(pool).filter(q=>{if(families.has(q.family))return false;families.add(q.family);return true;}).slice(0,20);if(!session.length)return setup();index=0;answers={};orders={};for(const q of session)orders[q.id]=shuffle(q.productions.map(p=>p.id));const pairs=[['rigueur','precision'],['rigueur','lisibilite'],['justesse','explicitation'],['precision','lisibilite'],['justesse','rigueur']];required=shuffle(pairs)[0];[axisX,axisY]=required;render();tour=0;showHelp();}
-function render(){const q=current(),done=session.filter(complete).length;app.innerHTML=`<section class="shell"><header class="panel"><div class="toolbar"><h1>Regards sur les rédactions</h1><button id="help-button">Mode d’emploi</button></div><div class="toolbar"><span>Question ${index+1} / ${session.length} · <strong>${esc(q.level)}</strong> · ${esc(q.domain)}</span><span class="status">${done} question${done>1?'s':''} évaluée${done>1?'s':''}</span></div><div class="progress"><span style="width:${100*done/session.length}%"></span></div><div class="statement">${esc(q.statement)}</div><div class="selectors"><label>Horizontal <select id="axis-x">${axisOptions(axisX)}</select></label><label>Vertical <select id="axis-y">${axisOptions(axisY)}</select></label><button id="compare">Comparer deux rédactions</button></div></header><div class="board" id="board" aria-label="Plan de comparaison des rédactions"><span class="axis-y">↑ ${esc(AXES[axisY].label)} · ${AXES[axisY].max}</span><span class="axis-x">0 → ${esc(AXES[axisX].label)} · ${AXES[axisX].max}</span>${shown().map((p,i)=>`<button class="card" data-id="${p.id}" aria-label="Ouvrir la rédaction ${String.fromCharCode(65+i)}"><strong>${String.fromCharCode(65+i)}</strong><small>Lire / évaluer</small></button>`).join('')}</div><div class="legend">Cliquez sur une vignette pour lire. Déplacez-la pour évaluer les deux critères affichés. Les vignettes en pointillés attendent une évaluation ; leur position initiale n’est pas une note.</div><section class="panel"><div class="toolbar"><strong>Vos évaluations</strong><span class="muted">0 : minimum · 4 : maximum · note sur 20</span></div><p class="muted">Pour cette session : note, ${esc(AXES[required[0]].label.toLowerCase())} et ${esc(AXES[required[1]].label.toLowerCase())}. Les autres critères sont facultatifs.</p><div class="table-wrap"><table><thead><tr><th>Rédaction</th>${[...new Set(['note',axisX,axisY])].map(a=>`<th title="${esc(AXES[a].help)}">${esc(AXES[a].label)}</th>`).join('')}</tr></thead><tbody>${shown().map((p,i)=>`<tr><td><button data-read="${p.id}">${String.fromCharCode(65+i)} · Lire</button></td>${[...new Set(['note',axisX,axisY])].map(a=>`<td><select aria-label="${esc(AXES[a].label)} rédaction ${String.fromCharCode(65+i)}" data-score="${p.id}" data-axis="${a}">${options(a,value(p,a))}</select></td>`).join('')}</tr>`).join('')}</tbody></table></div></section><footer class="navigation"><button id="prev" ${index===0?'disabled':''}>Précédente</button><label>Aller à <select id="jump">${session.map((item,i)=>`<option value="${i}" ${i===index?'selected':''}>${i+1}${complete(item)?' ✓':''}</option>`).join('')}</select></label><button id="skip">Passer</button><button class="primary" id="next">${index===session.length-1?'Bilan de session':'Suivante'}</button></footer><span class="muted">Simulation sans enregistrement permanent. Vous pouvez revenir sur toutes vos évaluations.</span></section>`;math(app);document.querySelector('#help-button').onclick=()=>{tour=0;showHelp();};for(const [id,key] of [['axis-x','x'],['axis-y','y']])document.getElementById(id).onchange=e=>{if(key==='x'){const old=axisX;axisX=e.target.value;if(axisX===axisY)axisY=old;}else{const old=axisY;axisY=e.target.value;if(axisY===axisX)axisX=old;}render();};document.querySelector('#prev').onclick=()=>{index--;render();};document.querySelector('#next').onclick=()=>{seen.add(q.id);if(index<session.length-1){index++;render();}else finish();};document.querySelector('#skip').onclick=()=>{response({id:q.id}).skipped=true;if(index<session.length-1){index++;render();}else finish();};document.querySelector('#jump').onchange=e=>{index=+e.target.value;render();};document.querySelector('#compare').onclick=compare;document.querySelectorAll('[data-read]').forEach(b=>b.onclick=()=>openReader(b.dataset.read));bindScores(app);positionCards();document.querySelectorAll('.card').forEach(bindDrag);}
-function bindScores(root){root.querySelectorAll('[data-score]').forEach(s=>s.onchange=()=>{const scores=answers[s.dataset.score].scores;if(s.value==='')delete scores[s.dataset.axis];else scores[s.dataset.axis]=s.value==='NA'?'NA':+s.value;if(!reader.open)render();});}
-function bounds(){const b=document.querySelector('#board'),c=b?.querySelector('.card');if(!b||!c)return null;return {left:24,top:44,w:Math.max(1,b.clientWidth-c.offsetWidth-48),h:Math.max(1,b.clientHeight-c.offsetHeight-84)};}
-function positionCards(){const b=bounds();if(!b)return;shown().forEach((p,i)=>{const c=document.querySelector(`.card[data-id="${p.id}"]`),x=value(p,axisX),y=value(p,axisY),valid=typeof x==='number'&&typeof y==='number';c.classList.toggle('unrated',!valid);c.style.left=`${b.left+(typeof x==='number'?x/AXES[axisX].max:i/Math.max(1,shown().length-1))*b.w}px`;c.style.top=`${b.top+(typeof y==='number'?1-y/AXES[axisY].max:.48)*b.h}px`;c.querySelector('small').textContent=valid?`${x}/${AXES[axisX].max} · ${y}/${AXES[axisY].max}`:'À évaluer';});}
-function bindDrag(c){let drag;c.onpointerdown=e=>{if(e.button!==0)return;drag={x:e.clientX,y:e.clientY,left:parseFloat(c.style.left),top:parseFloat(c.style.top),moved:false};c.setPointerCapture(e.pointerId);};c.onpointermove=e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>5)drag.moved=true;if(!drag.moved)return;c.classList.add('dragging');const b=bounds();c.style.left=`${Math.max(b.left,Math.min(b.left+b.w,drag.left+dx))}px`;c.style.top=`${Math.max(b.top,Math.min(b.top+b.h,drag.top+dy))}px`;};c.onpointerup=()=>{if(!drag)return;const moved=drag.moved;drag=null;if(moved){const b=bounds(),s=answers[c.dataset.id].scores;s[axisX]=Math.round((parseFloat(c.style.left)-b.left)/b.w*AXES[axisX].max);s[axisY]=Math.round((1-(parseFloat(c.style.top)-b.top)/b.h)*AXES[axisY].max);render();}else openReader(c.dataset.id);};c.onpointercancel=()=>{drag=null;c.classList.remove('dragging');positionCards();};c.onclick=e=>{if(e.detail===0)openReader(c.dataset.id);};}
-function openReader(id){const p=current().productions.find(p=>p.id===id),letter=String.fromCharCode(65+orders[current().id].indexOf(id));reader.innerHTML=`<button class="close" id="close-reader">Fermer ✕</button><span class="badge">Rédaction ${letter}</span><div class="reader-content"><p class="muted">${esc(current().level)} · ${esc(current().statement)}</p><hr><rich-text content="${esc(p.content)}"></rich-text><div class="rating-fields">${Object.entries(AXES).map(([a,v])=>`<label title="${esc(v.help)}">${esc(v.label)}${['note',...required].includes(a)?' *':''}<select data-score="${id}" data-axis="${a}">${options(a,value(p,a))}</select></label>`).join('')}</div><label>Qu’est-ce qui motive votre jugement ? (facultatif)<textarea id="comment">${esc(response(p).comment)}</textarea></label><p class="muted">* Critères retenus pour cette session. « Non pertinent » est une réponse possible.</p></div>`;math(reader);bindScores(reader);reader.querySelector('#comment').oninput=e=>response(p).comment=e.target.value;reader.querySelector('#close-reader').onclick=()=>reader.close();reader.showModal();}
-reader.addEventListener('close',()=>{if(session.length)render();});
-function compare(){const ps=shown();reader.innerHTML=`<button class="close" id="close-reader">Fermer ✕</button><h2>Comparer les textes</h2><div class="compare">${[0,1].map((n)=>`<article><label>Rédaction <select data-compare="${n}">${ps.map((p,i)=>`<option value="${p.id}" ${i===n?'selected':''}>${String.fromCharCode(65+i)}</option>`).join('')}</select></label><div id="comparison-${n}"></div></article>`).join('')}</div>`;function fill(s){const p=ps.find(p=>p.id===s.value),node=reader.querySelector(`#comparison-${s.dataset.compare}`);node.innerHTML=`<rich-text content="${esc(p.content)}"></rich-text>`;math(node);}reader.querySelectorAll('[data-compare]').forEach(s=>{fill(s);s.onchange=()=>fill(s);});reader.querySelector('#close-reader').onclick=()=>reader.close();reader.showModal();}
-function showHelp(){const steps=[['Lire les rédactions','Cliquez sur une vignette : la rédaction s’ouvre en grand. Fermez-la ou utilisez Échap pour revenir au plan.'],['Choisir les critères','Les deux menus choisissent les critères du plan. Changer de vue conserve les évaluations déjà saisies. Chaque critère a sa propre valeur.'],['Placer ou saisir','Déplacez une vignette : vers la droite et vers le haut, les valeurs augmentent. Vous pouvez aussi utiliser les menus sous le plan, au clavier ou au toucher. Les positions en pointillés ne sont pas des réponses.'],['Avancer à votre rythme','Attribuez une note et évaluez les deux critères indiqués pour la session. Les autres sont facultatifs. Vous pouvez passer, revenir ou comparer deux textes. Les données disparaissent au rechargement.']];help.innerHTML=`<p class="muted">Mode d’emploi · ${tour+1} / ${steps.length}</p><h2>${steps[tour][0]}</h2><p>${steps[tour][1]}</p><div class="navigation"><button id="end-help">Fermer</button><button class="primary" id="next-help">${tour===3?'Commencer':'Suite'}</button></div>`;help.querySelector('#end-help').onclick=()=>help.close();help.querySelector('#next-help').onclick=()=>{if(tour===3)help.close();else{tour++;showHelp();}};if(!help.open)help.showModal();}
-function finish(){const done=session.filter(complete).length;app.innerHTML=`<section class="setup"><h1>Bilan de la session</h1><p>${done} question${done>1?'s':''} évaluée${done>1?'s':''} sur ${session.length}, pour les trois critères retenus.</p><p>Les autres questions restent incomplètes ou ont été passées. Vous pouvez les retrouver avant de commencer une nouvelle session.</p><div class="navigation"><button id="return">Revenir aux questions</button><button id="export">Exporter mes réponses</button><button class="primary" id="restart">Nouvelle session</button></div><p class="muted">Les nouvelles questions encore disponibles seront proposées en priorité. Aucun historique ne sera conservé après rechargement.</p></section>`;document.querySelector('#return').onclick=render;document.querySelector('#restart').onclick=setup;document.querySelector('#export').onclick=()=>{const data={schemaVersion:1,bankVersion:bank.version,levels:selectedLevels,requiredAxes:['note',...required],questionOrder:session.map(q=>q.id),productionOrder:orders,answers};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='evaluations-redactions.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};}
-window.addEventListener('resize',positionCards);
-fetch('data/bank.json').then(r=>{if(!r.ok)throw new Error('http');return r.json();}).then(data=>{bank=data;setup();}).catch(()=>{app.innerHTML='<section class="setup"><h1>Chargement impossible</h1><p>La banque de questions n’a pas pu être chargée.</p><button onclick="location.reload()">Réessayer</button></section>';});
+/* Browser integration only. Survey state and coordinate invariants live in Elm. */
+import { prepareSession, createSeed, axes } from './session.js';
+import './space.js';
+const root = document.getElementById('app');
+let application, bank, seed, startedAt;
+let events = [], seen = new Set();
+function send(message) { application?.ports.incoming.send(message); }
+function showQuestion() {
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.dispatchEvent(new Event('regards-layout'));
+    positionComparison();
+  });
+}
+function positionComparison() {
+  const layer = document.querySelector('.comparison-layer');
+  if (layer) layer.style.paddingTop = `${Math.max(12, (document.querySelector('#question-panel')?.getBoundingClientRect().bottom || 140) + 14)}px`;
+}
+window.addEventListener('resize', positionComparison);
+window.addEventListener('scroll', positionComparison, true);
+
+class ReadingCard extends HTMLElement {
+  static get observedAttributes() { return ['production-id']; }
+  attributeChangedCallback() {
+    if (this.layout) requestAnimationFrame(() => {
+      this.querySelector('.reader-content').scrollTop = 0;
+      this.layout();
+      this.focus({ preventScroll: true });
+    });
+  }
+  connectedCallback() {
+    this.layout = () => {
+      const bottom = document.querySelector('#question-panel')?.getBoundingClientRect().bottom || 140;
+      const coach = document.querySelector('.coach-card');
+      const top = coach ? Math.min(innerHeight - 250, bottom + coach.offsetHeight + 38) : Math.max(12, bottom + 14);
+      this.closest('.reader-layer').style.paddingTop = `${top}px`;
+    };
+    this.resize = new ResizeObserver(this.layout);
+    this.resize.observe(document.querySelector('#question-panel'));
+    window.addEventListener('resize', this.layout);
+    window.addEventListener('regards-layout', this.layout);
+    this.onKey = e => {
+      if (e.key !== 'Tab') return;
+      const controls = [...this.querySelectorAll('button:not(:disabled),input,select,[tabindex="0"]'), ...document.querySelectorAll('.coach-card button')];
+      const first = controls[0], last = controls.at(-1);
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === this)) { last?.focus(); e.preventDefault(); }
+      if (!e.shiftKey && document.activeElement === last) { first?.focus(); e.preventDefault(); }
+    };
+    window.addEventListener('keydown', this.onKey);
+    requestAnimationFrame(() => {
+      this.layout();
+      this.focus({ preventScroll: true });
+      const orb = document.querySelector('evaluation-space')?.orb(this.getAttribute('production-id'));
+      const from = orb?.getBoundingClientRect(), to = this.getBoundingClientRect();
+      if (from && !matchMedia('(prefers-reduced-motion: reduce)').matches) this.animate([
+        { transform: `translate(${from.x + from.width / 2 - to.x - to.width / 2}px,${from.y + from.height / 2 - to.y - to.height / 2}px) scale(${from.width / to.width},${from.height / to.height})`, borderRadius: '50%', opacity: .65 },
+        { transform: 'none', borderRadius: '28px', opacity: 1 }
+      ], { duration: 520, easing: 'cubic-bezier(.16,1,.3,1)' }).finished.then(() => window.dispatchEvent(new Event('regards-layout')));
+      else window.dispatchEvent(new Event('regards-layout'));
+    });
+  }
+  disconnectedCallback() { window.removeEventListener('keydown', this.onKey); this.resize?.disconnect(); window.removeEventListener('resize', this.layout); window.removeEventListener('regards-layout', this.layout); }
+}
+customElements.define('reading-card', ReadingCard);
+async function closeReader(id) {
+  const card = document.querySelector('reading-card'), orb = document.querySelector('evaluation-space')?.orb(id);
+  if (card && orb && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const from = card.getBoundingClientRect(), to = orb.getBoundingClientRect();
+    const anim = card.animate([
+      { transform: 'none', borderRadius: '28px', opacity: 1 },
+      { transform: `translate(${to.x + to.width / 2 - from.x - from.width / 2}px,${to.y + to.height / 2 - from.y - from.height / 2}px) scale(${to.width / from.width},${to.height / from.height})`, borderRadius: '50%', opacity: .65 }
+    ], { duration: 420, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' });
+    await anim.finished.catch(() => {});
+  }
+  send({ type: 'closed' });
+  requestAnimationFrame(() => orb?.focus({ preventScroll: true }));
+}
+
+class SpotlightGuide extends HTMLElement {
+  static get observedAttributes() { return ['target', 'step']; }
+  connectedCallback() {
+    this.updateBounds = () => this.position();
+    this.resize = new ResizeObserver(this.updateBounds); this.resize.observe(document.documentElement);
+    window.addEventListener('resize', this.updateBounds); window.addEventListener('scroll', this.updateBounds, true); window.addEventListener('regards-layout', this.updateBounds);
+    this.panels = Array.from({ length: 4 }, () => { const panel = document.createElement('div'); panel.className = 'spotlight-shade'; document.body.append(panel); return panel; });
+    this.ring = document.createElement('div'); this.ring.className = 'spotlight-ring'; document.body.append(this.ring); this.schedule();
+  }
+  attributeChangedCallback() { this.schedule(); }
+  schedule() { cancelAnimationFrame(this.frame); this.frame = requestAnimationFrame(() => this.position()); }
+  position() {
+    if (!this.isConnected || !this.panels) return;
+    const target = document.querySelector(this.getAttribute('target')), coach = this.querySelector('.coach-card');
+    if (!target || !coach) return;
+    const rect = target.getBoundingClientRect(), pad = 8, w = innerWidth, h = innerHeight;
+    const l = Math.max(4, rect.left - pad), t = Math.max(4, rect.top - pad), r = Math.min(w - 4, rect.right + pad), b = Math.min(h - 4, rect.bottom + pad);
+    const bounds = [[0, 0, w, t], [0, t, l, b - t], [r, t, w - r, b - t], [0, b, w, h - b]];
+    bounds.forEach(([x, y, width, height], i) => Object.assign(this.panels[i].style, { left: `${x}px`, top: `${y}px`, width: `${width}px`, height: `${height}px` }));
+    Object.assign(this.ring.style, { left: `${l}px`, top: `${t}px`, width: `${r - l}px`, height: `${b - t}px` });
+    const ch = coach.offsetHeight, cw = coach.offsetWidth;
+    let y = t > ch + 24 ? t - ch - 14 : b + 14;
+    if (y + ch > h - 12) y = h - ch - 14;
+    if (this.getAttribute('target') === '#space') y = t > ch + 16 ? t - ch - 12 : Math.min(h - ch - 12, b - ch + 50);
+    if (document.querySelector('reading-card')) {
+      const reader = document.querySelector('reading-card'); reader.layout?.();
+      y = (document.querySelector('#question-panel')?.getBoundingClientRect().bottom || 100) + 14;
+    }
+    Object.assign(coach.style, { left: `${Math.max(12, Math.min(w - cw - 12, (l + r - cw) / 2))}px`, top: `${Math.max(12, y)}px` });
+  }
+  disconnectedCallback() {
+    cancelAnimationFrame(this.frame); this.resize?.disconnect(); window.removeEventListener('resize', this.updateBounds); window.removeEventListener('scroll', this.updateBounds, true); window.removeEventListener('regards-layout', this.updateBounds);
+    this.panels?.forEach(p => p.remove()); this.ring?.remove();
+    requestAnimationFrame(() => window.dispatchEvent(new Event('regards-layout')));
+  }
+}
+customElements.define('spotlight-guide', SpotlightGuide);
+const paths = {
+  layers: '<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/>',
+  cube: '<path d="m12 3 9 5v8l-9 5-9-5V8l9-5Zm0 10v8M3 8l9 5 9-5M12 3v10"/>',
+  'plane-xy': '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 12h16M12 4v16"/>',
+  'plane-xz': '<path d="m4 7 12-4 4 14-12 4L4 7Zm2 7 12-4M10 5l4 14"/>',
+  'plane-yz': '<path d="m4 4 16 5v11L4 15V4Zm0 6 16 5M12 7v11"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4m0 3h.01"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/>',
+  arrow: '<path d="M4 12h16m-6-6 6 6-6 6"/>', close: '<path d="m6 6 12 12M6 18 18 6"/>', check: '<path d="m5 12 4 4L19 6"/>',
+  read: '<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6m-6 4h6m-6 4h3"/>',
+  sliders: '<path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="currentColor"/><circle cx="15" cy="17" r="3" fill="currentColor"/>',
+  shrink: '<path d="M4 4l6 6m0-5v5H5m15 10-6-6m0 5v-5h5"/>',
+  hand: '<path d="M8 12V5a2 2 0 0 1 4 0v6-3a2 2 0 0 1 4 0v3-1a2 2 0 0 1 4 0v5c0 4-3 6-6 6h-2c-2 0-3-1-4-3l-4-6a2 2 0 0 1 3-2l1 2Z"/>',
+  compare: '<rect x="3" y="4" width="7" height="16" rx="2"/><rect x="14" y="4" width="7" height="16" rx="2"/>',
+  download: '<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>'
+};
+customElements.define('ui-icon', class extends HTMLElement {
+  connectedCallback() { this.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[this.getAttribute('name')] || paths.cube}</svg>`; }
+});
+
+try {
+  const response = await fetch('data/bank.json'); if (!response.ok) throw new Error('bank'); bank = await response.json();
+  const levels = ['5e', '4e', '3e', '2de', '1re spé', 'Tle spé', 'Sup 1'].filter(l => bank.questions.some(q => q.level === l));
+  application = Elm.Survey.init({ node: root, flags: { levels, version: bank.version } });
+  application.ports.action.subscribe(message => {
+    switch (message.type) {
+      case 'session': seed = createSeed(); events = []; startedAt = new Date().toISOString(); send({ type: 'session', questions: prepareSession(bank, message.levels, seed, seen) }); showQuestion(); break;
+      case 'close': closeReader(message.id); break;
+      case 'event': { const { type, ...entry } = message; events.push({ ...entry, at: new Date().toISOString(), elapsedMs: Date.now() - Date.parse(startedAt) }); if (entry.event === 'question' || entry.event === 'skip') seen.add(entry.questionId); if (['question', 'open', 'reveal', 'compare'].includes(entry.event)) showQuestion(); break; }
+      case 'export': {
+        const { type, ...data } = message;
+        const result = { schemaVersion: 2, ...data, randomization: { algorithm: 'mulberry32-fisher-yates-v1', seed }, axes, gradeScale: { min: 0, max: 3, step: .25 }, startedAt, exportedAt: new Date().toISOString(), events };
+        const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' }));
+        const link = document.createElement('a'); link.href = url; link.download = 'regards-redactions.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); break;
+      }
+    }
+  });
+} catch (error) {
+  root.replaceChildren(); const panel = document.createElement('section'); panel.className = 'finish-panel';
+  const title = document.createElement('h1'); title.textContent = 'Les questions n’ont pas pu être chargées.';
+  const retry = document.createElement('button'); retry.className = 'primary'; retry.textContent = 'Réessayer'; retry.onclick = () => location.reload(); panel.append(title, retry); root.append(panel); console.error(error);
+}

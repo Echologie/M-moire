@@ -1,18 +1,23 @@
 'use strict';
-const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
-const noop=()=>{};const element={addEventListener:noop};const context={document:{querySelector:()=>element},window:{addEventListener:noop},fetch:()=>new Promise(()=>{}),setTimeout,console,assert,bankInput:JSON.parse(fs.readFileSync('docs/site/data/bank.json'))};vm.createContext(context);vm.runInContext(fs.readFileSync('docs/site/enquete.js','utf8'),context);
-vm.runInContext(`
-render=()=>{};showHelp=()=>{};bank=bankInput;
-for(let repeat=0;repeat<100;repeat++){
- selectedLevels=[...LEVELS];seen=new Set();start();assert.equal(session.length,20);assert.equal(new Set(session.map(q=>q.family)).size,20);
- for(const q of session){assert.equal(orders[q.id].length,4);assert.equal(new Set(orders[q.id]).size,4);}
-}
-selectedLevels=['5e'];seen=new Set();start();assert.equal(session.length,2);assert.ok(session.every(q=>q.level==='5e'));
-selectedLevels=['Sup 1'];start();assert.equal(session.length,12);assert.ok(session.every(q=>q.level==='Sup 1'));
-const q=current();assert.equal(complete(q),false);for(const p of q.productions)for(const a of ['note',...required])response(p).scores[a]=0;assert.equal(complete(q),true);
-const p=q.productions[0];delete response(p).scores.note;assert.equal(complete(q),false);response(p).scores.note='NA';assert.equal(complete(q),true);
-const before=response(p).scores.lisibilite;response(p).scores.precision=3;axisX='lisibilite';axisY='justesse';assert.equal(response(p).scores.precision,3);assert.equal(response(p).scores.lisibilite,before);
-const oldOrder=[...orders[q.id]];index=1;index=0;assert.deepEqual(orders[q.id],oldOrder);
-selectedLevels=[...LEVELS];seen=new Set(bank.questions.slice(0,35).map(q=>q.id));start();assert.equal(session.length,5);assert.ok(session.every(q=>!seen.has(q.id)));
-console.log('Session sampling, family exclusion, stable order, zero / missing / NA, independent scores and unseen preference: OK');
-`,context);
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+(async () => {
+  const { prepareSession, axes } = await import('../site/session.js');
+  const bank = JSON.parse(fs.readFileSync(path.join(__dirname, '../site/data/bank.json')));
+  const levels = [...new Set(bank.questions.map(q => q.level))];
+  const first = prepareSession(bank, levels, 1234);
+  assert.deepEqual(first, prepareSession(bank, levels, 1234), 'The exported seed must reproduce both orders');
+  assert.notDeepEqual(first, prepareSession(bank, levels, 5678));
+  for (const q of first) assert.deepEqual([...q.productions.map(p => p.id)].sort(), bank.questions.find(b => b.id === q.id).productions.map(p => p.id).sort());
+  for (const level of levels) assert.ok(prepareSession(bank, [level], 7).every(q => q.level === level));
+  const seen = new Set(first.slice(0, 4).map(q => q.id));
+  assert.ok(prepareSession(bank, levels, 42, seen).every(q => !seen.has(q.id)));
+  const synthetic = { questions: [...bank.questions, { ...bank.questions[0], id: 'duplicate-family' }] };
+  const sample = prepareSession(synthetic, levels, 12);
+  assert.equal(new Set(sample.map(q => q.family)).size, sample.length);
+  assert.equal(prepareSession(bank, [], 123).length, 0);
+  assert.deepEqual(Object.keys(axes), ['x', 'y', 'z']);
+  assert.ok(Object.values(axes).every(a => a.min === -10 && a.max === 10));
+  console.log('Tirage reproductible, deux mélanges, filtrage des niveaux, familles et échelles : OK.');
+})().catch(error => { console.error(error); process.exitCode = 1; });
