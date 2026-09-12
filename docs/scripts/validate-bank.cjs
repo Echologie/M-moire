@@ -35,7 +35,10 @@ assert.ok(Object.keys(variants).length > 1, 'Variant counts must reflect the que
 assert.equal(read('docs/site/index.html'), read('docs/site/enquete.html'));
 for (const file of ['index.html', 'enquete.html', 'prototype.html']) {
   for (const m of read('docs/site/' + file).matchAll(/(?:src|href)="([^"]+)"/g)) {
-    if (!/^(https?:|data:|#)/.test(m[1])) assert.ok(fs.existsSync(path.join(root, 'docs/site', m[1])), m[1]);
+    if (!/^(https?:|data:|#)/.test(m[1])) {
+      const asset = decodeURIComponent(new URL(m[1], 'https://local.invalid/').pathname).slice(1);
+      assert.ok(fs.existsSync(path.join(root, 'docs/site', asset)), m[1]);
+    }
   }
 }
 const report = { version: bank.version, questions: qids.size, productions: ids.size, variantsPerQuestion: variants, formulas, levels, targetOccurrences: counts, checks: ['Unique stable identifiers', 'Variable production counts', 'Strict public allowlist', 'Valid mathematical markup', 'Identical entrypoints', 'Local assets present'] };
