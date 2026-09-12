@@ -196,3 +196,55 @@ test('curseurs au-dessus sur téléphone et lecture après rotation de l’écra
   await expect(page.locator('#place-button')).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('présentation épurée et proportions adaptées aux trois tailles d’écran', async ({ page }) => {
+  await start(page, '5e');
+  await grade(page, 8); await close(page);
+  await thumb(page, 'x').press('Shift+ArrowRight');
+  await thumb(page, 'y').press('Shift+ArrowRight');
+  await thumb(page, 'z').press('Shift+ArrowLeft');
+  await expect(page.locator('.question-meta')).toHaveText(/^Question \d+ \/ \d+\s*5e$/);
+  await expect(page.locator('main')).not.toContainText('Les pointillés situent la rédaction sélectionnée');
+  await expect(page.locator('main')).not.toContainText('Faites glisser pour tourner · touchez une bille pour lire');
+  await expect(page.locator('.orb-caption')).toHaveText('1');
+  await expect(page.locator('.orb')).toHaveAttribute('aria-label', 'Rédaction 1. Appuyer pour lire.');
+  await expect(page.locator('#space marker, #space [marker-start], #space [marker-end]')).toHaveCount(0);
+
+  for (const viewport of [{ width: 390, height: 844 }, { width: 820, height: 1180 }, { width: 1363, height: 936 }]) {
+    await page.setViewportSize(viewport);
+    await expect.poll(() => page.locator('#space').evaluate(el => el.style.getPropertyValue('--orb-size'))).toBeTruthy();
+    const strip = await page.locator('.production-strip').boundingBox();
+    const bars = await page.locator('#axes-panel').boundingBox();
+    const scene = await page.locator('#space').boundingBox();
+    expect(strip.y + strip.height).toBeLessThanOrEqual(Math.min(bars.y, scene.y) + 1);
+    if (viewport.width < 900) {
+      expect(bars.y + bars.height).toBeLessThanOrEqual(scene.y + 1);
+      expect(bars.height).toBeLessThan(240);
+      expect(scene.height).toBeGreaterThan(bars.height);
+    } else {
+      expect(bars.x + bars.width).toBeLessThan(scene.x);
+      expect(Math.abs(bars.height - scene.height)).toBeLessThan(2);
+    }
+    // No rectangular surface between the scene and the shared page background.
+    expect(await page.locator('#space').evaluate(el => {
+      for (let node = el; node && !node.classList.contains('evaluation-layout'); node = node.parentElement) {
+        const css = getComputedStyle(node);
+        if (css.backgroundColor !== 'rgba(0, 0, 0, 0)' || css.backgroundImage !== 'none' || css.boxShadow !== 'none' || css.borderTopWidth !== '0px') return false;
+      }
+      return true;
+    })).toBe(true);
+    await expect.poll(async () => (await page.locator('.orb').boundingBox()).width).toBeLessThan(Math.min(scene.width, scene.height) * .25);
+    const orb = await page.locator('.orb').boundingBox(), number = await page.locator('.orb-caption strong').boundingBox();
+    expect(orb.width).toBeGreaterThanOrEqual(44);
+    expect(Math.abs(number.x + number.width / 2 - orb.x - orb.width / 2)).toBeLessThan(1.5);
+    expect(Math.abs(number.y + number.height / 2 - orb.y - orb.height / 2)).toBeLessThan(1.5);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await coordinates(page.locator('.orb'))).toEqual([1, 1, -1]);
+    await page.screenshot({ path: test.info().outputPath(`presentation-${viewport.width}.png`), fullPage: true });
+  }
+  await page.getByRole('button', { name: 'Relire la rédaction 1', exact: true }).click();
+  await expect(page.locator('#reader-title')).toHaveText('Rédaction 1');
+  await close(page);
+  await page.locator('#next-production').click();
+  await expect(page.locator('#reader-title')).toHaveText('Rédaction 2');
+});

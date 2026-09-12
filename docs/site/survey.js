@@ -519,11 +519,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.bt.aP === region.bQ.aP)
+	if (region.bt.aP === region.bP.aP)
 	{
 		return 'on line ' + region.bt.aP;
 	}
-	return 'on lines ' + region.bt.aP + ' through ' + region.bQ.aP;
+	return 'on lines ' + region.bt.aP + ' through ' + region.bP.aP;
 }
 
 
@@ -3992,7 +3992,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.cS);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.cR);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ci === next.ci
-							&& curr.bY === next.bY
-							&& curr.cf.a === next.cf.a
+							&& curr.ch === next.ch
+							&& curr.bX === next.bX
+							&& curr.ce.a === next.ce.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { c8: 'hidden', cV: 'visibilitychange' }
+		? { c8: 'hidden', cU: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { c8: 'mozHidden', cV: 'mozvisibilitychange' }
+		? { c8: 'mozHidden', cU: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { c8: 'msHidden', cV: 'msvisibilitychange' }
+		? { c8: 'msHidden', cU: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { c8: 'webkitHidden', cV: 'webkitvisibilitychange' }
-		: { c8: 'hidden', cV: 'visibilitychange' };
+		? { c8: 'webkitHidden', cU: 'webkitvisibilitychange' }
+		: { c8: 'hidden', cU: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		cq: _Browser_getScene(),
-		cG: {
+		cp: _Browser_getScene(),
+		cF: {
 			bC: _Browser_window.pageXOffset,
 			bD: _Browser_window.pageYOffset,
-			cI: _Browser_doc.documentElement.clientWidth,
-			bX: _Browser_doc.documentElement.clientHeight
+			cH: _Browser_doc.documentElement.clientWidth,
+			bW: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		cI: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		bX: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		cH: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		bW: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			cq: {
-				cI: node.scrollWidth,
-				bX: node.scrollHeight
+			cp: {
+				cH: node.scrollWidth,
+				bW: node.scrollHeight
 			},
-			cG: {
+			cF: {
 				bC: node.scrollLeft,
 				bD: node.scrollTop,
-				cI: node.clientWidth,
-				bX: node.clientHeight
+				cH: node.clientWidth,
+				bW: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			cq: _Browser_getScene(),
-			cG: {
+			cp: _Browser_getScene(),
+			cF: {
 				bC: x,
 				bD: y,
-				cI: _Browser_doc.documentElement.clientWidth,
-				bX: _Browser_doc.documentElement.clientHeight
+				cH: _Browser_doc.documentElement.clientWidth,
+				bW: _Browser_doc.documentElement.clientHeight
 			},
 			c1: {
 				bC: x + rect.left,
 				bD: y + rect.top,
-				cI: rect.width,
-				bX: rect.height
+				cH: rect.width,
+				bW: rect.height
 			}
 		};
 	});
@@ -4880,7 +4880,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {bS: fragment, bY: host, cd: path, cf: port_, ci: protocol, cj: query};
+		return {bR: fragment, bX: host, cc: path, ce: port_, ch: protocol, ci: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5226,7 +5226,7 @@ var $elm$browser$Browser$Events$MySub = F3(
 	});
 var $elm$browser$Browser$Events$State = F2(
 	function (subs, pids) {
-		return {ce: pids, cA: subs};
+		return {cd: pids, cz: subs};
 	});
 var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
 	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
@@ -5456,7 +5456,7 @@ var $elm$core$Dict$merge = F6(
 	});
 var $elm$browser$Browser$Events$Event = F2(
 	function (key, event) {
-		return {bR: event, b0: key};
+		return {bQ: event, b$: key};
 	});
 var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
 var $elm$browser$Browser$Events$spawn = F3(
@@ -5531,7 +5531,7 @@ var $elm$browser$Browser$Events$onEffects = F3(
 			stepLeft,
 			stepBoth,
 			stepRight,
-			state.ce,
+			state.cd,
 			$elm$core$Dict$fromList(newSubs),
 			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
 		var deadPids = _v0.a;
@@ -5577,8 +5577,8 @@ var $elm$core$List$filterMap = F2(
 	});
 var $elm$browser$Browser$Events$onSelfMsg = F3(
 	function (router, _v0, state) {
-		var key = _v0.b0;
-		var event = _v0.bR;
+		var key = _v0.b$;
+		var event = _v0.bQ;
 		var toMessage = function (_v2) {
 			var subKey = _v2.a;
 			var _v3 = _v2.b;
@@ -5587,7 +5587,7 @@ var $elm$browser$Browser$Events$onSelfMsg = F3(
 			var decoder = _v3.c;
 			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
 		};
-		var messages = A2($elm$core$List$filterMap, toMessage, state.cA);
+		var messages = A2($elm$core$List$filterMap, toMessage, state.cz);
 		return A2(
 			$elm$core$Task$andThen,
 			function (_v1) {
@@ -5764,14 +5764,14 @@ var $elm$core$List$head = function (list) {
 	}
 };
 var $author$project$Survey$practice = {
-	bP: 'Un essai pour prendre la main',
+	c$: 'Un essai pour prendre la main',
 	b: 'practice',
-	b3: 'Entraînement',
+	b2: 'Entraînement',
 	H: _List_fromArray(
 		[
 			{ar: 'Notons $x$ la largeur, en centimètres. La longueur est $x+3$.\n\nLe périmètre donne $2x+2(x+3)=30$, donc $4x=24$ et $x=6$.\n\nLe rectangle mesure donc $6$ cm sur $9$ cm. Ces dimensions donnent bien un périmètre de $30$ cm.', b: 'practice-1'}
 		]),
-	cx: 'Un rectangle a un périmètre de $30$ cm. Sa longueur dépasse sa largeur de $3$ cm. Déterminer ses dimensions en justifiant.'
+	cw: 'Un rectangle a un périmètre de $30$ cm. Sa longueur dépasse sa largeur de $3$ cm. Déterminer ses dimensions en justifiant.'
 };
 var $author$project$Survey$current = function (m) {
 	return (m.f === 1) ? $author$project$Survey$practice : A2(
@@ -5786,7 +5786,7 @@ var $author$project$Survey$Model$Production = F2(
 	});
 var $author$project$Survey$Model$Question = F5(
 	function (id, level, domain, statement, productions) {
-		return {bP: domain, b: id, b3: level, H: productions, cx: statement};
+		return {c$: domain, b: id, b2: level, H: productions, cw: statement};
 	});
 var $elm$json$Json$Decode$map5 = _Json_map5;
 var $author$project$Survey$Model$decodeQuestion = A6(
@@ -8288,20 +8288,10 @@ var $author$project$Survey$viewWorkspace = function (m) {
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text(q.b3)
-									])),
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('domain')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(q.bP)
+										$elm$html$Html$text(q.b2)
 									]))
 							])),
-						$author$project$Survey$rich(q.cx),
+						$author$project$Survey$rich(q.cw),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
@@ -8327,6 +8317,53 @@ var $author$project$Survey$viewWorkspace = function (m) {
 								_List_Nil)
 							]))
 					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('production-strip'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Rédactions déjà lues')
+					]),
+				A2(
+					$elm$core$List$map,
+					function (v) {
+						return A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$classList(
+									_List_fromArray(
+										[
+											_Utils_Tuple2('production-chip', true),
+											_Utils_Tuple2(
+											'selected',
+											_Utils_eq(v.b, m.c))
+										])),
+									$elm$html$Html$Events$onClick(
+									$author$project$Survey$Open(v.b)),
+									A2(
+									$elm$html$Html$Attributes$attribute,
+									'aria-label',
+									'Relire la rédaction ' + $elm$core$String$fromInt(
+										A2($author$project$Survey$number, v.b, m)))
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											$elm$core$String$fromInt(
+												A2($author$project$Survey$number, v.b, m)))
+										])),
+									$elm$html$Html$text('Rédaction'),
+									($elm$core$List$length(
+									A2($author$project$Survey$getAnswer, v.b, m).P) === 3) ? $author$project$Survey$icon('check') : $elm$html$Html$text('')
+								]));
+					},
+					shown)),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -8462,70 +8499,41 @@ var $author$project$Survey$viewWorkspace = function (m) {
 										$elm$html$Html$text('Les trois repères sont placés')
 									]))
 							])),
-						A2(
-						$elm$html$Html$div,
+						A3(
+						$elm$html$Html$node,
+						'evaluation-space',
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('space-panel')
-							]),
-						_List_fromArray(
-							[
-								A3(
-								$elm$html$Html$node,
-								'evaluation-space',
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$id('space'),
-										A2(
-										$elm$html$Html$Attributes$attribute,
-										'payload',
-										A2($author$project$Survey$spacePayload, m, shown)),
-										A2(
-										$elm$html$Html$Events$on,
-										'read',
-										A2(
-											$elm$json$Json$Decode$map,
-											$author$project$Survey$Open,
-											A2(
-												$elm$json$Json$Decode$at,
-												_List_fromArray(
-													['detail', 'id']),
-												$elm$json$Json$Decode$string))),
-										A2(
-										$elm$html$Html$Events$on,
-										'orbit',
-										$elm$json$Json$Decode$succeed(
-											$author$project$Survey$Receive(
-												$elm$json$Json$Encode$object(
-													_List_fromArray(
-														[
-															_Utils_Tuple2(
-															'type',
-															$elm$json$Json$Encode$string('orbit'))
-														])))))
-									]),
-								_List_Nil),
+								$elm$html$Html$Attributes$id('space'),
 								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('space-bottom')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$span,
+								$elm$html$Html$Attributes$attribute,
+								'payload',
+								A2($author$project$Survey$spacePayload, m, shown)),
+								A2(
+								$elm$html$Html$Events$on,
+								'read',
+								A2(
+									$elm$json$Json$Decode$map,
+									$author$project$Survey$Open,
+									A2(
+										$elm$json$Json$Decode$at,
 										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('space-hint')
-											]),
-										_List_fromArray(
-											[
-												$author$project$Survey$icon('hand'),
-												$elm$html$Html$text('Faites glisser pour tourner · touchez une bille pour lire')
-											]))
-									]))
-							]))
+											['detail', 'id']),
+										$elm$json$Json$Decode$string))),
+								A2(
+								$elm$html$Html$Events$on,
+								'orbit',
+								$elm$json$Json$Decode$succeed(
+									$author$project$Survey$Receive(
+										$elm$json$Json$Encode$object(
+											_List_fromArray(
+												[
+													_Utils_Tuple2(
+													'type',
+													$elm$json$Json$Encode$string('orbit'))
+												])))))
+							]),
+						_List_Nil)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -8535,53 +8543,6 @@ var $author$project$Survey$viewWorkspace = function (m) {
 					]),
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('production-strip'),
-								A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Rédactions déjà lues')
-							]),
-						A2(
-							$elm$core$List$map,
-							function (v) {
-								return A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$classList(
-											_List_fromArray(
-												[
-													_Utils_Tuple2('production-chip', true),
-													_Utils_Tuple2(
-													'selected',
-													_Utils_eq(v.b, m.c))
-												])),
-											$elm$html$Html$Events$onClick(
-											$author$project$Survey$Open(v.b)),
-											A2(
-											$elm$html$Html$Attributes$attribute,
-											'aria-label',
-											'Relire la rédaction ' + $elm$core$String$fromInt(
-												A2($author$project$Survey$number, v.b, m)))
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$span,
-											_List_Nil,
-											_List_fromArray(
-												[
-													$elm$html$Html$text(
-													$elm$core$String$fromInt(
-														A2($author$project$Survey$number, v.b, m)))
-												])),
-											$elm$html$Html$text('Rédaction'),
-											($elm$core$List$length(
-											A2($author$project$Survey$getAnswer, v.b, m).P) === 3) ? $author$project$Survey$icon('check') : $elm$html$Html$text('')
-										]));
-							},
-							shown)),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(

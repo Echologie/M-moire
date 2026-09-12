@@ -19,6 +19,8 @@ Les tests navigateur sont obligatoires aussi pour une modification des seules do
 
 Les gestes tactiles sont injectés avec ~Input.dispatchTouchEvent~ : ils passent par le traitement des pointeurs et du défilement du navigateur. Réduire seulement la taille de la fenêtre ne simule pas ces gestes. Les tests attendent la fin des animations de lecture avant de saisir une bille ; ils inspectent aussi sa position *pendant* le glissement. Le parcours complet compare les réponses exportées aux notes et coordonnées observées dans l’interface.
 
+Le contrôle de présentation couvre les largeurs 390, 820 et 1363 pixels : vignettes au-dessus des contrôles, panneau des curseurs compact lorsqu’il est au-dessus de la scène, hauteur commune lorsqu’ils sont côte à côte, scène sans cadre et numéro centré dans une bille proportionnée à sa taille. Il conserve une capture de chaque disposition, puis vérifie la réouverture d’une vignette et le passage à la suivante.
+
 La régression signalée par ~431097.mp4~ est couverte par des prises décentrées et des trajectoires diagonales qui sortent de la barre, en portrait et sur un petit écran paysage, ainsi que par un départ vertical suivi d’un mouvement horizontal. Une saisie sur la bille ou la barre doit conserver le pointeur jusqu’au relâchement ; le défilement vertical de la page est essayé depuis les espaces libres. Une trajectoire parfaitement horizontale ne suffit pas à vérifier cette distinction.
 
 Les autres tests portent sur le prototype conservé à ~prototype.html~. Pour cibler un contrôle : ~npm run test:e2e -- --project=chromium~ ou ~--project=chromium-touch~. Une émulation tactile ne remplace pas une vérification complémentaire sur un téléphone physique.
