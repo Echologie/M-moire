@@ -179,7 +179,8 @@ test('curseurs au-dessus sur téléphone et lecture après rotation de l’écra
   const bars = await page.locator('#axes-panel').boundingBox(), scene = await page.locator('#space').boundingBox();
   expect(bars.y + bars.height).toBeLessThanOrEqual(scene.y);
   expect(bars.height).toBeLessThan(350);
-  expect(scene.y).toBeLessThan(570);
+  // The statement has variable length: measure the controls below it.
+  expect(scene.y - question.y - question.height).toBeLessThan(365);
   await thumb(page, 'z').press('Shift+ArrowRight');
   await page.screenshot({ path: test.info().outputPath('axes-mobile.png'), fullPage: true });
   await page.setViewportSize({ width: 844, height: 390 });
