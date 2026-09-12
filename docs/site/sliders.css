@@ -55,3 +55,13 @@ grade-slider:focus-within .grade-knob{outline:3px solid #36a896;outline-offset:4
   .evaluation-layout evaluation-space{min-height:320px}
   grade-slider{height:36px}
 }
+
+/* Compact portrait bars leave the volume visible below them. */
+@media(max-width:700px){
+  .axes-heading{display:none}
+  axis-slider .slider-poles{position:absolute;inset:0;display:block;pointer-events:none}
+  axis-slider .slider-poles span{position:absolute;top:var(--rail-y);transform:translateY(-50%);font-size:.6875rem}
+  axis-slider .slider-poles span:first-child{left:0}axis-slider .slider-poles span:last-child{right:0}
+  axis-slider .slider-field{margin-inline:49px}
+  .evaluation-layout evaluation-space{height:260px;min-height:260px;flex:auto}
+}

@@ -109,7 +109,7 @@ class AxisSlider extends HTMLElement {
     if (!this.data || !this.field.clientWidth) return;
     const layout = layoutThumbs(this.data.points.map(p => ({ id: p.id, number: p.number, value: p.point[this.axis] })), this.field.clientWidth, this.active || this.data.selected);
     const lift = Math.max(42, ...layout.map(p => -p.y)), baseline = lift + 22;
-    this.field.style.height = `${baseline + 24}px`; this.field.style.setProperty('--rail-y', `${baseline}px`);
+    this.field.style.height = `${baseline + 24}px`; this.style.setProperty('--rail-y', `${baseline}px`);
     this.leaders.replaceChildren();
     for (const position of layout) {
       const b = this.cards.get(position.id), p = this.data.points.find(item => item.id === position.id);
