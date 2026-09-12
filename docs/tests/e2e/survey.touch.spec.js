@@ -40,6 +40,7 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 534, height: 405 }
       await expect(page.locator('spotlight-guide')).toHaveAttribute('step', '2');
       const x = thumb(page, 'x'); await x.scrollIntoViewIfNeeded(); await settled(x);
       const p = await center(x), scroll = await page.evaluate(() => scrollY);
+      expect(await page.evaluate(p => document.elementFromPoint(p.x, p.y + 10)?.closest('.slider-thumb')?.getAttribute('aria-label'), p)).toBe('Rédaction 1 · Lisibilité');
       // Off-centre grab, then a curved diagonal path beyond the highlighted rail,
       // as in 431097.mp4. A perfectly horizontal swipe missed this regression.
       await d.down({ x: p.x, y: p.y + 10 });

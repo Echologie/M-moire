@@ -95,6 +95,7 @@ class SpotlightGuide extends HTMLElement {
         const r = target.getBoundingClientRect(), questionBottom = document.querySelector('#question-panel')?.getBoundingClientRect().bottom || 0;
         if (r.top < questionBottom + 12 || r.bottom > innerHeight - 100) target.scrollIntoView({ block: 'center', behavior: 'instant' });
       }
+      const coach = this.querySelector('.coach-card'); if (coach) coach.scrollTop = 0;
       this.position();
     });
   }
@@ -107,9 +108,16 @@ class SpotlightGuide extends HTMLElement {
     const bounds = [[0, 0, w, t], [0, t, l, b - t], [r, t, w - r, b - t], [0, b, w, h - b]];
     bounds.forEach(([x, y, width, height], i) => Object.assign(this.panels[i].style, { left: `${x}px`, top: `${y}px`, width: `${width}px`, height: `${height}px` }));
     Object.assign(this.ring.style, { left: `${l}px`, top: `${t}px`, width: `${r - l}px`, height: `${b - t}px` });
+    // On short screens the full instruction may not fit above or below an
+    // axis. Keep its sphere exposed and let the instruction itself scroll.
+    const axisTarget = target.matches('axis-slider');
+    const above = Math.max(0, t - 26), below = Math.max(0, h - b - 26);
+    coach.style.maxHeight = axisTarget ? `${Math.max(80, above, below)}px` : '';
+    coach.style.overflowY = axisTarget ? 'auto' : '';
     const ch = coach.offsetHeight, cw = coach.offsetWidth;
     let y = t > ch + 24 ? t - ch - 14 : b + 14;
     if (y + ch > h - 12) y = h - ch - 14;
+    if (axisTarget) y = above >= below ? t - ch - 14 : b + 14;
     if (this.getAttribute('target') === '#space') y = t > ch + 16 ? t - ch - 12 : Math.min(h - ch - 12, b - ch + 50);
     if (document.querySelector('reading-card')) {
       const reader = document.querySelector('reading-card'); reader.layout?.();
