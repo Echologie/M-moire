@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 (async () => {
+  const { dragValue, layoutThumbs } = await import('../site/slider-layout.js');
   const { prepareSession, axes } = await import('../site/session.js');
   const bank = JSON.parse(fs.readFileSync(path.join(__dirname, '../site/data/bank.json')));
   const levels = [...new Set(bank.questions.map(q => q.level))];
@@ -19,5 +20,21 @@ const path = require('node:path');
   assert.equal(prepareSession(bank, [], 123).length, 0);
   assert.deepEqual(Object.keys(axes), ['x', 'y', 'z']);
   assert.ok(Object.values(axes).every(a => a.min === -10 && a.max === 10));
-  console.log('Tirage reproductible, deux mélanges, filtrage des niveaux, familles et échelles : OK.');
+  assert.equal(dragValue(1.5, 0, 200, 0, 3, .25), 1.5, 'A grab must not jump');
+  assert.equal(dragValue(1.5, 50, 200, 0, 3, .25), 2.25);
+  assert.equal(dragValue(1.5, -500, 200, 0, 3, .25), 0);
+  for (const width of [220, 300, 500]) {
+    for (const values of [[0,0,0,0,0,0], [-10,-10,-9.9,9.9,10,10], [-5,-4.9,0,.1,5,5.1]]) {
+      const points = values.map((value, number) => ({ id: String(number), number, value }));
+      const before = JSON.stringify(points), layout = layoutThumbs(points, width, '1');
+      assert.equal(JSON.stringify(points), before, 'Fanning must not alter coordinates');
+      assert.equal(layout.find(p => p.id === '1').y, 0, 'The grabbed bille stays on the rail');
+      for (const [i, p] of layout.entries()) {
+        assert.ok(p.x >= 22 && p.x <= width - 22, 'Thumbs stay reachable at both ends');
+        assert.equal(p.value, values[Number(p.id)]);
+        for (const q of layout.slice(i+1)) assert.ok(Math.hypot(p.x-q.x,p.y-q.y) >= 41.99, 'All billes remain individually reachable');
+      }
+    }
+  }
+  console.log('Tirage, axes indépendants, saisie relative et séparation des billes : OK.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

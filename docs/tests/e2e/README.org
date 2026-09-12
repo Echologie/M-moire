@@ -10,6 +10,6 @@ npm run test:e2e
 
 Playwright lance un serveur statique sur ~docs/site/~ au port 4173, ou réutilise le serveur déjà présent. Firefox est le navigateur de contrôle du workflow GitHub. Les échecs conservent capture, vidéo et trace dans ~test-results/~.
 
-~survey.spec.js~ couvre le tutoriel avec gestes réels, les trois plans, l’indépendance de la note, les révisions, l’export et les petits écrans. Les autres tests portent sur le prototype conservé à ~prototype.html~.
+~survey.spec.js~ couvre le tutoriel avec gestes réels, les trois curseurs indépendants, la saisie sans saut et les billes proches, l’indépendance de la note, les révisions, l’export et les petits écrans. Les autres tests portent sur le prototype conservé à ~prototype.html~.
 
 Sur Guix seulement, ~npm run test:e2e:guix~ applique le correctif Firefox avant les tests. La commande standard ~test:e2e~ n’applique pas ce correctif.

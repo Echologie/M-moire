@@ -1,4 +1,4 @@
-module Survey.Model exposing (Answer, Point, Production, Question, answer, axes, complete, decodeQuestion, encodeAnswer, encodePoint, move, point, touchPlane)
+module Survey.Model exposing (Answer, Point, Production, Question, answer, axes, complete, decodeQuestion, encodeAnswer, encodePoint, move, point, touchAxis)
 
 import Dict exposing (Dict)
 import Json.Decode as D
@@ -36,52 +36,35 @@ axes =
     [ ( "x", "Confus", "Lisible" ), ( "y", "Vague", "Précis" ), ( "z", "Fautif", "Valide" ) ]
 
 
-{-| The hidden coordinate is preserved here, independently of the renderer.
+{-| Only the requested coordinate can change, independently of the renderer.
 -}
-move : String -> Point -> Point -> Point
-move plane incoming previous =
+move : String -> Float -> Point -> Point
+move axis value previous =
     let
-        bounded n =
-            clamp -10 10 n
+        bounded =
+            clamp -10 10 value
     in
-    case plane of
-        "xy" ->
-            { previous | x = bounded incoming.x, y = bounded incoming.y }
+    case axis of
+        "x" ->
+            { previous | x = bounded }
 
-        "xz" ->
-            { previous | x = bounded incoming.x, z = bounded incoming.z }
+        "y" ->
+            { previous | y = bounded }
 
-        "yz" ->
-            { previous | y = bounded incoming.y, z = bounded incoming.z }
+        "z" ->
+            { previous | z = bounded }
 
         _ ->
             previous
 
 
-touchPlane : String -> List String -> List String
-touchPlane plane previous =
-    List.foldl
-        (\a found ->
-            if List.member a found then
-                found
+touchAxis : String -> List String -> List String
+touchAxis axis previous =
+    if List.member axis [ "x", "y", "z" ] && not (List.member axis previous) then
+        axis :: previous
 
-            else
-                a :: found
-        )
+    else
         previous
-        (case plane of
-            "xy" ->
-                [ "x", "y" ]
-
-            "xz" ->
-                [ "x", "z" ]
-
-            "yz" ->
-                [ "y", "z" ]
-
-            _ ->
-                []
-        )
 
 
 complete : Dict String Answer -> Question -> Bool
