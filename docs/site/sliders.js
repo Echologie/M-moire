@@ -11,13 +11,13 @@ function relativeDrag(node, handlers) {
     if (e.button !== 0 || drag) return;
     const start = handlers.begin(e); if (!start) return;
     e.preventDefault();
-    drag = { ...start, pointer: e.pointerId, x: e.clientX, moved: false, current: start.value };
+    drag = { ...start, pointer: e.pointerId, x: e.clientX, y: e.clientY, moved: false, current: start.value };
     node.setPointerCapture(e.pointerId);
   };
   const move = e => {
     if (!drag || e.pointerId !== drag.pointer) return;
     const dx = e.clientX - drag.x;
-    if (Math.abs(dx) > 4) drag.moved = true;
+    if (Math.hypot(dx, e.clientY - drag.y) > 4) drag.moved = true;
     if (!drag.moved) return;
     e.preventDefault();
     drag.current = dragValue(drag.value, dx, drag.width, drag.min, drag.max, drag.step);

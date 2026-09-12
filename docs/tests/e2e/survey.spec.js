@@ -119,6 +119,12 @@ test('la saisie ne saute pas, le centre se confirme et la caméra garde les coor
   await expect.poll(() => coordinates(page.locator('.orb'))).toEqual([0, 0, 0]);
   const firstId = await page.locator('.orb').getAttribute('data-id');
   const box = await thumb(page, 'x').boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 25, { steps: 5 });
+  await page.mouse.up();
+  await expect(page.locator('reading-card')).toHaveCount(0);
+  await expect.poll(() => coordinates(page.locator('.orb'))).toEqual([0, 0, 0]);
   await page.mouse.move(box.x + box.width / 2 + 17, box.y + box.height / 2);
   await page.mouse.down();
   await expect.poll(() => coordinates(page.locator('.orb'))).toEqual([0, 0, 0]);

@@ -7,7 +7,7 @@
 axis-slider{display:block;position:relative;color:var(--green);min-width:0;user-select:none}
 axis-slider[axis=y]{color:#1686a0}axis-slider[axis=z]{color:#7863b1}
 .slider-poles{display:flex;justify-content:space-between;font-size:.8125rem;font-weight:600;padding:0 3px;line-height:1.4}
-.slider-field{position:relative;touch-action:none;isolation:isolate;min-height:88px}
+.slider-field{position:relative;touch-action:pan-y;isolation:isolate;min-height:88px}
 .slider-rail{position:absolute;left:22px;right:22px;top:var(--rail-y);height:6px;transform:translateY(-50%);border-radius:6px;background:linear-gradient(90deg,color-mix(in srgb,currentColor 18%,white),currentColor);box-shadow:inset 0 1px 1px #12352a0b}
 .axis-midpoint{position:absolute;left:50%;top:50%;width:2px;height:16px;background:currentColor;transform:translate(-50%,-50%);border-radius:2px;opacity:.65}
 .slider-leaders,.slider-handles{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
@@ -30,7 +30,7 @@ axis-slider[axis=y]{color:#1686a0}axis-slider[axis=z]{color:#7863b1}
 
 /* The native range keeps keyboard and assistive-technology semantics.
    Pointer gestures belong to the surrounding rail, never its jump-to-click default. */
-grade-slider{display:block;position:relative;flex:1;min-width:0;height:44px;touch-action:none;user-select:none;color:var(--green);cursor:grab}
+grade-slider{display:block;position:relative;flex:1;min-width:0;height:44px;touch-action:pan-y;user-select:none;color:var(--green);cursor:grab}
 grade-slider:active{cursor:grabbing}
 grade-slider input[type=range]{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;pointer-events:none}
 .grade-rail{position:absolute;left:16px;right:16px;top:50%;height:6px;transform:translateY(-50%);border-radius:6px;background:linear-gradient(90deg,#b6d4c3,#67b69a,#087f71)}
