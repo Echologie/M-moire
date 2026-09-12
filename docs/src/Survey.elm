@@ -519,14 +519,18 @@ btn cls txt msg =
 view : Model -> Html Msg
 view m =
     main_ [ class "experience" ]
-        [ header [ class "topbar" ]
-            [ brand
-            , if m.mode == Running || m.mode == Training then
-                button [ class "quiet help-button", onClick Help, disabled (m.mode == Training) ] [ icon "help", text "Mode d’emploi" ]
+        [ if m.mode == Setup then
+            text ""
 
-              else
-                span [ class "topbar-caption" ] [ text "Rédactions mathématiques" ]
-            ]
+          else
+            header [ class "topbar" ]
+                [ brand
+                , if m.mode == Running || m.mode == Training then
+                    button [ class "quiet help-button", onClick Help, disabled (m.mode == Training) ] [ icon "help", text "Mode d’emploi" ]
+
+                  else
+                    span [ class "topbar-caption" ] [ text "Rédactions mathématiques" ]
+                ]
         , case m.mode of
             Setup ->
                 viewSetup m
@@ -543,16 +547,12 @@ viewSetup : Model -> Html Msg
 viewSetup m =
     section [ class "welcome" ]
         [ div [ class "welcome-copy" ]
-            [ span [ class "eyebrow" ] [ text "À vous de voir" ]
-            , h1 [] [ text "Une rédaction.", Html.br [] [], span [] [ text "Votre regard." ] ]
-            , p [ class "intro" ] [ text "Lisez, attribuez une note, puis comparez les rédactions dans un espace à trois dimensions." ]
-            , div [ class "welcome-steps" ] [ span [] [ icon "read", text "Lire" ], span [] [ icon "sliders", text "Noter" ], span [] [ icon "cube", text "Placer" ] ]
+            [ h1 [] [ text "Critères d’évaluations ", span [] [ text "en mathématiques" ] ]
+            , p [ class "intro" ] [ text "Ce sondage fait partie d’un projet de recherche qui cherche à mettre en lumière les critères que les enseignantes et enseignants de mathématiques exploitent pour noter leurs élèves." ]
             , div [ class "local-note" ] [ icon "info", p [] [ text "Vos réponses restent dans cette page jusqu’à leur export. Un rechargement les efface." ] ]
             ]
         , div [ class "level-panel" ]
-            [ span [ class "step-tag" ] [ text "01 / Votre terrain" ]
-            , h2 [] [ text "Quels niveaux avez-vous enseignés ?" ]
-            , p [ class "muted" ] [ text "Les questions s’adaptent à votre expérience." ]
+            [ h2 [] [ text "Quels niveaux avez-vous enseignés ?" ]
             , div [ class "levels" ]
                 (List.map
                     (\l ->
@@ -560,11 +560,18 @@ viewSetup m =
                             [ input [ type_ "checkbox", checked (List.member l m.levels), onCheck (ToggleLevel l) ] []
                             , span []
                                 [ text
-                                    (if l == "Sup 1" then
-                                        "Supérieur · 1re année"
+                                    (case l of
+                                        "Sup 1" ->
+                                            "Études supérieures"
 
-                                     else
-                                        l
+                                        "1re spé" ->
+                                            "1re"
+
+                                        "Tle spé" ->
+                                            "Tle"
+
+                                        _ ->
+                                            l
                                     )
                                 ]
                             , icon "check"
@@ -572,9 +579,7 @@ viewSetup m =
                     )
                     m.available
                 )
-            , p [ class "level-detail" ] [ text "Première et terminale : spécialité mathématiques." ]
-            , button [ class "primary start-button", onClick Begin ] [ text "Prendre la main", icon "arrow" ]
-            , p [ class "muted small" ] [ text "Un essai guidé, puis vos premières rédactions." ]
+            , button [ class "primary start-button", onClick Begin ] [ text "Commencer", icon "arrow" ]
             , p [ class "error", attribute "role" "alert" ] [ text m.message ]
             ]
         ]

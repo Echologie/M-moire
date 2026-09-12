@@ -26,7 +26,7 @@ async function close(page) {
 async function start(page, level = '3e') {
   await page.goto('/');
   await page.getByRole('checkbox', { name: level, exact: true }).check();
-  await page.getByRole('button', { name: 'Prendre la main', exact: true }).click();
+  await page.getByRole('button', { name: 'Commencer', exact: true }).click();
   await tourStep(page, 0);
   await expect(page.locator('#place-button')).toBeDisabled();
   await grade(page, 7);
