@@ -641,11 +641,25 @@ viewWorkspace m =
                         )
                     ]
                 , span [ class "question-level" ] [ text q.level ]
-                , span [ class "domain" ] [ text q.domain ]
                 ]
             , rich q.statement
             , div [ class "question-progress", attribute "aria-label" "Progression de la session" ] [ div [ style "width" (String.fromFloat (100 * toFloat done / toFloat (Basics.max 1 (List.length m.questions))) ++ "%") ] [] ]
             ]
+        , div [ class "production-strip", attribute "aria-label" "Rédactions déjà lues" ]
+            (List.map
+                (\v ->
+                    button [ classList [ ( "production-chip", True ), ( "selected", v.id == m.selected ) ], onClick (Open v.id), attribute "aria-label" ("Relire la rédaction " ++ String.fromInt (number v.id m)) ]
+                        [ span [] [ text (String.fromInt (number v.id m)) ]
+                        , text "Rédaction"
+                        , if List.length (getAnswer v.id m).judged == 3 then
+                            icon "check"
+
+                          else
+                            text ""
+                        ]
+                )
+                shown
+            )
         , div [ class "evaluation-layout" ]
             [ section [ class "axes-panel", id "axes-panel", attribute "aria-label" "Placer les rédactions sur les trois axes" ]
                 [ div [ class "axes-heading" ] [ icon "sliders", span [] [ text "Vos repères" ], span [ class "selected-label" ] [ text ("Rédaction " ++ String.fromInt (number m.selected m)) ] ]
@@ -669,34 +683,16 @@ viewWorkspace m =
                   else
                     span [ class "position-ready" ] [ icon "check", text "Les trois repères sont placés" ]
                 ]
-            , div [ class "space-panel" ]
-                [ Html.node "evaluation-space"
-                    [ id "space"
-                    , attribute "payload" (spacePayload m shown)
-                    , on "read" (D.map Open (D.at [ "detail", "id" ] D.string))
-                    , on "orbit" (D.succeed (Receive (E.object [ ( "type", E.string "orbit" ) ])))
-                    ]
-                    []
-                , div [ class "space-bottom" ] [ span [ class "space-hint" ] [ icon "hand", text "Faites glisser pour tourner · touchez une bille pour lire" ] ]
+            , Html.node "evaluation-space"
+                [ id "space"
+                , attribute "payload" (spacePayload m shown)
+                , on "read" (D.map Open (D.at [ "detail", "id" ] D.string))
+                , on "orbit" (D.succeed (Receive (E.object [ ( "type", E.string "orbit" ) ])))
                 ]
+                []
             ]
         , div [ class "production-navigation" ]
-            [ div [ class "production-strip", attribute "aria-label" "Rédactions déjà lues" ]
-                (List.map
-                    (\v ->
-                        button [ classList [ ( "production-chip", True ), ( "selected", v.id == m.selected ) ], onClick (Open v.id), attribute "aria-label" ("Relire la rédaction " ++ String.fromInt (number v.id m)) ]
-                            [ span [] [ text (String.fromInt (number v.id m)) ]
-                            , text "Rédaction"
-                            , if List.length (getAnswer v.id m).judged == 3 then
-                                icon "check"
-
-                              else
-                                text ""
-                            ]
-                    )
-                    shown
-                )
-            , div [ class "next-group" ]
+            [ div [ class "next-group" ]
                 [ if List.length shown > 1 then
                     button [ class "quiet", onClick Compare ] [ icon "compare", text "Comparer" ]
 

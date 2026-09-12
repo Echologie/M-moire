@@ -16,7 +16,7 @@ export class EvaluationSpace extends HTMLElement {
     this.walls = svg('g'); this.lines = svg('g'); this.guides = svg('g'); this.svg.append(this.walls, this.lines, this.guides);
     this.labels = document.createElement('div'); this.labels.className = 'axis-labels';
     this.orbs = document.createElement('div'); this.orbs.className = 'orb-layer';
-    this.hint = document.createElement('div'); this.hint.className = 'projection-note'; this.append(this.svg, this.labels, this.orbs, this.hint);
+    this.append(this.svg, this.labels, this.orbs);
     this.resize = new ResizeObserver(() => this.draw()); this.resize.observe(this);
     this.down = e => this.pointerDown(e); this.move = e => this.pointerMove(e); this.up = e => this.pointerUp(e);
     this.addEventListener('pointerdown', this.down); this.addEventListener('pointermove', this.move); this.addEventListener('pointerup', this.up); this.addEventListener('pointercancel', this.up); this.addEventListener('lostpointercapture', this.up);
@@ -42,7 +42,7 @@ export class EvaluationSpace extends HTMLElement {
         orb = document.createElement('button'); orb.type = 'button'; orb.className = 'orb'; orb.dataset.id = p.id;
         const preview = document.createElement('rich-text'); preview.setAttribute('content', p.content); preview.className = 'orb-preview'; preview.setAttribute('aria-hidden', 'true');
         const shine = document.createElement('span'); shine.className = 'orb-shine';
-        const title = document.createElement('span'); title.className = 'orb-caption'; title.innerHTML = `<small>Rédaction</small><strong>${p.number}</strong>`;
+        const title = document.createElement('span'); title.className = 'orb-caption'; title.innerHTML = `<strong>${p.number}</strong>`;
         orb.append(preview, shine, title);
         orb.onclick = e => { if (e.detail === 0) this.dispatch('read', { id: p.id }); };
         this.cards.set(p.id, orb); this.orbs.append(orb);
@@ -58,15 +58,19 @@ export class EvaluationSpace extends HTMLElement {
   draw() {
     if (!this.data || !this.clientWidth) return;
     const w = this.clientWidth, h = this.clientHeight, free = true; this.cx = w / 2; this.cy = h / 2;
+    const diameter = Math.max(50, Math.min(72, Math.min(w, h) * .16));
+    this.style.setProperty('--orb-size', `${diameter}px`);
+    this.style.setProperty('--orb-preview-scale', String(diameter * .78 / 285));
     this.unit = Math.max(3, free ? Math.min((w - 120) / 34, (h - 86) / 31) : Math.min((w - 110) / 25, (h - 78) / 25));
     this.svg.setAttribute('viewBox', `0 0 ${w} ${h}`); this.walls.replaceChildren(); this.lines.replaceChildren(); this.guides.replaceChildren(); this.labels.replaceChildren();
     for (const pair of ['xy', 'xz', 'yz']) {
       const [a, b] = pair, hidden = xyz.find(axis => !pair.includes(axis)), base = point(); base[hidden] = free ? -10 : 0;
       const corners = [[-10, -10], [10, -10], [10, 10], [-10, 10]].map(([u, v]) => this.project({ ...base, [a]: u, [b]: v }));
-      this.walls.append(svg('polygon', { points: corners.map(p => `${p.x},${p.y}`).join(' '), fill: free ? colors[hidden] : '#dff1ed', 'fill-opacity': free ? '.045' : '.22', stroke: '#a8c8c2', 'stroke-opacity': '.65' }));
+      this.walls.append(svg('polygon', { points: corners.map(p => `${p.x},${p.y}`).join(' '), fill: free ? colors[hidden] : '#dff1ed', 'fill-opacity': free ? '.045' : '.22' }));
     }
     for (const axis of xyz) {
-      this.line(this.lines, { ...point(), [axis]: -10.5 }, { ...point(), [axis]: 10.5 }, { stroke: colors[axis], 'stroke-width': '1.5', 'stroke-opacity': '.7' });
+      // Both poles have identical rounded ends, with no directional arrowhead.
+      this.line(this.lines, { ...point(), [axis]: -10.5 }, { ...point(), [axis]: 10.5 }, { stroke: colors[axis], 'stroke-width': '1.5', 'stroke-opacity': '.7', 'stroke-linecap': 'round' });
       for (const sign of [-1, 1]) {
         const p = this.project({ ...point(), [axis]: sign * (free ? 12.4 : 11.8) }); const label = document.createElement('span'); label.className = `axis-label axis-${axis}`; label.style.left = `${p.x}px`; label.style.top = `${p.y}px`;
         label.innerHTML = `<strong>${sign < 0 ? axes[axis].negative : axes[axis].positive}</strong>`; this.labels.append(label);
@@ -84,15 +88,16 @@ export class EvaluationSpace extends HTMLElement {
     for (const { item, pos, screen } of projected) {
       const orb = this.cards.get(item.id);
       // Fan overlapping projections out, with a visible line to the exact coordinate.
-      const siblings = projected.filter(p => Math.hypot(p.screen.x - screen.x, p.screen.y - screen.y) < 34).sort((a, b) => a.item.number - b.item.number), order = siblings.findIndex(p => p.item.id === item.id);
-      const offsetX = siblings.length > 1 ? (order - (siblings.length - 1) / 2) * (w < 600 ? 60 : 82) : 0, offsetY = siblings.length > 1 ? -30 : 0;
-      const x = Math.max(42, Math.min(w - 42, screen.x + offsetX)), y = Math.max(42, Math.min(h - 42, screen.y + offsetY));
+      const gap = diameter * 1.12 + 8;
+      const siblings = projected.filter(p => Math.hypot(p.screen.x - screen.x, p.screen.y - screen.y) < gap).sort((a, b) => a.item.number - b.item.number), order = siblings.findIndex(p => p.item.id === item.id);
+      const offsetX = siblings.length > 1 ? (order - (siblings.length - 1) / 2) * gap : 0, offsetY = siblings.length > 1 ? -diameter * .4 : 0;
+      const inset = diameter * .56 + 6;
+      const x = Math.max(inset, Math.min(w - inset, screen.x + offsetX)), y = Math.max(inset, Math.min(h - inset, screen.y + offsetY));
       if (offsetX || offsetY || x !== screen.x || y !== screen.y) { this.guides.append(svg('line', { x1: screen.x, y1: screen.y, x2: x, y2: y, stroke: '#526f68', 'stroke-width': '1.1', 'stroke-dasharray': '3 3' })); this.guides.append(svg('circle', { cx: screen.x, cy: screen.y, r: '4', fill: '#087f71', stroke: 'white', 'stroke-width': '1.5' })); }
-      const size = free ? Math.max(.78, Math.min(1.12, .94 + screen.depth / 110)) : 1;
+      const size = free ? Math.max(.9, Math.min(1.12, .94 + screen.depth / 110)) : 1;
       Object.assign(orb.style, { left: `${x}px`, top: `${y}px`, transform: `translate(-50%,-50%) scale(${size})`, zIndex: item.id === this.data.selected ? 80 : Math.round(screen.depth + 35) });
       orb.dataset.x = pos.x; orb.dataset.y = pos.y; orb.dataset.z = pos.z;
     }
-    this.hint.textContent = 'Les pointillés situent la rédaction sélectionnée';
   }
   pointerDown(e) {
     if (e.button !== 0 || this.data.reader || this.drag) return;

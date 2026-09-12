@@ -1,4 +1,4 @@
-.evaluation-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:stretch}
+.evaluation-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:stretch;--slider-reserve:0px}
 .axes-panel{min-width:0;background:#ffffffd9;border:1px solid #fff;border-radius:25px;padding:20px 22px 14px;box-shadow:var(--shadow)}
 .axes-heading{display:flex;align-items:center;gap:9px;font-size:.875rem;font-weight:600;color:var(--green);margin-bottom:8px}
 .axes-heading .selected-label{margin-left:auto;font-size:.75rem;color:var(--muted);font-weight:500}
@@ -7,7 +7,7 @@
 axis-slider{display:block;position:relative;color:var(--green);min-width:0;user-select:none}
 axis-slider[axis=y]{color:#1686a0}axis-slider[axis=z]{color:#7863b1}
 .slider-poles{display:flex;justify-content:space-between;font-size:.8125rem;font-weight:600;padding:0 3px;line-height:1.4}
-.slider-field{position:relative;touch-action:pan-y;isolation:isolate;min-height:88px}
+.slider-field{position:relative;touch-action:pan-y;isolation:isolate;min-height:44px}
 .slider-rail{position:absolute;left:22px;right:22px;top:var(--rail-y);height:6px;transform:translateY(-50%);border-radius:6px;background:linear-gradient(90deg,color-mix(in srgb,currentColor 18%,white),currentColor);box-shadow:inset 0 1px 1px #12352a0b}
 .axis-midpoint{position:absolute;left:50%;top:50%;width:2px;height:16px;background:currentColor;transform:translate(-50%,-50%);border-radius:2px;opacity:.65}
 .slider-leaders,.slider-handles{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
@@ -22,10 +22,7 @@ axis-slider[axis=y]{color:#1686a0}axis-slider[axis=z]{color:#7863b1}
 .slider-thumb:hover:not(:disabled) .slider-sphere{box-shadow:0 0 0 4px color-mix(in srgb,currentColor 10%,transparent),0 7px 13px #123b292b}
 .axes-panel .confirm-position,.position-ready{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:34px;font-size:.75rem;margin-top:6px}
 .position-ready{color:var(--green)}.position-ready ui-icon{width:16px;height:16px;flex-basis:16px}
-.evaluation-layout .space-panel{display:flex;flex-direction:column;min-width:0}
-.evaluation-layout evaluation-space{flex:1;height:clamp(310px,calc(100dvh - 430px),590px);min-height:310px}
-.evaluation-layout .space-bottom{justify-content:center;min-height:45px;padding:8px 12px;text-align:center}
-.evaluation-layout .space-hint{font-size:.75rem}.evaluation-layout .space-hint ui-icon{width:17px;height:17px;flex-basis:17px}
+.evaluation-layout evaluation-space{min-width:0;height:clamp(260px,calc(100dvh - 500px),520px);min-height:260px;background:none;border:0;box-shadow:none}
 .question-panel{position:sticky;top:8px}
 
 /* The native range keeps keyboard and assistive-technology semantics.
@@ -47,14 +44,13 @@ grade-slider:focus-within .grade-knob{outline:3px solid #36a896;outline-offset:4
 .grade-track{gap:12px;margin-top:5px}
 
 @media(min-width:900px),(min-width:760px) and (orientation:landscape){
-  .evaluation-layout{grid-template-columns:minmax(250px,320px) minmax(0,1fr);gap:20px}
+  .evaluation-layout{grid-template-columns:minmax(250px,320px) minmax(0,1fr);gap:20px;--slider-reserve:42px}
   .evaluation-layout evaluation-space{height:100%;min-height:370px}
 }
 @media(max-width:700px){
   .axes-panel{border-radius:19px;padding:14px 16px 10px}.axes-heading{font-size:.8125rem;margin-bottom:6px}
   .axes-heading .selected-label{font-size:.6875rem}.axis-sliders{gap:2px}.slider-poles{font-size:.75rem}
-  .evaluation-layout{gap:10px}.evaluation-layout .space-hint{font-size:.6875rem}
-  .projection-note{font-size:.625rem}.question-panel{top:4px}
+  .evaluation-layout{gap:10px}.question-panel{top:4px}
 }
 @media(max-height:600px) and (min-width:701px){
   .axes-panel{padding:14px 14px 9px}.axes-heading{margin-bottom:5px}.axis-sliders{gap:0}
@@ -62,12 +58,16 @@ grade-slider:focus-within .grade-knob{outline:3px solid #36a896;outline-offset:4
   grade-slider{height:36px}
 }
 
-/* Compact portrait bars leave the volume visible below them. */
-@media(max-width:700px){
+/* Compact bars whenever the panels stack, including unfolded portrait phones. */
+@media(max-width:759px),(max-width:899px) and (orientation:portrait){
+  .axes-panel{padding:12px 16px 8px;align-self:start}
   .axes-heading{display:none}
+  .axis-sliders{gap:4px}
   axis-slider .slider-poles{position:absolute;inset:0;display:block;pointer-events:none}
   axis-slider .slider-poles span{position:absolute;top:var(--rail-y);transform:translateY(-50%);font-size:.6875rem}
   axis-slider .slider-poles span:first-child{left:0}axis-slider .slider-poles span:last-child{right:0}
   axis-slider .slider-field{margin-inline:49px}
-  .evaluation-layout evaluation-space{height:260px;min-height:260px;flex:auto}
+}
+@media(max-width:700px){
+  .evaluation-layout evaluation-space{height:clamp(240px,calc(100dvh - 560px),340px);min-height:240px}
 }

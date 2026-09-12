@@ -113,7 +113,11 @@ class AxisSlider extends HTMLElement {
   draw() {
     if (!this.data || !this.field.clientWidth) return;
     const layout = layoutThumbs(this.data.points.map(p => ({ id: p.id, number: p.number, value: p.point[this.axis] })), this.field.clientWidth, this.active || this.data.selected, 42, this.grabbed);
-    const lift = Math.max(42, ...layout.map(p => -p.y)), baseline = this.grabbed?.baseline ?? lift + 22;
+    // Stacked panels need no empty upper row for a lone sphere. Once several
+    // productions are visible, keep room for their pop-up without moving the
+    // rail or the grabbed sphere in the middle of a gesture.
+    const reserve = Math.max(this.data.points.length > 1 ? 42 : 0, parseFloat(getComputedStyle(this).getPropertyValue('--slider-reserve')) || 0);
+    const lift = Math.max(reserve, ...layout.map(p => -p.y)), baseline = this.grabbed?.baseline ?? lift + 22;
     this.field.style.height = `${baseline + 24}px`; this.style.setProperty('--rail-y', `${baseline}px`);
     this.leaders.replaceChildren();
     for (const position of layout) {
