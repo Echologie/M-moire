@@ -8,8 +8,8 @@
     "test:logic": "npx elm-test",
     "test:e2e": "npx playwright test",
     "test:e2e:guix": "bash scripts/patch-playwright-firefox.sh && PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 npx playwright test",
-    "test:e2e:install": "npx playwright install firefox",
-    "test:e2e:install:ci": "npx playwright install --with-deps firefox",
+    "test:e2e:install": "npx playwright install firefox chromium",
+    "test:e2e:install:ci": "npx playwright install --with-deps firefox chromium",
     "test:all": "npm run test:logic && npm run test:e2e",
     "build:data": "python3 scripts/build-bank.py && node scripts/validate-bank.cjs"
   },
