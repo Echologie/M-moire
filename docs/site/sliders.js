@@ -11,7 +11,7 @@ function relativeDrag(node, handlers) {
     if (e.button !== 0 || drag) return;
     const start = handlers.begin(e); if (!start) return;
     e.preventDefault();
-    drag = { ...start, pointer: e.pointerId, x: e.clientX, y: e.clientY, moved: false, intent: null, current: start.value };
+    drag = { ...start, pointer: e.pointerId, x: e.clientX, y: e.clientY, moved: false, horizontalMoved: false, intent: start.lockAxis ? 'horizontal' : null, current: start.value };
     node.setPointerCapture(e.pointerId);
   };
   const move = e => {
@@ -21,6 +21,8 @@ function relativeDrag(node, handlers) {
     if (!drag.moved) return;
     if (!drag.intent) drag.intent = Math.abs(dx) >= Math.abs(dy) ? 'horizontal' : 'vertical';
     if (drag.intent === 'vertical') return;
+    if (Math.abs(dx) > 4) drag.horizontalMoved = true;
+    if (!drag.horizontalMoved) return;
     e.preventDefault();
     const value = dragValue(drag.value, dx, drag.width, drag.min, drag.max, drag.step);
     if (value !== drag.current) { drag.current = value; handlers.move(drag, false); }
@@ -29,7 +31,7 @@ function relativeDrag(node, handlers) {
     if (!drag || e.pointerId !== drag.pointer) return;
     const ended = drag; drag = null;
     const cancelled = e.type !== 'pointerup' || ended.intent === 'vertical';
-    if (cancelled && ended.moved) { ended.current = ended.value; handlers.move(ended, false); }
+    if (cancelled && ended.current !== ended.value) { ended.current = ended.value; handlers.move(ended, false); }
     handlers.end(ended, cancelled);
     if (node.hasPointerCapture(ended.pointer)) node.releasePointerCapture(ended.pointer);
   };
@@ -62,14 +64,14 @@ class AxisSlider extends HTMLElement {
         const item = this.data.points.find(p => p.id === nearest.dataset.id);
         this.grabbed = { y: -Number(nearest.dataset.lift), offset: parseFloat(nearest.style.left) - Number(nearest.dataset.anchor), baseline: parseFloat(this.style.getPropertyValue('--rail-y')) };
         this.active = item.id; nearest.focus({ preventScroll: true });
-        return { id: item.id, value: item.point[this.axis], width: this.field.clientWidth - 44, min: -10, max: 10, step: .1, direct: Boolean(direct) };
+        return { id: item.id, value: item.point[this.axis], width: this.field.clientWidth - 44, min: -10, max: 10, step: .1, direct: Boolean(direct), lockAxis: Boolean(direct || e.target.closest('.slider-rail')) };
       },
       move: (d, committed) => this.propose(d.id, d.current, committed),
       end: (d, cancelled) => {
         this.cards.get(d.id)?.classList.remove('dragging');
         if (!cancelled) {
-          if (d.moved) this.propose(d.id, d.current, true);
-          else if (d.direct) dispatch(this, 'read', { id: d.id });
+          if (d.horizontalMoved) this.propose(d.id, d.current, true);
+          else if (!d.moved && d.direct) dispatch(this, 'read', { id: d.id });
         }
         this.active = null; this.grabbed = null; this.draw();
       }
@@ -149,9 +151,9 @@ class GradeSlider extends HTMLElement {
       this.resize = new ResizeObserver(this.paint); this.resize.observe(this);
       this.input.addEventListener('input', this.paint); this.input.addEventListener('change', this.paint);
       this.cleanupDrag = relativeDrag(this, {
-        begin: e => { this.input.focus({ preventScroll: true }); return { value: Number(this.input.value), width: this.clientWidth - 32, min: 0, max: 3, step: .25, direct: Math.abs(e.clientX - this.knob.getBoundingClientRect().x - 16) < 24 }; },
+        begin: e => { this.input.focus({ preventScroll: true }); return { value: Number(this.input.value), width: this.clientWidth - 32, min: 0, max: 3, step: .25, direct: Math.abs(e.clientX - this.knob.getBoundingClientRect().x - 16) < 24, lockAxis: Boolean(e.target.closest('.grade-knob,.grade-rail')) }; },
         move: d => { this.input.value = d.current; this.paint(); },
-        end: (d, cancelled) => { if (!cancelled && (d.moved || d.direct)) { this.input.value = d.current; this.paint(); this.input.dispatchEvent(new Event('change', { bubbles: true })); } }
+        end: (d, cancelled) => { if (!cancelled && (d.horizontalMoved || (!d.moved && d.direct))) { this.input.value = d.current; this.paint(); this.input.dispatchEvent(new Event('change', { bubbles: true })); } }
       });
       this.paint();
     });

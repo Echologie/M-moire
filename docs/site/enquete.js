@@ -1,7 +1,7 @@
 /* Browser integration only. Survey state and coordinate invariants live in Elm. */
 import { prepareSession, createSeed, axes } from './session.js?v=44fc617998f1';
 import './space.js?v=f9c78f330fea';
-import './sliders.js?v=c3e680ac3fe4';
+import './sliders.js?v=a4f515a0b0d0';
 const root = document.getElementById('app');
 let application, bank, seed, startedAt;
 let events = [], seen = new Set();

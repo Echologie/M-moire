@@ -35,7 +35,13 @@ grade-slider:active{cursor:grabbing}
 grade-slider input[type=range]{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;pointer-events:none}
 .grade-rail{position:absolute;left:16px;right:16px;top:50%;height:6px;transform:translateY(-50%);border-radius:6px;background:linear-gradient(90deg,#b6d4c3,#67b69a,#087f71)}
 .grade-tick{position:absolute;top:50%;width:2px;height:13px;transform:translate(-50%,-50%);background:#729f90;border-radius:2px}
-.grade-knob{position:absolute;top:50%;transform:translate(-50%,-50%);width:32px;height:32px;pointer-events:none;border:1.5px solid var(--green)}
+.grade-knob{position:absolute;top:50%;transform:translate(-50%,-50%);width:32px;height:32px;pointer-events:auto;border:1.5px solid var(--green)}
+.grade-knob::before{content:"";position:absolute;inset:-6px;border-radius:50%}
+/* The browser must decide this before pointerdown. Once a sphere or its rail
+   is grabbed, a curved finger path stays a drag, including outside the rail.
+   Empty space in the field retains pan-y for normal page scrolling. */
+.slider-thumb,.slider-rail,.grade-knob,.grade-rail{touch-action:none}
+.slider-rail::before,.grade-rail::before{content:"";position:absolute;left:0;right:0;top:50%;height:32px;transform:translateY(-50%)}
 .grade-knob.pending{color:#94ac9f;border-color:#94ac9f;border-style:dashed}
 grade-slider:focus-within .grade-knob{outline:3px solid #36a896;outline-offset:4px}
 .grade-track{gap:12px;margin-top:5px}
