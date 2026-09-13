@@ -26,3 +26,5 @@ La régression signalée par ~431097.mp4~ est couverte par des prises décentré
 Les autres tests portent sur le prototype conservé à ~prototype.html~. Pour cibler un contrôle : ~npm run test:e2e -- --project=chromium~ ou ~--project=chromium-touch~. Une émulation tactile ne remplace pas une vérification complémentaire sur un téléphone physique.
 
 Sur Guix seulement, ~npm run test:e2e:guix~ applique le correctif Firefox avant les tests. La commande standard ~test:e2e~ n’applique pas ce correctif.
+
+Le contrôle des portées injecte la paire R17-6/R17-7 issue de la banque générée, parcourt le tutoriel, ouvre les deux rédactions puis la comparaison. Il vérifie le contenu exact, les retraits de deux profondeurs, la sortie de portée, le rendu KaTeX et l’absence de débordement aux largeurs 390 et 1363 pixels. Des captures sont conservées dans les résultats du test. Les deux membres ne diffèrent que par les espaces initiaux, ce que les tests du compilateur vérifient également.

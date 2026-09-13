@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "status": "Banque exploratoire : relecture didactique et prétest requis",
   "questions": [
     {
@@ -10,6 +10,10 @@
       "statement": "Dans un triangle $ABC$, l’angle extérieur adjacent à $\\widehat{ACB}$ mesure $120^\\circ$, et $\\widehat{BAC}$ est le double de $\\widehat{ABC}$. La bissectrice de $\\widehat{BAC}$ coupe $[BC]$ en $D$. Calculer $\\widehat{ADB}$ en justifiant.",
       "referenceAnswer": "$100^\\circ$.",
       "family": "R01",
+      "tags": [
+        "5e",
+        "geometrie"
+      ],
       "productions": [
         {
           "id": "R01-1",
@@ -18,7 +22,11 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Trois étapes : angle supplémentaire, partage d’une somme, triangle ABD."
+            "analysis": "Trois étapes : angle supplémentaire, partage d’une somme, triangle ABD.",
+            "contracts": {
+              "EQ": true,
+              "EXPL": true
+            }
           }
         },
         {
@@ -29,7 +37,11 @@
               "ECO",
               "EXPL"
             ],
-            "analysis": "Même calcul et même enchaînement ; règles et désignations plus implicites, sans invalider les inférences."
+            "analysis": "Même calcul et même enchaînement ; règles et désignations plus implicites, sans invalider les inférences.",
+            "contracts": {
+              "EQ": true,
+              "EXPL": "discussable"
+            }
           }
         },
         {
@@ -39,7 +51,11 @@
             "targets": [
               "EQ"
             ],
-            "analysis": "Les résultats sont corrects, mais les chaînes séquentielles affirment des égalités fausses. Les unités ne constituent pas la manipulation principale."
+            "analysis": "Les résultats sont corrects, mais les chaînes séquentielles affirment des égalités fausses. Les unités ne constituent pas la manipulation principale.",
+            "contracts": {
+              "EQ": false,
+              "EXPL": true
+            }
           }
         }
       ]
@@ -52,6 +68,10 @@
       "statement": "On utilise les $\\frac25$ du contenu d’une réserve d’eau, puis le tiers de ce qui reste. Il reste alors $18$ litres. Quelle quantité d’eau y avait-il au départ ? Expliquer le calcul.",
       "referenceAnswer": "$45$ litres.",
       "family": "R02",
+      "tags": [
+        "5e",
+        "fractions"
+      ],
       "productions": [
         {
           "id": "R02-1",
@@ -60,7 +80,12 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Identification de la base de chaque fraction puis raisonnement inverse."
+            "analysis": "Identification de la base de chaque fraction puis raisonnement inverse.",
+            "contracts": {
+              "EXH": true,
+              "EXPL": true,
+              "MODEL": true
+            }
           }
         },
         {
@@ -70,7 +95,12 @@
             "targets": [
               "MODEL"
             ],
-            "analysis": "Le tiers du reste devient indûment un tiers du contenu initial ; calculs exacts pour le mauvais modèle."
+            "analysis": "Le tiers du reste devient indûment un tiers du contenu initial ; calculs exacts pour le mauvais modèle.",
+            "contracts": {
+              "EXH": true,
+              "EXPL": true,
+              "MODEL": false
+            }
           }
         },
         {
@@ -81,7 +111,12 @@
               "EXH",
               "EXPL"
             ],
-            "analysis": "Vérifie la valeur candidate ; ne dit pas comment elle est trouvée ni pourquoi elle est seule possible. Ne pas assimiler automatiquement cette économie à une erreur."
+            "analysis": "Vérifie la valeur candidate ; ne dit pas comment elle est trouvée ni pourquoi elle est seule possible. Ne pas assimiler automatiquement cette économie à une erreur.",
+            "contracts": {
+              "EXH": false,
+              "EXPL": "discussable",
+              "MODEL": true
+            }
           }
         }
       ]
@@ -94,6 +129,10 @@
       "statement": "Démontrer que la différence des carrés de deux entiers impairs est divisible par $8$.",
       "referenceAnswer": "$(2p+1)^2-(2q+1)^2=4[p(p+1)-q(q+1)]$, multiple de $8$.",
       "family": "R03",
+      "tags": [
+        "4e",
+        "arithmetique"
+      ],
       "productions": [
         {
           "id": "R03-1",
@@ -102,7 +141,14 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Témoins indépendants et lemme de parité explicite."
+            "analysis": "Témoins indépendants et lemme de parité explicite.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": true,
+              "QUANT": true,
+              "GEN": true,
+              "EMP": true
+            }
           }
         },
         {
@@ -114,7 +160,14 @@
               "QUANT",
               "GEN"
             ],
-            "analysis": "Un même témoin impose l’égalité des entiers. Rupture de désignation avec perte effective de généralité."
+            "analysis": "Un même témoin impose l’égalité des entiers. Rupture de désignation avec perte effective de généralité.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": null,
+              "QUANT": false,
+              "GEN": false,
+              "EMP": null
+            }
           }
         },
         {
@@ -126,7 +179,14 @@
               "SCOPE",
               "REGISTER"
             ],
-            "analysis": "Réemploi explicitement local du nom n ; preuve valide. Contraste avec témoin commun, sans postuler une interdiction universelle de réaffectation."
+            "analysis": "Réemploi explicitement local du nom n ; preuve valide. Contraste avec témoin commun, sans postuler une interdiction universelle de réaffectation.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": true,
+              "QUANT": true,
+              "GEN": true,
+              "EMP": true
+            }
           }
         },
         {
@@ -137,7 +197,14 @@
               "EMP",
               "GEN"
             ],
-            "analysis": "Généralisation empirique à partir de trois cas, tous numériquement exacts."
+            "analysis": "Généralisation empirique à partir de trois cas, tous numériquement exacts.",
+            "contracts": {
+              "NAME": null,
+              "SCOPE": null,
+              "QUANT": null,
+              "GEN": false,
+              "EMP": false
+            }
           }
         }
       ]
@@ -150,6 +217,10 @@
       "statement": "Un triangle $ABC$ vérifie $AB=5$ cm, $BC=12$ cm et $AC=13$ cm. On note $H$ le pied de la hauteur issue de $B$ sur $(AC)$. Calculer $BH$ en justifiant.",
       "referenceAnswer": "$BH=60/13$ cm.",
       "family": "R04",
+      "tags": [
+        "4e",
+        "geometrie"
+      ],
       "productions": [
         {
           "id": "R04-1",
@@ -158,7 +229,11 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Identification de la structure puis double calcul d’aire."
+            "analysis": "Identification de la structure puis double calcul d’aire.",
+            "contracts": {
+              "EXPL": true,
+              "TERM": true
+            }
           }
         },
         {
@@ -166,9 +241,13 @@
           "content": "$AB^2+BC^2=25+144=169=AC^2$. Par le théorème de Pythagore, $ABC$ est rectangle en $B$. Son aire vaut donc $5\\times12/2=30$ cm².\n\nCette aire vaut aussi $AC\\times BH/2$. Ainsi $13BH/2=30$, d’où $BH=60/13$ cm.",
           "research": {
             "targets": [
-              "NAME"
+              "TERM"
             ],
-            "analysis": "Seul le mot « réciproque » est retiré ; inférence géométrique identique et valide. Norme de nomination à distinguer de validité."
+            "analysis": "Seul le mot « réciproque » est retiré ; inférence géométrique identique et valide. Norme de nomination à distinguer de validité.",
+            "contracts": {
+              "EXPL": true,
+              "TERM": false
+            }
           }
         },
         {
@@ -179,7 +258,11 @@
               "ECO",
               "EXPL"
             ],
-            "analysis": "Rectangle et aire récupérables, non verbalisés ; résultat et calcul exacts."
+            "analysis": "Rectangle et aire récupérables, non verbalisés ; résultat et calcul exacts.",
+            "contracts": {
+              "EXPL": "discussable",
+              "TERM": null
+            }
           }
         }
       ]
@@ -192,6 +275,10 @@
       "statement": "Résoudre dans $\\mathbb R$ l’équation $(2x-1)^2=(2x-1)(x+3)$. Justifier l’ensemble des solutions.",
       "referenceAnswer": "$S=\\{1/2;4\\}$.",
       "family": "R05",
+      "tags": [
+        "3e",
+        "algebre"
+      ],
       "productions": [
         {
           "id": "R05-1",
@@ -200,7 +287,12 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Factorisation et équivalence complètes."
+            "analysis": "Factorisation et équivalence complètes.",
+            "contracts": {
+              "DOMAIN": true,
+              "EXH": true,
+              "CONNECT": true
+            }
           }
         },
         {
@@ -211,7 +303,12 @@
               "DOMAIN",
               "EXH"
             ],
-            "analysis": "Division sans traiter son annulation ; perte de la solution 1/2."
+            "analysis": "Division sans traiter son annulation ; perte de la solution 1/2.",
+            "contracts": {
+              "DOMAIN": false,
+              "EXH": false,
+              "CONNECT": true
+            }
           }
         },
         {
@@ -221,7 +318,12 @@
             "targets": [
               "REGISTER"
             ],
-            "analysis": "Disjonction de cas valide ; contrôle de méthode alternative."
+            "analysis": "Disjonction de cas valide ; contrôle de méthode alternative.",
+            "contracts": {
+              "DOMAIN": true,
+              "EXH": true,
+              "CONNECT": true
+            }
           }
         },
         {
@@ -231,7 +333,12 @@
             "targets": [
               "CONNECT"
             ],
-            "analysis": "Connecteur « et » contredit les alternatives de l’ensemble annoncé."
+            "analysis": "Connecteur « et » contredit les alternatives de l’ensemble annoncé.",
+            "contracts": {
+              "DOMAIN": true,
+              "EXH": "discussable",
+              "CONNECT": false
+            }
           }
         },
         {
@@ -241,7 +348,12 @@
             "targets": [
               "EXH"
             ],
-            "analysis": "Existence vérifiée, exhaustivité non établie dans le texte."
+            "analysis": "Existence vérifiée, exhaustivité non établie dans le texte.",
+            "contracts": {
+              "DOMAIN": true,
+              "EXH": false,
+              "CONNECT": true
+            }
           }
         }
       ]
@@ -254,6 +366,10 @@
       "statement": "Démontrer que, pour tout entier naturel $n$, le nombre $n^3-n$ est divisible par $6$.",
       "referenceAnswer": "$n^3-n=(n-1)n(n+1)$ est divisible par $2$ et $3$.",
       "family": "R06",
+      "tags": [
+        "3e",
+        "arithmetique"
+      ],
       "productions": [
         {
           "id": "R06-1",
@@ -262,7 +378,13 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Factorisation et deux propriétés de divisibilité."
+            "analysis": "Factorisation et deux propriétés de divisibilité.",
+            "contracts": {
+              "GEN": true,
+              "EMP": true,
+              "EXPL": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -273,7 +395,13 @@
               "ECO",
               "EXPL"
             ],
-            "analysis": "Argument correct, propriétés condensées."
+            "analysis": "Argument correct, propriétés condensées.",
+            "contracts": {
+              "GEN": true,
+              "EMP": true,
+              "EXPL": "discussable",
+              "LOG": true
+            }
           }
         },
         {
@@ -284,7 +412,13 @@
               "GEN",
               "LOG"
             ],
-            "analysis": "Hypothèses indûment imposées à n, conclusion universelle non prouvée."
+            "analysis": "Hypothèses indûment imposées à n, conclusion universelle non prouvée.",
+            "contracts": {
+              "GEN": false,
+              "EMP": null,
+              "EXPL": true,
+              "LOG": false
+            }
           }
         },
         {
@@ -295,7 +429,13 @@
               "EMP",
               "GEN"
             ],
-            "analysis": "Cas exacts mais extrapolation non justifiée."
+            "analysis": "Cas exacts mais extrapolation non justifiée.",
+            "contracts": {
+              "GEN": false,
+              "EMP": false,
+              "EXPL": true,
+              "LOG": false
+            }
           }
         }
       ]
@@ -308,6 +448,10 @@
       "statement": "Résoudre dans $\\mathbb R$ l’inéquation $\\frac{(x-1)(x+2)}{x-3}\\geq0$. Justifier et donner l’ensemble des solutions.",
       "referenceAnswer": "$[-2;1]\\cup]3;+\\infty[$.",
       "family": "R07",
+      "tags": [
+        "2de",
+        "algebre"
+      ],
       "productions": [
         {
           "id": "R07-1",
@@ -316,7 +460,14 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Domaine, signe et bornes contrôlés."
+            "analysis": "Domaine, signe et bornes contrôlés.",
+            "contracts": {
+              "DOMAIN": true,
+              "EXH": true,
+              "BOUND": true,
+              "EXPL": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -327,7 +478,14 @@
               "BOUND",
               "DOMAIN"
             ],
-            "analysis": "Borne 3 incluse malgré domaine initial correct ; variante appariée au contrôle."
+            "analysis": "Borne 3 incluse malgré domaine initial correct ; variante appariée au contrôle.",
+            "contracts": {
+              "DOMAIN": false,
+              "EXH": true,
+              "BOUND": false,
+              "EXPL": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -338,7 +496,14 @@
               "DOMAIN",
               "LOG"
             ],
-            "analysis": "Multiplication d’inégalité sans signe du dénominateur et oubli de sa nullité."
+            "analysis": "Multiplication d’inégalité sans signe du dénominateur et oubli de sa nullité.",
+            "contracts": {
+              "DOMAIN": false,
+              "EXH": true,
+              "BOUND": false,
+              "EXPL": true,
+              "LOG": false
+            }
           }
         },
         {
@@ -349,7 +514,14 @@
               "EXPL",
               "EXH"
             ],
-            "analysis": "Échantillon des intervalles ; invariance du signe implicite mais récupérable par facteurs. Ne pas coder comme simple expérience aléatoire."
+            "analysis": "Échantillon des intervalles ; invariance du signe implicite mais récupérable par facteurs. Ne pas coder comme simple expérience aléatoire.",
+            "contracts": {
+              "DOMAIN": true,
+              "EXH": "discussable",
+              "BOUND": true,
+              "EXPL": "discussable",
+              "LOG": "discussable"
+            }
           }
         }
       ]
@@ -362,6 +534,10 @@
       "statement": "Résoudre dans $\\mathbb R$ l’équation $\\sqrt{x+6}=x$. Justifier l’ensemble des solutions.",
       "referenceAnswer": "$S=\\{3\\}$.",
       "family": "R08",
+      "tags": [
+        "2de",
+        "algebre"
+      ],
       "productions": [
         {
           "id": "R08-1",
@@ -370,7 +546,10 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Signe préalable rend l’élévation au carré réversible."
+            "analysis": "Signe préalable rend l’élévation au carré réversible.",
+            "contracts": {
+              "REC": true
+            }
           }
         },
         {
@@ -380,7 +559,10 @@
             "targets": [
               "REGISTER"
             ],
-            "analysis": "Analyse-synthèse valide sans annonce du domaine avant calcul."
+            "analysis": "Analyse-synthèse valide sans annonce du domaine avant calcul.",
+            "contracts": {
+              "REC": true
+            }
           }
         },
         {
@@ -390,7 +572,10 @@
             "targets": [
               "REC"
             ],
-            "analysis": "Ensemble final et élimination corrects ; symbole d’équivalence localement faux. Le texte se répare en remplaçant la première équivalence par une implication."
+            "analysis": "Ensemble final et élimination corrects ; symbole d’équivalence localement faux. Le texte se répare en remplaçant la première équivalence par une implication.",
+            "contracts": {
+              "REC": false
+            }
           }
         }
       ]
@@ -403,6 +588,10 @@
       "statement": "Résoudre dans $\\mathbb R$ l’équation $(x^2-5x+6)(2x^2-x-1)=0$ en justifiant.",
       "referenceAnswer": "$S=\\{-1/2;1;2;3\\}$.",
       "family": "R09",
+      "tags": [
+        "1re_spe",
+        "algebre"
+      ],
       "productions": [
         {
           "id": "R09-1",
@@ -411,7 +600,13 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Deux objets explicitement nommés différemment."
+            "analysis": "Deux objets explicitement nommés différemment.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": true,
+              "CALC": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -422,7 +617,13 @@
               "NAME",
               "SCOPE"
             ],
-            "analysis": "Différence appariée : seuls les indices des deux delta sont retirés. Contexte local lisible ; ne pas confondre réemploi séquentiel et identification simultanée."
+            "analysis": "Différence appariée : seuls les indices des deux delta sont retirés. Contexte local lisible ; ne pas confondre réemploi séquentiel et identification simultanée.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": true,
+              "CALC": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -432,7 +633,13 @@
             "targets": [
               "NAME"
             ],
-            "analysis": "Réaffectation explicitement signalée ; contrôle de la portée pragmatique du nom."
+            "analysis": "Réaffectation explicitement signalée ; contrôle de la portée pragmatique du nom.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": true,
+              "CALC": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -443,7 +650,13 @@
               "REGISTER",
               "ECO"
             ],
-            "analysis": "Méthode alternative valide par factorisation ; n’isole pas l’effet de longueur."
+            "analysis": "Méthode alternative valide par factorisation ; n’isole pas l’effet de longueur.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": null,
+              "CALC": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -455,7 +668,48 @@
               "LOG",
               "CALC"
             ],
-            "analysis": "Conserve indûment la valeur d’un discriminant pour un autre polynôme ; contrôle d’une identification réellement invalide."
+            "analysis": "Conserve indûment la valeur d’un discriminant pour un autre polynôme ; contrôle d’une identification réellement invalide.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": false,
+              "CALC": false,
+              "LOG": false
+            }
+          }
+        },
+        {
+          "id": "R09-6",
+          "content": "Le produit est nul si et seulement si l’un des deux facteurs est nul.\n\nPour $x^2-5x+6=0$ :\nLe discriminant vaut $\\Delta=25-24=1$.\nLes solutions sont $x=2$ ou $x=3$.\n\nPour $2x^2-x-1=0$ :\nLe discriminant vaut $\\Delta=1+8=9$.\nLes solutions sont $x=-1/2$ ou $x=1$.\n\nDonc $S=\\{-1/2;1;2;3\\}$.",
+          "research": {
+            "targets": [
+              "NAME",
+              "SCOPE"
+            ],
+            "analysis": "Les deux discriminants ont le même nom dans des traitements locaux séparés. La convention stricte d’un nom unique sur toute la rédaction est transgressée ; les calculs et les portées locales restent interprétables. Le retrait doit rendre visible chaque contexte et le retour à la conclusion commune, sans changer les mots. Version sans retrait ; les retours à la ligne sont identiques dans la variante indentée.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": true,
+              "CALC": true,
+              "LOG": true
+            }
+          }
+        },
+        {
+          "id": "R09-7",
+          "content": "Le produit est nul si et seulement si l’un des deux facteurs est nul.\n\nPour $x^2-5x+6=0$ :\n    Le discriminant vaut $\\Delta=25-24=1$.\n    Les solutions sont $x=2$ ou $x=3$.\n\nPour $2x^2-x-1=0$ :\n    Le discriminant vaut $\\Delta=1+8=9$.\n    Les solutions sont $x=-1/2$ ou $x=1$.\n\nDonc $S=\\{-1/2;1;2;3\\}$.",
+          "research": {
+            "targets": [
+              "NAME",
+              "SCOPE"
+            ],
+            "analysis": "Les deux discriminants ont le même nom dans des traitements locaux séparés. La convention stricte d’un nom unique sur toute la rédaction est transgressée ; les calculs et les portées locales restent interprétables. Le retrait doit rendre visible chaque contexte et le retour à la conclusion commune, sans changer les mots. Seuls les espaces de début de ligne diffèrent de la rédaction appariée.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": true,
+              "CALC": true,
+              "LOG": true
+            },
+            "indentationOf": "R09-6"
           }
         }
       ]
@@ -468,6 +722,10 @@
       "statement": "Une urne contient $4$ boules rouges et $3$ bleues, indiscernables au toucher. On tire successivement deux boules sans remise. Sachant que la seconde est rouge, calculer la probabilité que la première soit bleue. Justifier.",
       "referenceAnswer": "$1/2$.",
       "family": "R10",
+      "tags": [
+        "1re_spe",
+        "probabilites"
+      ],
       "productions": [
         {
           "id": "R10-1",
@@ -476,7 +734,12 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Événements, total et quotient correctement distingués."
+            "analysis": "Événements, total et quotient correctement distingués.",
+            "contracts": {
+              "NAME": true,
+              "TYPE": true,
+              "MODEL": true
+            }
           }
         },
         {
@@ -487,7 +750,12 @@
               "TYPE",
               "NAME"
             ],
-            "analysis": "Les noms d’événements portent directement des probabilités, et B1 désigne numériquement une intersection. Le calcul voulu est récupérable ; plusieurs ambiguïtés délibérées sont signalées."
+            "analysis": "Les noms d’événements portent directement des probabilités, et B1 désigne numériquement une intersection. Le calcul voulu est récupérable ; plusieurs ambiguïtés délibérées sont signalées.",
+            "contracts": {
+              "NAME": false,
+              "TYPE": false,
+              "MODEL": true
+            }
           }
         },
         {
@@ -497,7 +765,12 @@
             "targets": [
               "REGISTER"
             ],
-            "analysis": "Argument combinatoire conditionnel valide ; pas de formule de Bayes obligatoire."
+            "analysis": "Argument combinatoire conditionnel valide ; pas de formule de Bayes obligatoire.",
+            "contracts": {
+              "NAME": true,
+              "TYPE": true,
+              "MODEL": true
+            }
           }
         },
         {
@@ -507,7 +780,12 @@
             "targets": [
               "MODEL"
             ],
-            "analysis": "Indépendance incorrecte sans remise."
+            "analysis": "Indépendance incorrecte sans remise.",
+            "contracts": {
+              "NAME": true,
+              "TYPE": true,
+              "MODEL": false
+            }
           }
         }
       ]
@@ -520,6 +798,10 @@
       "statement": "On considère $f(x)=x^3-3x^2-9x+4$ sur $\\mathbb R$. Déterminer les équations de ses tangentes horizontales, en justifiant.",
       "referenceAnswer": "$y=9$ et $y=-23$.",
       "family": "R11",
+      "tags": [
+        "1re_spe",
+        "analyse"
+      ],
       "productions": [
         {
           "id": "R11-1",
@@ -528,7 +810,12 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Lien dérivée pente, exhaustivité des abscisses, équations de droites."
+            "analysis": "Lien dérivée pente, exhaustivité des abscisses, équations de droites.",
+            "contracts": {
+              "EXH": true,
+              "TYPE": true,
+              "EXPL": true
+            }
           }
         },
         {
@@ -538,7 +825,12 @@
             "targets": [
               "TYPE"
             ],
-            "analysis": "Résultats numériques corrects ; fonction, abscisses, droites et nombres confondus dans la formulation."
+            "analysis": "Résultats numériques corrects ; fonction, abscisses, droites et nombres confondus dans la formulation.",
+            "contracts": {
+              "EXH": "discussable",
+              "TYPE": false,
+              "EXPL": "discussable"
+            }
           }
         },
         {
@@ -550,7 +842,12 @@
               "EXH",
               "EXPL"
             ],
-            "analysis": "Exhaustivité visible dans la factorisation mais non dite. À distinguer d’une seule vérification sans structure factorisée."
+            "analysis": "Exhaustivité visible dans la factorisation mais non dite. À distinguer d’une seule vérification sans structure factorisée.",
+            "contracts": {
+              "EXH": "discussable",
+              "TYPE": true,
+              "EXPL": "discussable"
+            }
           }
         }
       ]
@@ -563,6 +860,10 @@
       "statement": "Résoudre $\\cos(2x)=\\sin(3x)$ pour $x\\in[-2\\pi;3\\pi]$, en justifiant l’ensemble des solutions.",
       "referenceAnswer": "$S=\\{\\pi/10+2k\\pi/5:k\\in\\mathbb Z,-5\\le k\\le7\\}$. La seconde famille est incluse dans la première.",
       "family": "R12",
+      "tags": [
+        "tle_spe",
+        "trigonometrie"
+      ],
       "productions": [
         {
           "id": "R12-1",
@@ -571,7 +872,14 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Deux branches puis inclusion et restriction entières contrôlées."
+            "analysis": "Deux branches puis inclusion et restriction entières contrôlées.",
+            "contracts": {
+              "QUANT": true,
+              "DOMAIN": true,
+              "EXH": true,
+              "EXPL": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -582,7 +890,14 @@
               "REGISTER",
               "ECO"
             ],
-            "analysis": "Congruences réelles modulo un réel positif au sens de différence multiple entier ; variante valide. Sens du modulo à expliciter dans la notice interne, pas au répondant."
+            "analysis": "Congruences réelles modulo un réel positif au sens de différence multiple entier ; variante valide. Sens du modulo à expliciter dans la notice interne, pas au répondant.",
+            "contracts": {
+              "QUANT": true,
+              "DOMAIN": true,
+              "EXH": true,
+              "EXPL": "discussable",
+              "LOG": true
+            }
           }
         },
         {
@@ -594,7 +909,14 @@
               "REGISTER",
               "EXPL"
             ],
-            "analysis": "Même nom k licite sous la disjonction existentielle ; témoins de branches non simultanés. Contrôle d’une norme trop forte sur l’unicité des noms."
+            "analysis": "Même nom k licite sous la disjonction existentielle ; témoins de branches non simultanés. Contrôle d’une norme trop forte sur l’unicité des noms.",
+            "contracts": {
+              "QUANT": true,
+              "DOMAIN": true,
+              "EXH": true,
+              "EXPL": "discussable",
+              "LOG": true
+            }
           }
         },
         {
@@ -605,7 +927,14 @@
               "EXH",
               "LOG"
             ],
-            "analysis": "Injectivité globale indue du cosinus ; omission de la périodicité et de l’autre branche."
+            "analysis": "Injectivité globale indue du cosinus ; omission de la périodicité et de l’autre branche.",
+            "contracts": {
+              "QUANT": null,
+              "DOMAIN": true,
+              "EXH": false,
+              "EXPL": true,
+              "LOG": false
+            }
           }
         },
         {
@@ -616,7 +945,14 @@
               "DOMAIN",
               "EXPL"
             ],
-            "analysis": "Intégralité indiquée en amont, omise dans l’ensemble final : lecture contextuelle récupérable. Comparaison avec un vrai paramètre réel ci-dessous."
+            "analysis": "Intégralité indiquée en amont, omise dans l’ensemble final : lecture contextuelle récupérable. Comparaison avec un vrai paramètre réel ci-dessous.",
+            "contracts": {
+              "QUANT": true,
+              "DOMAIN": true,
+              "EXH": true,
+              "EXPL": "discussable",
+              "LOG": true
+            }
           }
         },
         {
@@ -627,7 +963,14 @@
               "DOMAIN",
               "LOG"
             ],
-            "analysis": "Paramètre réel rend la famille continue ; ensemble faux. Ne pas confondre avec omission seulement locale de l’intégralité."
+            "analysis": "Paramètre réel rend la famille continue ; ensemble faux. Ne pas confondre avec omission seulement locale de l’intégralité.",
+            "contracts": {
+              "QUANT": null,
+              "DOMAIN": false,
+              "EXH": false,
+              "EXPL": true,
+              "LOG": false
+            }
           }
         }
       ]
@@ -640,6 +983,10 @@
       "statement": "On définit $u_0=0$ et $u_{n+1}=\\sqrt{2+u_n}$. Démontrer que la suite est bien définie et que $0\\leq u_n<2$ pour tout $n\\in\\mathbb N$.",
       "referenceAnswer": "Initialisation puis récurrence : $0\\le u_n<2$ implique $2\\le2+u_n<4$.",
       "family": "R13",
+      "tags": [
+        "tle_spe",
+        "suites"
+      ],
       "productions": [
         {
           "id": "R13-1",
@@ -648,7 +995,15 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Hypothèse locale, existence et borne stricte établies."
+            "analysis": "Hypothèse locale, existence et borne stricte établies.",
+            "contracts": {
+              "SCOPE": true,
+              "QUANT": true,
+              "CIRC": true,
+              "INIT": true,
+              "GEN": true,
+              "EMP": true
+            }
           }
         },
         {
@@ -658,7 +1013,15 @@
             "targets": [
               "INIT"
             ],
-            "analysis": "Suppression appariée de l’initialisation ; hérédité identique. Le cas initial est immédiatement contrôlable par le lecteur."
+            "analysis": "Suppression appariée de l’initialisation ; hérédité identique. Le cas initial est immédiatement contrôlable par le lecteur.",
+            "contracts": {
+              "SCOPE": true,
+              "QUANT": true,
+              "CIRC": true,
+              "INIT": false,
+              "GEN": true,
+              "EMP": true
+            }
           }
         },
         {
@@ -669,7 +1032,15 @@
               "QUANT",
               "CIRC"
             ],
-            "analysis": "Conclusion universelle posée comme hypothèse globale ; absence d’initialisation également signalée comme facteur associé."
+            "analysis": "Conclusion universelle posée comme hypothèse globale ; absence d’initialisation également signalée comme facteur associé.",
+            "contracts": {
+              "SCOPE": false,
+              "QUANT": false,
+              "CIRC": false,
+              "INIT": false,
+              "GEN": false,
+              "EMP": true
+            }
           }
         },
         {
@@ -680,7 +1051,56 @@
               "EMP",
               "GEN"
             ],
-            "analysis": "Calculs approchés exacts aux précisions annoncées, extrapolation non prouvée."
+            "analysis": "Calculs approchés exacts aux précisions annoncées, extrapolation non prouvée.",
+            "contracts": {
+              "SCOPE": null,
+              "QUANT": null,
+              "CIRC": true,
+              "INIT": true,
+              "GEN": false,
+              "EMP": false
+            }
+          }
+        },
+        {
+          "id": "R13-5",
+          "content": "Au rang $0$, $u_0=0$ est défini et $0\\le u_0<2$.\n\nSoit $n\\in\\mathbb N$. Supposons $u_n$ défini et $0\\le u_n<2$.\nAlors $2\\le2+u_n<4$.\nLa racine existe et $0\\le u_{n+1}=\\sqrt{2+u_n}<2$.\n\nPar récurrence, pour tout $n\\in\\mathbb N$, $u_n$ existe et $0\\le u_n<2$.",
+          "research": {
+            "targets": [
+              "SCOPE",
+              "QUANT",
+              "INIT"
+            ],
+            "analysis": "L’initialisation et l’hérédité sont complètes dans les deux versions. Le retrait porte uniquement sur les conséquences de l’hypothèse locale ; la conclusion universelle revient au niveau initial. Il ne s’agit pas de réparer une circularité par la mise en page. Version sans retrait ; les retours à la ligne sont identiques dans la variante indentée.",
+            "contracts": {
+              "SCOPE": true,
+              "QUANT": true,
+              "CIRC": true,
+              "INIT": true,
+              "GEN": true,
+              "EMP": true
+            }
+          }
+        },
+        {
+          "id": "R13-6",
+          "content": "Au rang $0$, $u_0=0$ est défini et $0\\le u_0<2$.\n\nSoit $n\\in\\mathbb N$. Supposons $u_n$ défini et $0\\le u_n<2$.\n    Alors $2\\le2+u_n<4$.\n    La racine existe et $0\\le u_{n+1}=\\sqrt{2+u_n}<2$.\n\nPar récurrence, pour tout $n\\in\\mathbb N$, $u_n$ existe et $0\\le u_n<2$.",
+          "research": {
+            "targets": [
+              "SCOPE",
+              "QUANT",
+              "INIT"
+            ],
+            "analysis": "L’initialisation et l’hérédité sont complètes dans les deux versions. Le retrait porte uniquement sur les conséquences de l’hypothèse locale ; la conclusion universelle revient au niveau initial. Il ne s’agit pas de réparer une circularité par la mise en page. Seuls les espaces de début de ligne diffèrent de la rédaction appariée.",
+            "contracts": {
+              "SCOPE": true,
+              "QUANT": true,
+              "CIRC": true,
+              "INIT": true,
+              "GEN": true,
+              "EMP": true
+            },
+            "indentationOf": "R13-5"
           }
         }
       ]
@@ -693,6 +1113,10 @@
       "statement": "Démontrer que l’équation $x^3+x-1=0$ admet une unique solution réelle $\\alpha$ et que $0{,}68<\\alpha<0{,}69$.",
       "referenceAnswer": "Continuité, stricte croissance, signes $f(0.68)=-0.005568$ et $f(0.69)=0.018509$.",
       "family": "R14",
+      "tags": [
+        "tle_spe",
+        "analyse"
+      ],
       "productions": [
         {
           "id": "R14-1",
@@ -701,7 +1125,14 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Existence sur intervalle et unicité globale."
+            "analysis": "Existence sur intervalle et unicité globale.",
+            "contracts": {
+              "CIRC": true,
+              "EXH": true,
+              "EXIST": true,
+              "EXPL": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -712,7 +1143,14 @@
               "EXH",
               "LOG"
             ],
-            "analysis": "TVI ne donne pas l’unicité ; monotonie absente."
+            "analysis": "TVI ne donne pas l’unicité ; monotonie absente.",
+            "contracts": {
+              "CIRC": true,
+              "EXH": false,
+              "EXIST": true,
+              "EXPL": true,
+              "LOG": false
+            }
           }
         },
         {
@@ -723,7 +1161,14 @@
               "EXIST",
               "EXPL"
             ],
-            "analysis": "Existence annoncée sur la seule croissance ; signes et continuité polynomiale récupérables ensuite. Réorganisation potentiellement suffisante, à distinguer d’une conclusion fausse."
+            "analysis": "Existence annoncée sur la seule croissance ; signes et continuité polynomiale récupérables ensuite. Réorganisation potentiellement suffisante, à distinguer d’une conclusion fausse.",
+            "contracts": {
+              "CIRC": true,
+              "EXH": true,
+              "EXIST": "discussable",
+              "EXPL": "discussable",
+              "LOG": false
+            }
           }
         },
         {
@@ -735,7 +1180,14 @@
               "EXIST",
               "EXH"
             ],
-            "analysis": "Existence et unicité présupposées, seul encadrement argumenté ; croissance également non justifiée."
+            "analysis": "Existence et unicité présupposées, seul encadrement argumenté ; croissance également non justifiée.",
+            "contracts": {
+              "CIRC": false,
+              "EXH": false,
+              "EXIST": false,
+              "EXPL": false,
+              "LOG": false
+            }
           }
         }
       ]
@@ -748,6 +1200,10 @@
       "statement": "On définit $f(x)=x^2$ pour $x\\le1$ et $f(x)=ax+b$ pour $x>1$. Déterminer les réels $a,b$ pour que $f$ soit dérivable en $1$. Justifier.",
       "referenceAnswer": "$a=2,b=-1$.",
       "family": "R15",
+      "tags": [
+        "tle_spe",
+        "analyse"
+      ],
       "productions": [
         {
           "id": "R15-1",
@@ -756,7 +1212,13 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Nécessité continuité, taux et réciproque."
+            "analysis": "Nécessité continuité, taux et réciproque.",
+            "contracts": {
+              "DOMAIN": true,
+              "REC": true,
+              "EXIST": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -768,7 +1230,13 @@
               "EXIST",
               "LOG"
             ],
-            "analysis": "Continuité omise ; dérivées des morceaux ne suffisent pas."
+            "analysis": "Continuité omise ; dérivées des morceaux ne suffisent pas.",
+            "contracts": {
+              "DOMAIN": false,
+              "REC": false,
+              "EXIST": false,
+              "LOG": false
+            }
           }
         },
         {
@@ -778,7 +1246,13 @@
             "targets": [
               "ECO"
             ],
-            "analysis": "Réciproque portée par « exactement lorsque », sans paragraphe séparé."
+            "analysis": "Réciproque portée par « exactement lorsque », sans paragraphe séparé.",
+            "contracts": {
+              "DOMAIN": true,
+              "REC": true,
+              "EXIST": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -788,7 +1262,13 @@
             "targets": [
               "REC"
             ],
-            "analysis": "Paramètres corrects et conditions nécessaires exactes, mais réciproque finale fausse en général."
+            "analysis": "Paramètres corrects et conditions nécessaires exactes, mais réciproque finale fausse en général.",
+            "contracts": {
+              "DOMAIN": true,
+              "REC": false,
+              "EXIST": "discussable",
+              "LOG": false
+            }
           }
         }
       ]
@@ -801,6 +1281,10 @@
       "statement": "Soient $a,b\\in\\mathbb Z$ tels que $6\\mid a$ et $10\\mid b$. Démontrer que $2\\mid(a+b)$, puis déterminer si $4\\mid(a+b)$ est nécessairement vrai.",
       "referenceAnswer": "$a+b=2(3p+5q)$ ; non pour $a=6,b=0$.",
       "family": "R16",
+      "tags": [
+        "sup_1",
+        "logique"
+      ],
       "productions": [
         {
           "id": "R16-1",
@@ -809,7 +1293,14 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Témoins indépendants et contre-exemple admissible."
+            "analysis": "Témoins indépendants et contre-exemple admissible.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": true,
+              "QUANT": true,
+              "DOMAIN": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -821,7 +1312,14 @@
               "QUANT",
               "LOG"
             ],
-            "analysis": "Fusion de deux existentiels ; témoin commun illégitime et conclusion renforcée fausse."
+            "analysis": "Fusion de deux existentiels ; témoin commun illégitime et conclusion renforcée fausse.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": null,
+              "QUANT": false,
+              "DOMAIN": true,
+              "LOG": false
+            }
           }
         },
         {
@@ -832,7 +1330,14 @@
               "NAME",
               "SCOPE"
             ],
-            "analysis": "Réemploi séquentiel explicite, pas d’addition symbolique de témoins identifiés ; argument correct."
+            "analysis": "Réemploi séquentiel explicite, pas d’addition symbolique de témoins identifiés ; argument correct.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": true,
+              "QUANT": true,
+              "DOMAIN": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -843,7 +1348,53 @@
               "DOMAIN",
               "ECO"
             ],
-            "analysis": "Intégralité des quotients implicite mais donnée par les hypothèses. Réécriture exacte."
+            "analysis": "Intégralité des quotients implicite mais donnée par les hypothèses. Réécriture exacte.",
+            "contracts": {
+              "NAME": null,
+              "SCOPE": null,
+              "QUANT": true,
+              "DOMAIN": true,
+              "LOG": true
+            }
+          }
+        },
+        {
+          "id": "R16-5",
+          "content": "Pour $a$ :\nÉcrivons $a=6k$ avec $k\\in\\mathbb Z$.\nAlors $a=2(3k)$ est pair.\n\nPour $b$ :\nÉcrivons $b=10k$ avec $k\\in\\mathbb Z$.\nAlors $b=2(5k)$ est pair.\n\nLa somme de deux entiers pairs est paire, donc $2\\mid(a+b)$.\nAvec $a=6$ et $b=0$, on a $a+b=6$, qui n’est pas divisible par $4$.\nLa divisibilité par $4$ n’est donc pas nécessaire.",
+          "research": {
+            "targets": [
+              "NAME",
+              "SCOPE",
+              "QUANT"
+            ],
+            "analysis": "Deux témoins locaux portent le même nom, mais aucune formule ne les additionne comme s’ils étaient identiques. La convention globale [[file:contrats.org::#NAME][NAME]] est transgressée ; la preuve est valide selon les portées locales. Le retrait matérialise deux sous-raisonnements puis leur sortie commune. Version sans retrait ; les retours à la ligne sont identiques dans la variante indentée.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": true,
+              "QUANT": true,
+              "DOMAIN": true,
+              "LOG": true
+            }
+          }
+        },
+        {
+          "id": "R16-6",
+          "content": "Pour $a$ :\n    Écrivons $a=6k$ avec $k\\in\\mathbb Z$.\n    Alors $a=2(3k)$ est pair.\n\nPour $b$ :\n    Écrivons $b=10k$ avec $k\\in\\mathbb Z$.\n    Alors $b=2(5k)$ est pair.\n\nLa somme de deux entiers pairs est paire, donc $2\\mid(a+b)$.\nAvec $a=6$ et $b=0$, on a $a+b=6$, qui n’est pas divisible par $4$.\nLa divisibilité par $4$ n’est donc pas nécessaire.",
+          "research": {
+            "targets": [
+              "NAME",
+              "SCOPE",
+              "QUANT"
+            ],
+            "analysis": "Deux témoins locaux portent le même nom, mais aucune formule ne les additionne comme s’ils étaient identiques. La convention globale [[file:contrats.org::#NAME][NAME]] est transgressée ; la preuve est valide selon les portées locales. Le retrait matérialise deux sous-raisonnements puis leur sortie commune. Seuls les espaces de début de ligne diffèrent de la rédaction appariée.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": true,
+              "QUANT": true,
+              "DOMAIN": true,
+              "LOG": true
+            },
+            "indentationOf": "R16-5"
           }
         }
       ]
@@ -856,6 +1407,10 @@
       "statement": "À l’aide de la définition quantifiée, démontrer que $u_n=\\frac{2n+1}{n+2}$ converge vers $2$. Donner un rang qui convient à chaque $\\varepsilon>0$.",
       "referenceAnswer": "$|u_n-2|=3/(n+2)$ ; $N=\\lceil3/\\varepsilon\\rceil$ convient.",
       "family": "R17",
+      "tags": [
+        "sup_1",
+        "analyse"
+      ],
       "productions": [
         {
           "id": "R17-1",
@@ -864,7 +1419,14 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Seuil entier dépendant d’epsilon et inégalité stricte."
+            "analysis": "Seuil entier dépendant d’epsilon et inégalité stricte.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": true,
+              "QUANT": true,
+              "TASK": true,
+              "LOG": true
+            }
           }
         },
         {
@@ -875,7 +1437,14 @@
               "QUANT",
               "LOG"
             ],
-            "analysis": "Seuil universel impossible, ordre des quantificateurs modifié."
+            "analysis": "Seuil universel impossible, ordre des quantificateurs modifié.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": null,
+              "QUANT": false,
+              "TASK": true,
+              "LOG": false
+            }
           }
         },
         {
@@ -885,7 +1454,14 @@
             "targets": [
               "QUANT"
             ],
-            "analysis": "Epsilon choisi après n ; ne satisfait pas le défi de la définition."
+            "analysis": "Epsilon choisi après n ; ne satisfait pas le défi de la définition.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": null,
+              "QUANT": false,
+              "TASK": false,
+              "LOG": false
+            }
           }
         },
         {
@@ -896,7 +1472,14 @@
               "TASK",
               "REGISTER"
             ],
-            "analysis": "Preuve correcte par règles de limites, sans la définition ni le rang demandés."
+            "analysis": "Preuve correcte par règles de limites, sans la définition ni le rang demandés.",
+            "contracts": {
+              "NAME": null,
+              "SCOPE": null,
+              "QUANT": null,
+              "TASK": false,
+              "LOG": true
+            }
           }
         },
         {
@@ -907,7 +1490,51 @@
               "NAME",
               "SCOPE"
             ],
-            "analysis": "Collision entre nom du seuil fixé et indice quantifié. Sens récupérable par renommage, formulation littérale à analyser."
+            "analysis": "Collision entre nom du seuil fixé et indice quantifié. Sens récupérable par renommage, formulation littérale à analyser.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": "discussable",
+              "QUANT": "discussable",
+              "TASK": true,
+              "LOG": "discussable"
+            }
+          }
+        },
+        {
+          "id": "R17-6",
+          "content": "Soit $\\varepsilon>0$.\nPosons $N=\\lceil3/\\varepsilon\\rceil$.\nSoit $n\\in\\mathbb N$ tel que $n\\ge N$.\nOn a $|u_n-2|=3/(n+2)$ et $n+2>3/\\varepsilon$.\nDonc $|u_n-2|<\\varepsilon$.\nAinsi, pour tout $n\\ge N$, $|u_n-2|<\\varepsilon$.\nPour tout $\\varepsilon>0$, il existe donc un rang $N$ tel que, pour tout $n\\ge N$, $|u_n-2|<\\varepsilon$.\nPar définition, $u_n\\to2$.",
+          "research": {
+            "targets": [
+              "SCOPE",
+              "QUANT"
+            ],
+            "analysis": "Le témoin N dépend d’epsilon ; l’indice n est arbitraire au-delà de N. Les retraits à deux profondeurs matérialisent l’imbrication et les sorties successives. Le contenu et les quantificateurs sont valides dans les deux versions ; l’effet attendu porte sur la lecture de leur structure, sans note prescrite. Version sans retrait ; les retours à la ligne sont identiques dans la variante indentée.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": true,
+              "QUANT": true,
+              "TASK": true,
+              "LOG": true
+            }
+          }
+        },
+        {
+          "id": "R17-7",
+          "content": "Soit $\\varepsilon>0$.\n    Posons $N=\\lceil3/\\varepsilon\\rceil$.\n    Soit $n\\in\\mathbb N$ tel que $n\\ge N$.\n        On a $|u_n-2|=3/(n+2)$ et $n+2>3/\\varepsilon$.\n        Donc $|u_n-2|<\\varepsilon$.\n    Ainsi, pour tout $n\\ge N$, $|u_n-2|<\\varepsilon$.\nPour tout $\\varepsilon>0$, il existe donc un rang $N$ tel que, pour tout $n\\ge N$, $|u_n-2|<\\varepsilon$.\nPar définition, $u_n\\to2$.",
+          "research": {
+            "targets": [
+              "SCOPE",
+              "QUANT"
+            ],
+            "analysis": "Le témoin N dépend d’epsilon ; l’indice n est arbitraire au-delà de N. Les retraits à deux profondeurs matérialisent l’imbrication et les sorties successives. Le contenu et les quantificateurs sont valides dans les deux versions ; l’effet attendu porte sur la lecture de leur structure, sans note prescrite. Seuls les espaces de début de ligne diffèrent de la rédaction appariée.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": true,
+              "QUANT": true,
+              "TASK": true,
+              "LOG": true
+            },
+            "indentationOf": "R17-6"
           }
         }
       ]
@@ -920,6 +1547,10 @@
       "statement": "Démontrer, à partir de la définition de la convergence, qu’une suite réelle ne peut pas avoir deux limites distinctes.",
       "referenceAnswer": "Contradiction par epsilon égal au tiers de la distance entre deux limites.",
       "family": "R18",
+      "tags": [
+        "sup_1",
+        "analyse"
+      ],
       "productions": [
         {
           "id": "R18-1",
@@ -928,7 +1559,11 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Deux seuils et seuil commun explicités."
+            "analysis": "Deux seuils et seuil commun explicités.",
+            "contracts": {
+              "CIRC": true,
+              "EXPL": true
+            }
           }
         },
         {
@@ -939,7 +1574,11 @@
               "ECO",
               "EXPL"
             ],
-            "analysis": "Seul développement des deux rangs remplacé par « assez grand » ; seuil commun récupérable."
+            "analysis": "Seul développement des deux rangs remplacé par « assez grand » ; seuil commun récupérable.",
+            "contracts": {
+              "CIRC": true,
+              "EXPL": "discussable"
+            }
           }
         },
         {
@@ -947,10 +1586,13 @@
           "content": "Si la suite converge vers $a$ et vers $b$, alors $a=\\lim_{n\\to\\infty}u_n=b$. Donc $a=b$.",
           "research": {
             "targets": [
-              "CIRC",
-              "NAME"
+              "CIRC"
             ],
-            "analysis": "La notation de limite unique présuppose ce qui doit être démontré."
+            "analysis": "La notation de limite unique présuppose ce qui doit être démontré.",
+            "contracts": {
+              "CIRC": false,
+              "EXPL": true
+            }
           }
         },
         {
@@ -960,7 +1602,11 @@
             "targets": [
               "REGISTER"
             ],
-            "analysis": "Argument verbal complet issu de la définition ; contrôle de registre sans symbolisme."
+            "analysis": "Argument verbal complet issu de la définition ; contrôle de registre sans symbolisme.",
+            "contracts": {
+              "CIRC": true,
+              "EXPL": true
+            }
           }
         }
       ]
@@ -973,6 +1619,10 @@
       "statement": "Pour $x\\in[0;1]$, on pose $F(x)=\\int_0^x t\\,dt+\\int_x^1(1-t)\\,dt$. Déterminer le minimum de $F$ sur $[0;1]$ et les points où il est atteint.",
       "referenceAnswer": "$F(x)=x^2-x+1/2=(x-1/2)^2+1/4$, minimum $1/4$ en $x=1/2$.",
       "family": "R19",
+      "tags": [
+        "sup_1",
+        "analyse"
+      ],
       "productions": [
         {
           "id": "R19-1",
@@ -981,7 +1631,13 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Calcul de primitives, forme canonique et domaine."
+            "analysis": "Calcul de primitives, forme canonique et domaine.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": true,
+              "EQ": true,
+              "TYPE": true
+            }
           }
         },
         {
@@ -992,7 +1648,13 @@
               "SCOPE",
               "REGISTER"
             ],
-            "analysis": "Renommage licite des deux variables muettes, réemploi du même nom dans portées séparées."
+            "analysis": "Renommage licite des deux variables muettes, réemploi du même nom dans portées séparées.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": true,
+              "EQ": true,
+              "TYPE": true
+            }
           }
         },
         {
@@ -1003,7 +1665,13 @@
               "SCOPE",
               "NAME"
             ],
-            "analysis": "Même symbole libre dans bornes et lié dans intégrandes ; notation d’usage parfois admise, à lire avec convention de portée explicite. Pas une faute mathématique automatique."
+            "analysis": "Même symbole libre dans bornes et lié dans intégrandes ; notation d’usage parfois admise, à lire avec convention de portée explicite. Pas une faute mathématique automatique.",
+            "contracts": {
+              "NAME": false,
+              "SCOPE": "discussable",
+              "EQ": true,
+              "TYPE": true
+            }
           }
         },
         {
@@ -1015,7 +1683,13 @@
               "EQ",
               "TYPE"
             ],
-            "analysis": "Primitives confondues avec intégrales définies ; bornes ignorées et variable liée devenue libre."
+            "analysis": "Primitives confondues avec intégrales définies ; bornes ignorées et variable liée devenue libre.",
+            "contracts": {
+              "NAME": true,
+              "SCOPE": false,
+              "EQ": false,
+              "TYPE": false
+            }
           }
         }
       ]
@@ -1028,6 +1702,10 @@
       "statement": "Soient $A,B$ deux parties d’un ensemble $E$ et $A\\triangle B=(A\\setminus B)\\cup(B\\setminus A)$. Démontrer que $A\\triangle B=\\varnothing$ si et seulement si $A=B$.",
       "referenceAnswer": "Deux inclusions puis réciproque.",
       "family": "R20",
+      "tags": [
+        "sup_1",
+        "algebre"
+      ],
       "productions": [
         {
           "id": "R20-1",
@@ -1036,7 +1714,11 @@
             "targets": [
               "REF"
             ],
-            "analysis": "Équivalence et double inclusion établies."
+            "analysis": "Équivalence et double inclusion établies.",
+            "contracts": {
+              "REC": true,
+              "EXH": true
+            }
           }
         },
         {
@@ -1046,7 +1728,11 @@
             "targets": [
               "EXH"
             ],
-            "analysis": "Une inclusion manque dans la première implication, le reste est identique au contrôle."
+            "analysis": "Une inclusion manque dans la première implication, le reste est identique au contrôle.",
+            "contracts": {
+              "REC": "discussable",
+              "EXH": false
+            }
           }
         },
         {
@@ -1057,7 +1743,11 @@
               "REC",
               "EXH"
             ],
-            "analysis": "Une seule direction de l’équivalence."
+            "analysis": "Une seule direction de l’équivalence.",
+            "contracts": {
+              "REC": false,
+              "EXH": false
+            }
           }
         },
         {
@@ -1068,10 +1758,19 @@
               "REGISTER",
               "ECO"
             ],
-            "analysis": "Chaîne d’équivalences complète sans paragraphes ni éléments génériques."
+            "analysis": "Chaîne d’équivalences complète sans paragraphes ni éléments génériques.",
+            "contracts": {
+              "REC": true,
+              "EXH": true
+            }
           }
         }
       ]
     }
-  ]
+  ],
+  "source": {
+    "questions": "research/questions.org",
+    "contracts": "research/contrats.org",
+    "sha256": "3bb40ba77ca6ec1d0e7a2b627e5cb89b73d0bda6193e15f4d3847908000f2349"
+  }
 }

@@ -17,8 +17,8 @@
   }
 
   function markdownToHtml(source) {
-    const input = escapeHtml(source).replace(/\r\n?/g, "\n").trim();
-    if (!input) return "";
+    const input = escapeHtml(source).replace(/\r\n?/g, "\n");
+    if (!input.trim()) return "";
 
     const lines = input.split("\n");
     const html = [];
@@ -27,7 +27,15 @@
 
     const flushParagraph = () => {
       if (paragraph.length) {
-        html.push("<p>" + inlineMarkdown(paragraph.join("<br>")) + "</p>");
+        // Leading spaces encode the experimental layout of a proof. A block
+        // per line also keeps wrapped text aligned with its scope on mobile.
+        const content = paragraph.some(line => /^ +/.test(line))
+          ? paragraph.map(line => {
+              const indent = line.match(/^ */)[0].length;
+              return `<span class="proof-line" style="display:block;padding-left:${indent}ch">${inlineMarkdown(line.slice(indent))}</span>`;
+            }).join("")
+          : inlineMarkdown(paragraph.join("<br>"));
+        html.push("<p>" + content + "</p>");
         paragraph = [];
       }
     };

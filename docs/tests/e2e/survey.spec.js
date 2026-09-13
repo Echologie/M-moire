@@ -248,3 +248,53 @@ test('présentation épurée et proportions adaptées aux trois tailles d’écr
   await page.locator('#next-production').click();
   await expect(page.locator('#reader-title')).toHaveText('Rédaction 2');
 });
+
+test('les portées indentées survivent au chargement, à la lecture et à la comparaison', async ({ page }, testInfo) => {
+  test.setTimeout(60000);
+  const bank = JSON.parse(fs.readFileSync(require('node:path').resolve(__dirname, '../../site/data/bank.json'), 'utf8'));
+  const original = bank.questions.find(q => q.id === 'R17');
+  const question = { ...original, productions: original.productions.filter(p => ['R17-6', 'R17-7'].includes(p.id)) };
+  await page.route('**/data/bank.json*', route => route.fulfill({ json: { ...bank, questions: [question] } }));
+  await start(page, 'Études supérieures');
+  const seen = [];
+  for (let i = 0; i < 2; i++) {
+    const card = page.locator('reading-card');
+    const pid = await card.getAttribute('production-id');
+    seen.push(pid);
+    const rich = card.locator('rich-text');
+    await expect(rich).toHaveAttribute('content', question.productions.find(p => p.id === pid).content);
+    if (pid === 'R17-7') {
+      for (const width of [390, 1363]) {
+        await page.setViewportSize({ width, height: 936 });
+        const geometry = await rich.evaluate(el => {
+          const lines = [...el.querySelectorAll('.proof-line')];
+          return lines.map(line => ({
+            indent: parseFloat(getComputedStyle(line).paddingLeft),
+            width: line.clientWidth, scroll: line.scrollWidth,
+            firstText: line.textContent.slice(0, 12)
+          }));
+        });
+        expect(geometry).toHaveLength(8);
+        expect(geometry[0].indent).toBe(0);
+        expect(geometry[1].indent).toBeGreaterThan(0);
+        expect(geometry[3].indent).toBeCloseTo(geometry[1].indent * 2, 0);
+        expect(geometry[5].indent).toBe(geometry[1].indent);
+        expect(geometry[6].indent).toBe(0);
+        expect(geometry.every(line => line.scroll <= line.width + 1)).toBeTruthy();
+        await page.screenshot({ path: testInfo.outputPath(`portees-${width}.png`) });
+      }
+      await expect(rich.locator('.katex-error')).toHaveCount(0);
+    } else {
+      await expect(rich.locator('.proof-line')).toHaveCount(0);
+    }
+    await grade(page, 8); await close(page);
+    if (i === 0) await page.locator('#next-production').click();
+  }
+  expect(seen.sort()).toEqual(['R17-6', 'R17-7']);
+  await page.getByRole('button', { name: 'Comparer', exact: true }).click();
+  const comparison = page.locator('.comparison-columns rich-text');
+  await expect(comparison).toHaveCount(2);
+  await expect(page.locator('.comparison-columns .proof-line')).toHaveCount(8);
+  const content = await comparison.evaluateAll(elements => elements.map(el => el.getAttribute('content')));
+  expect(content.sort()).toEqual(question.productions.map(p => p.content).sort());
+});

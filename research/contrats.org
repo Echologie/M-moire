@@ -1,0 +1,1081 @@
+#+title: Contrats candidats et contrôles — référentiel de Regards
+#+language: fr
+#+startup: overview
+
+* Mode d’emploi
+
+Ce référentiel définit les codes utilisés par [[file:questions.org][les questions et les rédactions]]. Ses propriétés et définitions sont éditoriales ; les blocs ~generated~ de renvois sont automatiquement recalculés depuis les tableaux des questions. Ne pas modifier ces renvois à la main. Le fichier ~codebook.json~ est également généré. Modifier les deux sources Org, puis lancer ~npm --prefix docs run build:data~ ; ~npm --prefix docs run check:data~ vérifie leur cohérence sans les modifier.
+
+« Contrat » désigne ici une attente candidate rendue testable, pas une règle dont l’existence sociale serait déjà démontrée. Les formulations et les codages ci-dessous sont construits pour cette étude. Les références étayent les distinctions théoriques ; sauf mention contraire, elles ne formulent pas ces contrats exacts. Les trois marqueurs de contrôle n’énoncent aucune obligation. Les codes réservés sans variante sont signalés automatiquement dans leurs renvois.
+
+Les cases signifient ~[X]~ respecté, ~[ ]~ non respecté, ~[?]~ discutable et ~—~ non pertinent dans ce contraste. Elles codent l’attente définie dans l’entrée, pas une note ni une appréciation globale. Par exemple, [[#NAME][NAME]] impose une unicité globale du nom ; [[#SCOPE][SCOPE]] admet des liaisons locales distinctes. Une même rédaction peut ne pas respecter le premier et respecter le second tout en étant mathématiquement valide.
+
+La grille sépare conventions, exigences logiques et contrôle des calculs. Elle ne doit pas être transformée en score par simple comptage des cases. Les axes actuellement recueillis sont Confus–Lisible, Vague–Précis et Fautif–Valide, avec une note indépendante. Ils ne constituent pas une traduction univoque des contrats. Les jugements enseignants serviront à étudier les attentes et les réparations qu’ils mobilisent.
+
+Les liens de fichiers sont relatifs au présent dossier. Le lien portant le titre ouvre le PDF ; le lien ~docview~ vise sa page physique (couverture comprise), avec la pagination imprimée dans le libellé. Le saut de page utilise DocView d’Emacs ; un lecteur externe peut n’ouvrir que le fichier. Les pages ont été vérifiées dans les PDF disponibles. L’indexation d’une page est un repère documentaire, pas la garantie qu’un contrat figure textuellement dans la source.
+
+Appui méthodologique commun :
+- [[file:../bib/Herbst_Chazan_2023_Practical_rationality.pdf][Herbst & Chazan, 2023, Keeping Theorizing in Touch with Practice]], [[docview:../bib/Herbst_Chazan_2023_Practical_rationality.pdf::15][PDF p. 15 ; p. 203]]. Normes comme attentes partagées et expériences virtuelles de transgression ; prolongement PDF p. 16 (p. 204).
+- [[file:../bib/Inglis_et_al_2013_Different_standards.pdf][Inglis et al., 2013, On Mathematicians’ Different Standards When Evaluating Elementary Proofs]], [[docview:../bib/Inglis_et_al_2013_Different_standards.pdf::2][PDF p. 2 ; manuscrit p. 2]]. Désaccords de validation ; ne pas supposer un jugement uniforme des correcteurs.
+
+Les variantes d’indentation sont une nouvelle manipulation conçue pour cette enquête. Les passages examinés motivent l’étude du langage, de la structure et de la présentation ; ils ne démontrent pas l’efficacité didactique de l’indentation. Le [[file:protocole.org][protocole]] précise les appariements et les limites d’interprétation.
+
+Évolution du codage : l’ancien NAME mélangeait réemploi d’un nom et appellation d’un théorème. La seconde cible est désormais [[#TERM][TERM]] (R04-2). R18-3 est rattachée à [[#CIRC][CIRC]] : la notation de limite présuppose l’unicité à démontrer ; elle ne réaffecte pas un nom à deux objets. Les textes historiques des rédactions sont conservés.
+
+* REF — Rédaction de référence :controle:
+:PROPERTIES:
+:CUSTOM_ID: REF
+:TYPE: controle
+:LIBELLE: Rédaction de référence dans le contexte indiqué ; pas une forme universellement obligatoire.
+:END:
+
+** Définition et codage
+
+Point de comparaison éditorial. Ce marqueur indique la rédaction de référence choisie pour la question ; il ne signifie ni perfection, ni obligation de reproduire sa méthode. Il n’a pas de case de respect. Les contrats examinés sont codés séparément, et les enseignants conservent leur jugement sur les quatre mesures.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::24][PDF p. 24 ; p. 269]]. Le niveau de détail, la gravité attribuée aux défauts et la notation dépendent du jugement du correcteur.
+- [[file:../bib/Herbst_Chazan_2023_Practical_rationality.pdf][Herbst & Chazan, 2023, Keeping Theorizing in Touch with Practice]], [[docview:../bib/Herbst_Chazan_2023_Practical_rationality.pdf::15][PDF p. 15 ; p. 203]]. Normes comme attentes partagées et expériences virtuelles de transgression ; prolongement PDF p. 16 (p. 204).
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-REF
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R01-1][R01-1]] | — | cible |
+| [[file:questions.org::#R02-1][R02-1]] | — | cible |
+| [[file:questions.org::#R03-1][R03-1]] | — | cible |
+| [[file:questions.org::#R04-1][R04-1]] | — | cible |
+| [[file:questions.org::#R05-1][R05-1]] | — | cible |
+| [[file:questions.org::#R06-1][R06-1]] | — | cible |
+| [[file:questions.org::#R07-1][R07-1]] | — | cible |
+| [[file:questions.org::#R08-1][R08-1]] | — | cible |
+| [[file:questions.org::#R09-1][R09-1]] | — | cible |
+| [[file:questions.org::#R10-1][R10-1]] | — | cible |
+| [[file:questions.org::#R11-1][R11-1]] | — | cible |
+| [[file:questions.org::#R12-1][R12-1]] | — | cible |
+| [[file:questions.org::#R13-1][R13-1]] | — | cible |
+| [[file:questions.org::#R14-1][R14-1]] | — | cible |
+| [[file:questions.org::#R15-1][R15-1]] | — | cible |
+| [[file:questions.org::#R16-1][R16-1]] | — | cible |
+| [[file:questions.org::#R17-1][R17-1]] | — | cible |
+| [[file:questions.org::#R18-1][R18-1]] | — | cible |
+| [[file:questions.org::#R19-1][R19-1]] | — | cible |
+| [[file:questions.org::#R20-1][R20-1]] | — | cible |
+#+end_generated
+
+* NAME — Unicité globale d’une désignation :contrat:
+:PROPERTIES:
+:CUSTOM_ID: NAME
+:TYPE: contrat
+:LIBELLE: Un même nom conserve un unique référent dans toute la rédaction (hypothèse de convention stricte).
+:END:
+
+** Définition et codage
+
+Hypothèse testée : un objet peut recevoir plusieurs noms, mais un nom ne doit pas désigner deux objets différents au cours de la même rédaction, même successivement. [X] : pas de réemploi pour un autre objet ; [ ] : nom réutilisé, même si la réaffectation est annoncée ou les sous-contextes sont clairs ; [?] : identification discutable. Cette convention globale est volontairement plus stricte que la liaison logique locale. Une transgression peut donc accompagner une preuve valide. Le code [[#SCOPE][SCOPE]] examine séparément la portée. La simple omission du mot « réciproque » relève maintenant de [[#TERM][TERM]].
+
+** Appuis bibliographiques
+
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::23][PDF p. 23 ; p. 268]]. Correction, clarté, notation et ponctuation interviennent dans des jugements dont les pondérations diffèrent.
+- [[file:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf][Durand-Guerrier et al., Argumentation and Proof in the Mathematics Classroom]], [[docview:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf::7][PDF p. 7 ; p. 355]]. Quantification explicite ou implicite et contrôle sémantique de la preuve.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-NAME
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R03-1][R03-1]] | [X] | comparaison |
+| [[file:questions.org::#R03-2][R03-2]] | [ ] | cible |
+| [[file:questions.org::#R03-3][R03-3]] | [ ] | cible |
+| [[file:questions.org::#R09-1][R09-1]] | [X] | comparaison |
+| [[file:questions.org::#R09-2][R09-2]] | [ ] | cible |
+| [[file:questions.org::#R09-3][R09-3]] | [ ] | cible |
+| [[file:questions.org::#R09-4][R09-4]] | [X] | comparaison |
+| [[file:questions.org::#R09-5][R09-5]] | [ ] | cible |
+| [[file:questions.org::#R09-6][R09-6]] | [ ] | cible |
+| [[file:questions.org::#R09-7][R09-7]] | [ ] | cible |
+| [[file:questions.org::#R10-1][R10-1]] | [X] | comparaison |
+| [[file:questions.org::#R10-2][R10-2]] | [ ] | cible |
+| [[file:questions.org::#R10-3][R10-3]] | [X] | comparaison |
+| [[file:questions.org::#R10-4][R10-4]] | [X] | comparaison |
+| [[file:questions.org::#R16-1][R16-1]] | [X] | comparaison |
+| [[file:questions.org::#R16-2][R16-2]] | [ ] | cible |
+| [[file:questions.org::#R16-3][R16-3]] | [ ] | cible |
+| [[file:questions.org::#R16-5][R16-5]] | [ ] | cible |
+| [[file:questions.org::#R16-6][R16-6]] | [ ] | cible |
+| [[file:questions.org::#R17-1][R17-1]] | [X] | comparaison |
+| [[file:questions.org::#R17-2][R17-2]] | [X] | comparaison |
+| [[file:questions.org::#R17-3][R17-3]] | [X] | comparaison |
+| [[file:questions.org::#R17-5][R17-5]] | [ ] | cible |
+| [[file:questions.org::#R17-6][R17-6]] | [X] | comparaison |
+| [[file:questions.org::#R17-7][R17-7]] | [X] | comparaison |
+| [[file:questions.org::#R19-1][R19-1]] | [X] | comparaison |
+| [[file:questions.org::#R19-2][R19-2]] | [ ] | comparaison |
+| [[file:questions.org::#R19-3][R19-3]] | [ ] | cible |
+| [[file:questions.org::#R19-4][R19-4]] | [X] | comparaison |
+#+end_generated
+
+* SCOPE — Respect des portées locales :contrat:
+:PROPERTIES:
+:CUSTOM_ID: SCOPE
+:TYPE: contrat
+:LIBELLE: Les noms, témoins et hypothèses restent dans leur portée ; les sorties de portée sont justifiées.
+:END:
+
+** Définition et codage
+
+Un nom lié peut être réutilisé dans des sous-raisonnements distincts ; une hypothèse locale ne devient pas un fait global sans décharge appropriée. [X] : interprétation cohérente des liaisons et des sorties ; [ ] : capture, fuite de variable ou emploi d’une hypothèse hors de son cadre ; [?] : frontière dépendant d’une convention de lecture. Le réemploi local licite peut enfreindre [[#NAME][NAME]]. Les paires d’indentation matérialisent deux contextes successifs, une hypothèse de récurrence ou des quantificateurs imbriqués. La mise en page est une manipulation de lisibilité ; son absence n’est pas automatiquement une violation de portée.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf][Durand-Guerrier et al., Argumentation and Proof in the Mathematics Classroom]], [[docview:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf::7][PDF p. 7 ; p. 355]]. Quantification explicite ou implicite et contrôle sémantique de la preuve.
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::23][PDF p. 23 ; p. 268]]. Correction, clarté, notation et ponctuation interviennent dans des jugements dont les pondérations diffèrent.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-SCOPE
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R03-1][R03-1]] | [X] | comparaison |
+| [[file:questions.org::#R03-3][R03-3]] | [X] | cible |
+| [[file:questions.org::#R09-1][R09-1]] | [X] | comparaison |
+| [[file:questions.org::#R09-2][R09-2]] | [X] | cible |
+| [[file:questions.org::#R09-3][R09-3]] | [X] | comparaison |
+| [[file:questions.org::#R09-5][R09-5]] | [ ] | comparaison |
+| [[file:questions.org::#R09-6][R09-6]] | [X] | cible |
+| [[file:questions.org::#R09-7][R09-7]] | [X] | cible |
+| [[file:questions.org::#R13-1][R13-1]] | [X] | comparaison |
+| [[file:questions.org::#R13-2][R13-2]] | [X] | comparaison |
+| [[file:questions.org::#R13-3][R13-3]] | [ ] | comparaison |
+| [[file:questions.org::#R13-5][R13-5]] | [X] | cible |
+| [[file:questions.org::#R13-6][R13-6]] | [X] | cible |
+| [[file:questions.org::#R16-1][R16-1]] | [X] | comparaison |
+| [[file:questions.org::#R16-3][R16-3]] | [X] | cible |
+| [[file:questions.org::#R16-5][R16-5]] | [X] | cible |
+| [[file:questions.org::#R16-6][R16-6]] | [X] | cible |
+| [[file:questions.org::#R17-1][R17-1]] | [X] | comparaison |
+| [[file:questions.org::#R17-5][R17-5]] | [?] | cible |
+| [[file:questions.org::#R17-6][R17-6]] | [X] | cible |
+| [[file:questions.org::#R17-7][R17-7]] | [X] | cible |
+| [[file:questions.org::#R19-1][R19-1]] | [X] | comparaison |
+| [[file:questions.org::#R19-2][R19-2]] | [X] | cible |
+| [[file:questions.org::#R19-3][R19-3]] | [?] | cible |
+| [[file:questions.org::#R19-4][R19-4]] | [ ] | cible |
+#+end_generated
+
+* QUANT — Ordre et dépendance des quantificateurs :contrat:
+:PROPERTIES:
+:CUSTOM_ID: QUANT
+:TYPE: contrat
+:LIBELLE: Les quantificateurs, leurs dépendances et le caractère arbitraire des variables sont respectés.
+:END:
+
+** Définition et codage
+
+Les témoins existentiels peuvent dépendre des variables choisies avant eux et ne sont pas indûment identifiés. [X] : ordre et dépendances corrects, explicites ou récupérables sans changer l’argument ; [ ] : témoin commun imposé, seuil universel ou epsilon choisi après l’indice ; [?] : formulation ambiguë. Un même nom dans une disjonction existentielle n’impose pas deux témoins simultanés : le codage porte sur la structure, pas sur la seule répétition d’une lettre.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf][Durand-Guerrier et al., Argumentation and Proof in the Mathematics Classroom]], [[docview:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf::7][PDF p. 7 ; p. 355]]. Quantification explicite ou implicite et contrôle sémantique de la preuve.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-QUANT
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R03-1][R03-1]] | [X] | comparaison |
+| [[file:questions.org::#R03-2][R03-2]] | [ ] | cible |
+| [[file:questions.org::#R03-3][R03-3]] | [X] | comparaison |
+| [[file:questions.org::#R12-1][R12-1]] | [X] | comparaison |
+| [[file:questions.org::#R12-2][R12-2]] | [X] | comparaison |
+| [[file:questions.org::#R12-3][R12-3]] | [X] | cible |
+| [[file:questions.org::#R12-5][R12-5]] | [X] | comparaison |
+| [[file:questions.org::#R13-1][R13-1]] | [X] | comparaison |
+| [[file:questions.org::#R13-2][R13-2]] | [X] | comparaison |
+| [[file:questions.org::#R13-3][R13-3]] | [ ] | cible |
+| [[file:questions.org::#R13-5][R13-5]] | [X] | cible |
+| [[file:questions.org::#R13-6][R13-6]] | [X] | cible |
+| [[file:questions.org::#R16-1][R16-1]] | [X] | comparaison |
+| [[file:questions.org::#R16-2][R16-2]] | [ ] | cible |
+| [[file:questions.org::#R16-3][R16-3]] | [X] | comparaison |
+| [[file:questions.org::#R16-4][R16-4]] | [X] | comparaison |
+| [[file:questions.org::#R16-5][R16-5]] | [X] | cible |
+| [[file:questions.org::#R16-6][R16-6]] | [X] | cible |
+| [[file:questions.org::#R17-1][R17-1]] | [X] | comparaison |
+| [[file:questions.org::#R17-2][R17-2]] | [ ] | cible |
+| [[file:questions.org::#R17-3][R17-3]] | [ ] | cible |
+| [[file:questions.org::#R17-5][R17-5]] | [?] | comparaison |
+| [[file:questions.org::#R17-6][R17-6]] | [X] | cible |
+| [[file:questions.org::#R17-7][R17-7]] | [X] | cible |
+#+end_generated
+
+* DOMAIN — Conditions des opérations et domaines :contrat:
+:PROPERTIES:
+:CUSTOM_ID: DOMAIN
+:TYPE: contrat
+:LIBELLE: Les domaines et les conditions des opérations ou des paramètres sont respectés.
+:END:
+
+** Définition et codage
+
+Examiner les divisions, racines, signes des multiplicateurs, conditions de dérivabilité et nature entière ou réelle des paramètres. [X] : conditions satisfaites dans le contexte, même si un rappel local manque ; [ ] : opération illégitime ou paramètre de mauvaise nature ; [?] : contexte insuffisant pour trancher. Une mention antérieure de l’intégralité peut suffire à l’ensemble final. Les bornes sont également repérées par [[#BOUND][BOUND]].
+
+** Appuis bibliographiques
+
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-DOMAIN
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R05-1][R05-1]] | [X] | comparaison |
+| [[file:questions.org::#R05-2][R05-2]] | [ ] | cible |
+| [[file:questions.org::#R05-3][R05-3]] | [X] | comparaison |
+| [[file:questions.org::#R05-4][R05-4]] | [X] | comparaison |
+| [[file:questions.org::#R05-5][R05-5]] | [X] | comparaison |
+| [[file:questions.org::#R07-1][R07-1]] | [X] | comparaison |
+| [[file:questions.org::#R07-2][R07-2]] | [ ] | cible |
+| [[file:questions.org::#R07-3][R07-3]] | [ ] | cible |
+| [[file:questions.org::#R07-4][R07-4]] | [X] | comparaison |
+| [[file:questions.org::#R12-1][R12-1]] | [X] | comparaison |
+| [[file:questions.org::#R12-2][R12-2]] | [X] | comparaison |
+| [[file:questions.org::#R12-3][R12-3]] | [X] | comparaison |
+| [[file:questions.org::#R12-4][R12-4]] | [X] | comparaison |
+| [[file:questions.org::#R12-5][R12-5]] | [X] | cible |
+| [[file:questions.org::#R12-6][R12-6]] | [ ] | cible |
+| [[file:questions.org::#R15-1][R15-1]] | [X] | comparaison |
+| [[file:questions.org::#R15-2][R15-2]] | [ ] | cible |
+| [[file:questions.org::#R15-3][R15-3]] | [X] | comparaison |
+| [[file:questions.org::#R15-4][R15-4]] | [X] | comparaison |
+| [[file:questions.org::#R16-1][R16-1]] | [X] | comparaison |
+| [[file:questions.org::#R16-2][R16-2]] | [X] | comparaison |
+| [[file:questions.org::#R16-3][R16-3]] | [X] | comparaison |
+| [[file:questions.org::#R16-4][R16-4]] | [X] | cible |
+| [[file:questions.org::#R16-5][R16-5]] | [X] | comparaison |
+| [[file:questions.org::#R16-6][R16-6]] | [X] | comparaison |
+#+end_generated
+
+* REC — Sens des implications et réversibilité :contrat:
+:PROPERTIES:
+:CUSTOM_ID: REC
+:TYPE: contrat
+:LIBELLE: Le sens des implications et les équivalences annoncées sont justifiés.
+:END:
+
+** Définition et codage
+
+Distinguer théorème direct, réciproque, implication nécessaire et équivalence. [X] : chaque direction revendiquée est fondée ; [ ] : symbole d’équivalence faux, réciproque illégitime ou direction absente ; [?] : étape omise dont la reconstruction fait débat. Un résultat final correct ne rend pas vraie une équivalence intermédiaire fausse. Nommer imprécisément un théorème sans changer l’inférence relève de [[#TERM][TERM]].
+
+** Appuis bibliographiques
+
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-REC
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R08-1][R08-1]] | [X] | comparaison |
+| [[file:questions.org::#R08-2][R08-2]] | [X] | comparaison |
+| [[file:questions.org::#R08-3][R08-3]] | [ ] | cible |
+| [[file:questions.org::#R15-1][R15-1]] | [X] | comparaison |
+| [[file:questions.org::#R15-2][R15-2]] | [ ] | comparaison |
+| [[file:questions.org::#R15-3][R15-3]] | [X] | comparaison |
+| [[file:questions.org::#R15-4][R15-4]] | [ ] | cible |
+| [[file:questions.org::#R20-1][R20-1]] | [X] | comparaison |
+| [[file:questions.org::#R20-2][R20-2]] | [?] | comparaison |
+| [[file:questions.org::#R20-3][R20-3]] | [ ] | cible |
+| [[file:questions.org::#R20-4][R20-4]] | [X] | comparaison |
+#+end_generated
+
+* CIRC — Absence de circularité :contrat:
+:PROPERTIES:
+:CUSTOM_ID: CIRC
+:TYPE: contrat
+:LIBELLE: La conclusion n’est pas présupposée pour établir l’énoncé à démontrer.
+:END:
+
+** Définition et codage
+
+Les prémisses doivent venir des données, de résultats disponibles ou d’hypothèses locales légitimement déchargées. [X] : pas de dépendance circulaire ; [ ] : conclusion utilisée pour justifier elle-même sa preuve ; [?] : ordre de présentation récupérable sans dépendance réelle. L’hypothèse de récurrence au rang fixé et l’hypothèse contradictoire d’une preuve par l’absurde ne sont pas, à elles seules, circulaires.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Gautreau_2026_Demonstration_circulaire.pdf][Gautreau, 2026, Que révèle l’activité de validation de démonstration circulaire…]], [[docview:../bib/Gautreau_2026_Demonstration_circulaire.pdf::2][PDF p. 2 ; p. 2]]. La conclusion utilisée comme prémisse ; rôle de la condition et du statut des propositions.
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-CIRC
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R13-1][R13-1]] | [X] | comparaison |
+| [[file:questions.org::#R13-2][R13-2]] | [X] | comparaison |
+| [[file:questions.org::#R13-3][R13-3]] | [ ] | cible |
+| [[file:questions.org::#R13-4][R13-4]] | [X] | comparaison |
+| [[file:questions.org::#R13-5][R13-5]] | [X] | comparaison |
+| [[file:questions.org::#R13-6][R13-6]] | [X] | comparaison |
+| [[file:questions.org::#R14-1][R14-1]] | [X] | comparaison |
+| [[file:questions.org::#R14-2][R14-2]] | [X] | comparaison |
+| [[file:questions.org::#R14-3][R14-3]] | [X] | comparaison |
+| [[file:questions.org::#R14-4][R14-4]] | [ ] | cible |
+| [[file:questions.org::#R18-1][R18-1]] | [X] | comparaison |
+| [[file:questions.org::#R18-2][R18-2]] | [X] | comparaison |
+| [[file:questions.org::#R18-3][R18-3]] | [ ] | cible |
+| [[file:questions.org::#R18-4][R18-4]] | [X] | comparaison |
+#+end_generated
+
+* EXH — Exhaustivité et unicité :contrat:
+:PROPERTIES:
+:CUSTOM_ID: EXH
+:TYPE: contrat
+:LIBELLE: Toutes les possibilités revendiquées et l’unicité éventuelle sont établies.
+:END:
+
+** Définition et codage
+
+Pour résoudre une équation, vérifier des candidats ne prouve pas que la liste soit exhaustive. Une égalité d’ensembles exige deux inclusions ; l’unicité n’est pas fournie par la seule existence. [X] : fermeture du raisonnement justifiée ; [ ] : cas, inclusion ou argument d’unicité manquant ; [?] : exhaustivité visible dans un calcul mais non explicitée. [[#EXIST][EXIST]] sépare l’autre exigence : disposer effectivement d’un objet satisfaisant les conditions.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::24][PDF p. 24 ; p. 269]]. Le niveau de détail, la gravité attribuée aux défauts et la notation dépendent du jugement du correcteur.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-EXH
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R02-1][R02-1]] | [X] | comparaison |
+| [[file:questions.org::#R02-2][R02-2]] | [X] | comparaison |
+| [[file:questions.org::#R02-3][R02-3]] | [ ] | cible |
+| [[file:questions.org::#R05-1][R05-1]] | [X] | comparaison |
+| [[file:questions.org::#R05-2][R05-2]] | [ ] | cible |
+| [[file:questions.org::#R05-3][R05-3]] | [X] | comparaison |
+| [[file:questions.org::#R05-4][R05-4]] | [?] | comparaison |
+| [[file:questions.org::#R05-5][R05-5]] | [ ] | cible |
+| [[file:questions.org::#R07-1][R07-1]] | [X] | comparaison |
+| [[file:questions.org::#R07-2][R07-2]] | [X] | comparaison |
+| [[file:questions.org::#R07-3][R07-3]] | [X] | comparaison |
+| [[file:questions.org::#R07-4][R07-4]] | [?] | cible |
+| [[file:questions.org::#R11-1][R11-1]] | [X] | comparaison |
+| [[file:questions.org::#R11-2][R11-2]] | [?] | comparaison |
+| [[file:questions.org::#R11-3][R11-3]] | [?] | cible |
+| [[file:questions.org::#R12-1][R12-1]] | [X] | comparaison |
+| [[file:questions.org::#R12-2][R12-2]] | [X] | comparaison |
+| [[file:questions.org::#R12-3][R12-3]] | [X] | comparaison |
+| [[file:questions.org::#R12-4][R12-4]] | [ ] | cible |
+| [[file:questions.org::#R12-5][R12-5]] | [X] | comparaison |
+| [[file:questions.org::#R12-6][R12-6]] | [ ] | comparaison |
+| [[file:questions.org::#R14-1][R14-1]] | [X] | comparaison |
+| [[file:questions.org::#R14-2][R14-2]] | [ ] | cible |
+| [[file:questions.org::#R14-3][R14-3]] | [X] | comparaison |
+| [[file:questions.org::#R14-4][R14-4]] | [ ] | cible |
+| [[file:questions.org::#R20-1][R20-1]] | [X] | comparaison |
+| [[file:questions.org::#R20-2][R20-2]] | [ ] | cible |
+| [[file:questions.org::#R20-3][R20-3]] | [ ] | cible |
+| [[file:questions.org::#R20-4][R20-4]] | [X] | comparaison |
+#+end_generated
+
+* EXIST — Existence établie :contrat:
+:PROPERTIES:
+:CUSTOM_ID: EXIST
+:TYPE: contrat
+:LIBELLE: L’existence des objets ou solutions annoncés est établie.
+:END:
+
+** Définition et codage
+
+Un raisonnement conditionnel sur un objet supposé existant ne démontre pas sa présence. [X] : construction, théorème ou vérification suffisante ; [ ] : existence présupposée ou inférée de la seule unicité ; [?] : éléments suffisants dispersés dans le texte, dont l’organisation est à reconstruire. La stricte croissance seule ne fournit pas un zéro ; les conditions de continuité et de signe doivent être disponibles.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::24][PDF p. 24 ; p. 269]]. Le niveau de détail, la gravité attribuée aux défauts et la notation dépendent du jugement du correcteur.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-EXIST
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R14-1][R14-1]] | [X] | comparaison |
+| [[file:questions.org::#R14-2][R14-2]] | [X] | comparaison |
+| [[file:questions.org::#R14-3][R14-3]] | [?] | cible |
+| [[file:questions.org::#R14-4][R14-4]] | [ ] | cible |
+| [[file:questions.org::#R15-1][R15-1]] | [X] | comparaison |
+| [[file:questions.org::#R15-2][R15-2]] | [ ] | cible |
+| [[file:questions.org::#R15-3][R15-3]] | [X] | comparaison |
+| [[file:questions.org::#R15-4][R15-4]] | [?] | comparaison |
+#+end_generated
+
+* INIT — Initialisation de la récurrence :contrat:
+:PROPERTIES:
+:CUSTOM_ID: INIT
+:TYPE: contrat
+:LIBELLE: Le cas initial nécessaire à la récurrence est établi.
+:END:
+
+** Définition et codage
+
+L’hérédité ne remplace pas une initialisation. [X] : cas initial vérifié au rang pertinent ; [ ] : vérification absente, même immédiatement réalisable par le lecteur ; [?] : vérification seulement suggérée. Ce code repère précisément une omission écrite, sans décider de la sanction. Il ne code pas l’ensemble de la preuve par récurrence : [[#QUANT][QUANT]], [[#SCOPE][SCOPE]] et [[#CIRC][CIRC]] en examinent d’autres aspects.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::24][PDF p. 24 ; p. 269]]. Le niveau de détail, la gravité attribuée aux défauts et la notation dépendent du jugement du correcteur.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-INIT
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R13-1][R13-1]] | [X] | comparaison |
+| [[file:questions.org::#R13-2][R13-2]] | [ ] | cible |
+| [[file:questions.org::#R13-3][R13-3]] | [ ] | comparaison |
+| [[file:questions.org::#R13-4][R13-4]] | [X] | comparaison |
+| [[file:questions.org::#R13-5][R13-5]] | [X] | cible |
+| [[file:questions.org::#R13-6][R13-6]] | [X] | cible |
+#+end_generated
+
+* GEN — Généralité de la preuve :contrat:
+:PROPERTIES:
+:CUSTOM_ID: GEN
+:TYPE: contrat
+:LIBELLE: L’argument porte sur tous les objets visés par l’énoncé.
+:END:
+
+** Définition et codage
+
+Le cas traité doit être arbitraire ou représentatif par un argument explicite, sans restriction supplémentaire illégitime. [X] : généralité fondée ; [ ] : cas particulier abusivement universalisé, objets imposés égaux ou propriété supposée seulement sur une sous-classe ; [?] : statut générique ambigu. Un argument verbal peut être général ; un argument symbolique peut être particulier.
+
+** Appuis bibliographiques
+
+- [[file:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf][Balacheff, 1987, Processus de preuve et situations de validation]], [[docview:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf::20][PDF p. 20 ; tapuscrit p. 19]]. Début de la typologie : empirisme naïf ; poursuivre PDF p. 21–22 (tapuscrit p. 20–21) pour exemple générique et expérience mentale.
+- [[file:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf][Durand-Guerrier et al., Argumentation and Proof in the Mathematics Classroom]], [[docview:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf::7][PDF p. 7 ; p. 355]]. Quantification explicite ou implicite et contrôle sémantique de la preuve.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-GEN
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R03-1][R03-1]] | [X] | comparaison |
+| [[file:questions.org::#R03-2][R03-2]] | [ ] | cible |
+| [[file:questions.org::#R03-3][R03-3]] | [X] | comparaison |
+| [[file:questions.org::#R03-4][R03-4]] | [ ] | cible |
+| [[file:questions.org::#R06-1][R06-1]] | [X] | comparaison |
+| [[file:questions.org::#R06-2][R06-2]] | [X] | comparaison |
+| [[file:questions.org::#R06-3][R06-3]] | [ ] | cible |
+| [[file:questions.org::#R06-4][R06-4]] | [ ] | cible |
+| [[file:questions.org::#R13-1][R13-1]] | [X] | comparaison |
+| [[file:questions.org::#R13-2][R13-2]] | [X] | comparaison |
+| [[file:questions.org::#R13-3][R13-3]] | [ ] | comparaison |
+| [[file:questions.org::#R13-4][R13-4]] | [ ] | cible |
+| [[file:questions.org::#R13-5][R13-5]] | [X] | comparaison |
+| [[file:questions.org::#R13-6][R13-6]] | [X] | comparaison |
+#+end_generated
+
+* EMP — Usage probant des exemples :contrat:
+:PROPERTIES:
+:CUSTOM_ID: EMP
+:TYPE: contrat
+:LIBELLE: Des exemples ne sont pas seuls érigés en preuve d’une assertion universelle.
+:END:
+
+** Définition et codage
+
+Ce contrat opérationnalise la différence entre vérifications particulières et justification générale. [X] : absence de généralisation empirique abusive, notamment preuve générale sans exemples ou exemples accompagnés d’une justification ; [ ] : certitude universelle tirée du seul échantillon ; [?] : portée de l’exemple générique discutable ; — : aucun recours aux exemples n’est examiné. Un contre-exemple suffit à réfuter une assertion universelle : ce cas est licite.
+
+** Appuis bibliographiques
+
+- [[file:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf][Balacheff, 1987, Processus de preuve et situations de validation]], [[docview:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf::20][PDF p. 20 ; tapuscrit p. 19]]. Début de la typologie : empirisme naïf ; poursuivre PDF p. 21–22 (tapuscrit p. 20–21) pour exemple générique et expérience mentale.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-EMP
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R03-1][R03-1]] | [X] | comparaison |
+| [[file:questions.org::#R03-3][R03-3]] | [X] | comparaison |
+| [[file:questions.org::#R03-4][R03-4]] | [ ] | cible |
+| [[file:questions.org::#R06-1][R06-1]] | [X] | comparaison |
+| [[file:questions.org::#R06-2][R06-2]] | [X] | comparaison |
+| [[file:questions.org::#R06-4][R06-4]] | [ ] | cible |
+| [[file:questions.org::#R13-1][R13-1]] | [X] | comparaison |
+| [[file:questions.org::#R13-2][R13-2]] | [X] | comparaison |
+| [[file:questions.org::#R13-3][R13-3]] | [X] | comparaison |
+| [[file:questions.org::#R13-4][R13-4]] | [ ] | cible |
+| [[file:questions.org::#R13-5][R13-5]] | [X] | comparaison |
+| [[file:questions.org::#R13-6][R13-6]] | [X] | comparaison |
+#+end_generated
+
+* FIG — Statut des arguments figuraux :contrat:
+:PROPERTIES:
+:CUSTOM_ID: FIG
+:TYPE: contrat
+:LIBELLE: Le recours à une figure justifie l’énoncé au-delà d’une simple apparence particulière.
+:END:
+
+** Définition et codage
+
+Une lecture de dessin ou un tracé peut suggérer, illustrer ou participer à un argument générique. [X] : la portée probante est contrôlée ; [ ] : une apparence particulière est la seule garantie d’une affirmation exacte ou universelle ; [?] : argument visuel dont la généralité dépend de la lecture. Ce code est conservé pour extension ; sa présence au référentiel ne signifie pas qu’il soit actuellement testé.
+
+** Appuis bibliographiques
+
+- [[file:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf][Balacheff, 1987, Processus de preuve et situations de validation]], [[docview:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf::20][PDF p. 20 ; tapuscrit p. 19]]. Début de la typologie : empirisme naïf ; poursuivre PDF p. 21–22 (tapuscrit p. 20–21) pour exemple générique et expérience mentale.
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-FIG
+Aucune rédaction actuellement ; code conservé pour une extension du corpus.
+#+end_generated
+
+* EQ — Signification du signe égal :contrat:
+:PROPERTIES:
+:CUSTOM_ID: EQ
+:TYPE: contrat
+:LIBELLE: Chaque égalité écrite relie des expressions de même valeur et de type compatible.
+:END:
+
+** Définition et codage
+
+Dans une chaîne, le signe égal affirme l’égalité des expressions, et non une succession de commandes. [X] : chaque lien est vrai dans son contexte ; [ ] : égalité littéralement fausse, même si la suite des opérations voulue conduit au bon résultat ; [?] : convention d’écriture réellement indécidable. Les unités et les types peuvent être examinés séparément par [[#UNIT][UNIT]] et [[#TYPE][TYPE]].
+
+** Appuis bibliographiques
+
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::23][PDF p. 23 ; p. 268]]. Correction, clarté, notation et ponctuation interviennent dans des jugements dont les pondérations diffèrent.
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-EQ
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R01-1][R01-1]] | [X] | comparaison |
+| [[file:questions.org::#R01-2][R01-2]] | [X] | comparaison |
+| [[file:questions.org::#R01-3][R01-3]] | [ ] | cible |
+| [[file:questions.org::#R19-1][R19-1]] | [X] | comparaison |
+| [[file:questions.org::#R19-2][R19-2]] | [X] | comparaison |
+| [[file:questions.org::#R19-3][R19-3]] | [X] | comparaison |
+| [[file:questions.org::#R19-4][R19-4]] | [ ] | cible |
+#+end_generated
+
+* APPROX — Exact et approché :contrat:
+:PROPERTIES:
+:CUSTOM_ID: APPROX
+:TYPE: contrat
+:LIBELLE: Les valeurs approchées sont distinguées des valeurs exactes et la précision est adaptée.
+:END:
+
+** Définition et codage
+
+Examiner le signe d’approximation, l’arrondi et la précision nécessaire à la conclusion. [X] : statut annoncé et précision suffisante ; [ ] : approximation présentée comme exacte ou précision incapable de soutenir la conclusion ; [?] : convention implicite discutable. Un calcul approché correctement annoncé ne justifie pas pour autant une généralisation : [[#GEN][GEN]] et [[#EMP][EMP]] sont distincts. Code disponible pour extension.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::23][PDF p. 23 ; p. 268]]. Correction, clarté, notation et ponctuation interviennent dans des jugements dont les pondérations diffèrent.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-APPROX
+Aucune rédaction actuellement ; code conservé pour une extension du corpus.
+#+end_generated
+
+* LIMIT — Sens de la convergence :contrat:
+:PROPERTIES:
+:CUSTOM_ID: LIMIT
+:TYPE: contrat
+:LIBELLE: La convergence n’est pas confondue avec l’atteinte de la limite à partir d’un rang fini.
+:END:
+
+** Définition et codage
+
+Une suite peut rester toujours différente de sa limite tout en convergeant. [X] : l’écart est contrôlé par la notion de convergence ; [ ] : convergence identifiée à une égalité définitive ou à un arrêt de la variation ; [?] : expression verbale insuffisante. Le code [[#QUANT][QUANT]] porte plus précisément sur l’ordre des choix dans la définition quantifiée. Ce code reste disponible sans variante dédiée à l’atteinte dans le corpus actuel.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf][Durand-Guerrier et al., Argumentation and Proof in the Mathematics Classroom]], [[docview:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf::7][PDF p. 7 ; p. 355]]. Quantification explicite ou implicite et contrôle sémantique de la preuve.
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-LIMIT
+Aucune rédaction actuellement ; code conservé pour une extension du corpus.
+#+end_generated
+
+* TYPE — Nature des objets :contrat:
+:PROPERTIES:
+:CUSTOM_ID: TYPE
+:TYPE: contrat
+:LIBELLE: Les types des objets mathématiques et leurs relations sont distingués.
+:END:
+
+** Définition et codage
+
+Un événement n’est pas sa probabilité ; une fonction n’est pas une abscisse ; une tangente n’est pas son ordonnée. [X] : objets et notations compatibles ; [ ] : confusion littérale de nature ; [?] : métonymie acceptable seulement selon une convention à expliciter. Le calcul peut être récupérable et correct malgré une formulation typée incorrectement ; le codage n’impose pas une note.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::23][PDF p. 23 ; p. 268]]. Correction, clarté, notation et ponctuation interviennent dans des jugements dont les pondérations diffèrent.
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-TYPE
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R10-1][R10-1]] | [X] | comparaison |
+| [[file:questions.org::#R10-2][R10-2]] | [ ] | cible |
+| [[file:questions.org::#R10-3][R10-3]] | [X] | comparaison |
+| [[file:questions.org::#R10-4][R10-4]] | [X] | comparaison |
+| [[file:questions.org::#R11-1][R11-1]] | [X] | comparaison |
+| [[file:questions.org::#R11-2][R11-2]] | [ ] | cible |
+| [[file:questions.org::#R11-3][R11-3]] | [X] | comparaison |
+| [[file:questions.org::#R19-1][R19-1]] | [X] | comparaison |
+| [[file:questions.org::#R19-2][R19-2]] | [X] | comparaison |
+| [[file:questions.org::#R19-3][R19-3]] | [X] | comparaison |
+| [[file:questions.org::#R19-4][R19-4]] | [ ] | cible |
+#+end_generated
+
+* CONNECT — Connecteurs logiques :contrat:
+:PROPERTIES:
+:CUSTOM_ID: CONNECT
+:TYPE: contrat
+:LIBELLE: Les connecteurs expriment les relations logiques voulues.
+:END:
+
+** Définition et codage
+
+Examiner en particulier « et », « ou », la négation et leurs usages dans les alternatives. [X] : relation correcte ; [ ] : connecteur changeant le sens, par exemple deux facteurs simultanément nuls au lieu d’au moins un ; [?] : usage linguistique ambigu. Évaluer la relation effectivement exprimée, pas la seule présence d’un mot réputé obligatoire.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+- [[file:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf][Durand-Guerrier et al., Argumentation and Proof in the Mathematics Classroom]], [[docview:../bib/Durand_Guerrier_et_al_2012_Argumentation_and_proof.pdf::7][PDF p. 7 ; p. 355]]. Quantification explicite ou implicite et contrôle sémantique de la preuve.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-CONNECT
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R05-1][R05-1]] | [X] | comparaison |
+| [[file:questions.org::#R05-2][R05-2]] | [X] | comparaison |
+| [[file:questions.org::#R05-3][R05-3]] | [X] | comparaison |
+| [[file:questions.org::#R05-4][R05-4]] | [ ] | cible |
+| [[file:questions.org::#R05-5][R05-5]] | [X] | comparaison |
+#+end_generated
+
+* BOUND — Bornes et extrémités :contrat:
+:PROPERTIES:
+:CUSTOM_ID: BOUND
+:TYPE: contrat
+:LIBELLE: Les bornes et les extrémités des ensembles sont traitées correctement.
+:END:
+
+** Définition et codage
+
+L’inclusion d’une borne doit tenir compte de la relation et du domaine. [X] : bornes incluses ou exclues conformément aux conditions ; [ ] : extrémité interdite incluse ou solution admissible exclue ; [?] : notation de l’intervalle ambiguë. Une borne incohérente avec le domaine déjà annoncé reste une anomalie écrite, même si le lecteur sait la réparer.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-BOUND
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R07-1][R07-1]] | [X] | comparaison |
+| [[file:questions.org::#R07-2][R07-2]] | [ ] | cible |
+| [[file:questions.org::#R07-3][R07-3]] | [ ] | comparaison |
+| [[file:questions.org::#R07-4][R07-4]] | [X] | comparaison |
+#+end_generated
+
+* UNIT — Unités et dimensions :contrat:
+:PROPERTIES:
+:CUSTOM_ID: UNIT
+:TYPE: contrat
+:LIBELLE: Les unités et dimensions des grandeurs sont cohérentes.
+:END:
+
+** Définition et codage
+
+Examiner l’homogénéité et l’expression du résultat avec les unités pertinentes. [X] : cohérence dans le contexte de calcul ; [ ] : unité fausse, dimensions incompatibles ou omission si l’exigence d’écriture est la cible ; [?] : unité tacitement fixée par le contexte. Une omission locale ne suffit pas à attribuer une erreur conceptuelle. Le corpus actuel ne comporte pas de contraste dédié à ce code.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::23][PDF p. 23 ; p. 268]]. Correction, clarté, notation et ponctuation interviennent dans des jugements dont les pondérations diffèrent.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-UNIT
+Aucune rédaction actuellement ; code conservé pour une extension du corpus.
+#+end_generated
+
+* EXPL — Explicitation des justifications :contrat:
+:PROPERTIES:
+:CUSTOM_ID: EXPL
+:TYPE: contrat
+:LIBELLE: Le niveau d’explicitation des règles et des étapes convient au contexte de la tâche.
+:END:
+
+** Définition et codage
+
+Ce contrat dépend du niveau, des acquis supposés et de la consigne. [X] : justifications présentes au niveau retenu ; [ ] : justification explicitement requise manquante ; [?] : passage récupérable dont le degré d’explicitation attendu reste à discuter. Le corpus code volontairement plusieurs rédactions condensées comme discutables. L’absence d’un nom de théorème ne signifie pas forcément l’absence de l’inférence.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::24][PDF p. 24 ; p. 269]]. Le niveau de détail, la gravité attribuée aux défauts et la notation dépendent du jugement du correcteur.
+- [[file:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf][Balacheff, 1987, Processus de preuve et situations de validation]], [[docview:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf::8][PDF p. 8 ; tapuscrit p. 7]]. L’économie des justifications peut tenir à la situation et à ses attentes.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-EXPL
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R01-1][R01-1]] | [X] | comparaison |
+| [[file:questions.org::#R01-2][R01-2]] | [?] | cible |
+| [[file:questions.org::#R01-3][R01-3]] | [X] | comparaison |
+| [[file:questions.org::#R02-1][R02-1]] | [X] | comparaison |
+| [[file:questions.org::#R02-2][R02-2]] | [X] | comparaison |
+| [[file:questions.org::#R02-3][R02-3]] | [?] | cible |
+| [[file:questions.org::#R04-1][R04-1]] | [X] | comparaison |
+| [[file:questions.org::#R04-2][R04-2]] | [X] | comparaison |
+| [[file:questions.org::#R04-3][R04-3]] | [?] | cible |
+| [[file:questions.org::#R06-1][R06-1]] | [X] | comparaison |
+| [[file:questions.org::#R06-2][R06-2]] | [?] | cible |
+| [[file:questions.org::#R06-3][R06-3]] | [X] | comparaison |
+| [[file:questions.org::#R06-4][R06-4]] | [X] | comparaison |
+| [[file:questions.org::#R07-1][R07-1]] | [X] | comparaison |
+| [[file:questions.org::#R07-2][R07-2]] | [X] | comparaison |
+| [[file:questions.org::#R07-3][R07-3]] | [X] | comparaison |
+| [[file:questions.org::#R07-4][R07-4]] | [?] | cible |
+| [[file:questions.org::#R11-1][R11-1]] | [X] | comparaison |
+| [[file:questions.org::#R11-2][R11-2]] | [?] | comparaison |
+| [[file:questions.org::#R11-3][R11-3]] | [?] | cible |
+| [[file:questions.org::#R12-1][R12-1]] | [X] | comparaison |
+| [[file:questions.org::#R12-2][R12-2]] | [?] | comparaison |
+| [[file:questions.org::#R12-3][R12-3]] | [?] | cible |
+| [[file:questions.org::#R12-4][R12-4]] | [X] | comparaison |
+| [[file:questions.org::#R12-5][R12-5]] | [?] | cible |
+| [[file:questions.org::#R12-6][R12-6]] | [X] | comparaison |
+| [[file:questions.org::#R14-1][R14-1]] | [X] | comparaison |
+| [[file:questions.org::#R14-2][R14-2]] | [X] | comparaison |
+| [[file:questions.org::#R14-3][R14-3]] | [?] | cible |
+| [[file:questions.org::#R14-4][R14-4]] | [ ] | comparaison |
+| [[file:questions.org::#R18-1][R18-1]] | [X] | comparaison |
+| [[file:questions.org::#R18-2][R18-2]] | [?] | cible |
+| [[file:questions.org::#R18-3][R18-3]] | [X] | comparaison |
+| [[file:questions.org::#R18-4][R18-4]] | [X] | comparaison |
+#+end_generated
+
+* ECO — Économie rédactionnelle :controle:
+:PROPERTIES:
+:CUSTOM_ID: ECO
+:TYPE: controle
+:LIBELLE: Rédaction condensée ; l’économie n’est pas une invalidité.
+:END:
+
+** Définition et codage
+
+Marqueur d’une réduction de longueur ou d’explicitation à comparer avec un autre texte. Il n’a pas de case de respect et ne constitue pas une injonction universelle à être bref. Les effets possibles sur lisibilité, précision, validité et note sont distincts ; [[#EXPL][EXPL]] décrit les attentes d’explicitation. Le marqueur ne garantit pas que la longueur soit la seule différence entre variantes.
+
+** Appuis bibliographiques
+
+- [[file:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf][Balacheff, 1987, Processus de preuve et situations de validation]], [[docview:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf::8][PDF p. 8 ; tapuscrit p. 7]]. L’économie des justifications peut tenir à la situation et à ses attentes.
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::24][PDF p. 24 ; p. 269]]. Le niveau de détail, la gravité attribuée aux défauts et la notation dépendent du jugement du correcteur.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-ECO
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R01-2][R01-2]] | — | cible |
+| [[file:questions.org::#R04-3][R04-3]] | — | cible |
+| [[file:questions.org::#R06-2][R06-2]] | — | cible |
+| [[file:questions.org::#R09-4][R09-4]] | — | cible |
+| [[file:questions.org::#R11-3][R11-3]] | — | cible |
+| [[file:questions.org::#R12-2][R12-2]] | — | cible |
+| [[file:questions.org::#R15-3][R15-3]] | — | cible |
+| [[file:questions.org::#R16-4][R16-4]] | — | cible |
+| [[file:questions.org::#R18-2][R18-2]] | — | cible |
+| [[file:questions.org::#R20-4][R20-4]] | — | cible |
+#+end_generated
+
+* REGISTER — Registre ou méthode alternative :controle:
+:PROPERTIES:
+:CUSTOM_ID: REGISTER
+:TYPE: controle
+:LIBELLE: Méthode ou registre alternatif ; sa validité se lit dans l’analyse.
+:END:
+
+** Définition et codage
+
+Marqueur de comparaison : verbal, symbolique, factorisation, raisonnement combinatoire, congruences, etc. Aucun registre n’est automatiquement supérieur. Pas de case de respect pour ce marqueur. Vérifier la validité de la variante et les éventuelles exigences de méthode de [[#TASK][TASK]]. Un changement de méthode peut modifier plusieurs dimensions du texte ; il ne constitue pas un contraste causal isolé.
+
+** Appuis bibliographiques
+
+- [[file:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf][Balacheff, 1987, Processus de preuve et situations de validation]], [[docview:../bib/1987 Balacheff - ESM - Processus de preuve et situations de validation.pdf::20][PDF p. 20 ; tapuscrit p. 19]]. Début de la typologie : empirisme naïf ; poursuivre PDF p. 21–22 (tapuscrit p. 20–21) pour exemple générique et expérience mentale.
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-REGISTER
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R03-3][R03-3]] | — | cible |
+| [[file:questions.org::#R05-3][R05-3]] | — | cible |
+| [[file:questions.org::#R08-2][R08-2]] | — | cible |
+| [[file:questions.org::#R09-4][R09-4]] | — | cible |
+| [[file:questions.org::#R10-3][R10-3]] | — | cible |
+| [[file:questions.org::#R12-2][R12-2]] | — | cible |
+| [[file:questions.org::#R12-3][R12-3]] | — | cible |
+| [[file:questions.org::#R17-4][R17-4]] | — | cible |
+| [[file:questions.org::#R18-4][R18-4]] | — | cible |
+| [[file:questions.org::#R19-2][R19-2]] | — | cible |
+| [[file:questions.org::#R20-4][R20-4]] | — | cible |
+#+end_generated
+
+* TASK — Réponse à la consigne :contrat:
+:PROPERTIES:
+:CUSTOM_ID: TASK
+:TYPE: contrat
+:LIBELLE: Les demandes explicites de la tâche sont prises en charge.
+:END:
+
+** Définition et codage
+
+Distinguer une méthode mathématiquement valide d’une réponse à une consigne imposant une définition, une justification ou la fourniture d’un objet précis. [X] : demandes prises en charge ; [ ] : méthode ou élément explicitement demandé absent ; [?] : formulation de consigne ambiguë. Ce code ne double pas systématiquement toutes les erreurs mathématiques : une tentative de méthode prescrite peut être fautive et néanmoins répondre au type de travail demandé.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+- [[file:../bib/Herbst_Chazan_2023_Practical_rationality.pdf][Herbst & Chazan, 2023, Keeping Theorizing in Touch with Practice]], [[docview:../bib/Herbst_Chazan_2023_Practical_rationality.pdf::15][PDF p. 15 ; p. 203]]. Normes comme attentes partagées et expériences virtuelles de transgression ; prolongement PDF p. 16 (p. 204).
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-TASK
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R17-1][R17-1]] | [X] | comparaison |
+| [[file:questions.org::#R17-2][R17-2]] | [X] | comparaison |
+| [[file:questions.org::#R17-3][R17-3]] | [ ] | comparaison |
+| [[file:questions.org::#R17-4][R17-4]] | [ ] | cible |
+| [[file:questions.org::#R17-5][R17-5]] | [X] | comparaison |
+| [[file:questions.org::#R17-6][R17-6]] | [X] | comparaison |
+| [[file:questions.org::#R17-7][R17-7]] | [X] | comparaison |
+#+end_generated
+
+* CALC — Exactitude des calculs :contrat:
+:PROPERTIES:
+:CUSTOM_ID: CALC
+:TYPE: contrat
+:LIBELLE: Les calculs et l’emploi des formules sont exacts pour les objets concernés.
+:END:
+
+** Définition et codage
+
+Contrôle de correction du calcul ou de la formule utilisée. [X] : opérations correctes dans leur contexte ; [ ] : résultat arithmétique ou application de formule incorrecte ; [?] : transcription ambiguë. Une formule exécutée correctement avec un discriminant emprunté à un autre polynôme reste incorrectement appliquée. Inversement, un calcul peut être exact dans un modèle inadéquat : voir [[#MODEL][MODEL]].
+
+** Appuis bibliographiques
+
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::23][PDF p. 23 ; p. 268]]. Correction, clarté, notation et ponctuation interviennent dans des jugements dont les pondérations diffèrent.
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-CALC
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R09-1][R09-1]] | [X] | comparaison |
+| [[file:questions.org::#R09-2][R09-2]] | [X] | comparaison |
+| [[file:questions.org::#R09-3][R09-3]] | [X] | comparaison |
+| [[file:questions.org::#R09-4][R09-4]] | [X] | comparaison |
+| [[file:questions.org::#R09-5][R09-5]] | [ ] | cible |
+| [[file:questions.org::#R09-6][R09-6]] | [X] | comparaison |
+| [[file:questions.org::#R09-7][R09-7]] | [X] | comparaison |
+#+end_generated
+
+* MODEL — Adéquation du modèle :contrat:
+:PROPERTIES:
+:CUSTOM_ID: MODEL
+:TYPE: contrat
+:LIBELLE: Les relations utilisées représentent les données de la situation.
+:END:
+
+** Définition et codage
+
+Examiner la base des fractions, la dépendance des tirages ou les hypothèses de structure. [X] : modèle compatible avec la situation ; [ ] : base changée ou hypothèse contredite par les données ; [?] : hypothèse tacite non décidée par la consigne. Distinguer une opération numériquement exacte d’une modélisation correcte. Ce contrôle empêche de faire passer toute différence de note pour un effet de convention rédactionnelle.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf][Québec, 2011, Cadre d’évaluation des apprentissages, mathématique au secondaire]], [[docview:../bib/Quebec_2011_Cadre_evaluation_mathematique_secondaire.pdf::6][PDF p. 6 ; p. 6]]. Critères institutionnels : démarche, concepts, justification et communication. Contrepoint québécois, non prescription française.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-MODEL
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R02-1][R02-1]] | [X] | comparaison |
+| [[file:questions.org::#R02-2][R02-2]] | [ ] | cible |
+| [[file:questions.org::#R02-3][R02-3]] | [X] | comparaison |
+| [[file:questions.org::#R10-1][R10-1]] | [X] | comparaison |
+| [[file:questions.org::#R10-2][R10-2]] | [X] | comparaison |
+| [[file:questions.org::#R10-3][R10-3]] | [X] | comparaison |
+| [[file:questions.org::#R10-4][R10-4]] | [ ] | cible |
+#+end_generated
+
+* LOG — Validité des inférences écrites :contrat:
+:PROPERTIES:
+:CUSTOM_ID: LOG
+:TYPE: contrat
+:LIBELLE: Les conclusions des pas d’inférence suivent des prémisses disponibles.
+:END:
+
+** Définition et codage
+
+Contrôle transversal, à justifier dans l’analyse. [X] : inférences fondées dans l’interprétation retenue ; [ ] : conclusion tirée d’une règle non applicable ou inférence invalide explicite ; [?] : reconstruction nécessaire dont l’acceptabilité est discutable. Les erreurs peuvent aussi être décrites par des codes plus spécifiques ; les chevauchements sont assumés. Ce codage éditorial n’est pas le jugement de validité à recueillir auprès du répondant.
+
+** Appuis bibliographiques
+
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+- [[file:../bib/Inglis_et_al_2013_Different_standards.pdf][Inglis et al., 2013, On Mathematicians’ Different Standards When Evaluating Elementary Proofs]], [[docview:../bib/Inglis_et_al_2013_Different_standards.pdf::2][PDF p. 2 ; manuscrit p. 2]]. Désaccords de validation ; ne pas supposer un jugement uniforme des correcteurs.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-LOG
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R06-1][R06-1]] | [X] | comparaison |
+| [[file:questions.org::#R06-2][R06-2]] | [X] | comparaison |
+| [[file:questions.org::#R06-3][R06-3]] | [ ] | cible |
+| [[file:questions.org::#R06-4][R06-4]] | [ ] | comparaison |
+| [[file:questions.org::#R07-1][R07-1]] | [X] | comparaison |
+| [[file:questions.org::#R07-2][R07-2]] | [X] | comparaison |
+| [[file:questions.org::#R07-3][R07-3]] | [ ] | cible |
+| [[file:questions.org::#R07-4][R07-4]] | [?] | comparaison |
+| [[file:questions.org::#R09-1][R09-1]] | [X] | comparaison |
+| [[file:questions.org::#R09-2][R09-2]] | [X] | comparaison |
+| [[file:questions.org::#R09-3][R09-3]] | [X] | comparaison |
+| [[file:questions.org::#R09-4][R09-4]] | [X] | comparaison |
+| [[file:questions.org::#R09-5][R09-5]] | [ ] | cible |
+| [[file:questions.org::#R09-6][R09-6]] | [X] | comparaison |
+| [[file:questions.org::#R09-7][R09-7]] | [X] | comparaison |
+| [[file:questions.org::#R12-1][R12-1]] | [X] | comparaison |
+| [[file:questions.org::#R12-2][R12-2]] | [X] | comparaison |
+| [[file:questions.org::#R12-3][R12-3]] | [X] | comparaison |
+| [[file:questions.org::#R12-4][R12-4]] | [ ] | cible |
+| [[file:questions.org::#R12-5][R12-5]] | [X] | comparaison |
+| [[file:questions.org::#R12-6][R12-6]] | [ ] | cible |
+| [[file:questions.org::#R14-1][R14-1]] | [X] | comparaison |
+| [[file:questions.org::#R14-2][R14-2]] | [ ] | cible |
+| [[file:questions.org::#R14-3][R14-3]] | [ ] | comparaison |
+| [[file:questions.org::#R14-4][R14-4]] | [ ] | comparaison |
+| [[file:questions.org::#R15-1][R15-1]] | [X] | comparaison |
+| [[file:questions.org::#R15-2][R15-2]] | [ ] | cible |
+| [[file:questions.org::#R15-3][R15-3]] | [X] | comparaison |
+| [[file:questions.org::#R15-4][R15-4]] | [ ] | comparaison |
+| [[file:questions.org::#R16-1][R16-1]] | [X] | comparaison |
+| [[file:questions.org::#R16-2][R16-2]] | [ ] | cible |
+| [[file:questions.org::#R16-3][R16-3]] | [X] | comparaison |
+| [[file:questions.org::#R16-4][R16-4]] | [X] | comparaison |
+| [[file:questions.org::#R16-5][R16-5]] | [X] | comparaison |
+| [[file:questions.org::#R16-6][R16-6]] | [X] | comparaison |
+| [[file:questions.org::#R17-1][R17-1]] | [X] | comparaison |
+| [[file:questions.org::#R17-2][R17-2]] | [ ] | cible |
+| [[file:questions.org::#R17-3][R17-3]] | [ ] | comparaison |
+| [[file:questions.org::#R17-4][R17-4]] | [X] | comparaison |
+| [[file:questions.org::#R17-5][R17-5]] | [?] | comparaison |
+| [[file:questions.org::#R17-6][R17-6]] | [X] | comparaison |
+| [[file:questions.org::#R17-7][R17-7]] | [X] | comparaison |
+#+end_generated
+
+* TERM — Désignation précise des propriétés :contrat:
+:PROPERTIES:
+:CUSTOM_ID: TERM
+:TYPE: contrat
+:LIBELLE: Précision dans la désignation des théorèmes et des propriétés.
+:END:
+
+** Définition et codage
+
+Hypothèse de convention : lorsqu’une propriété est nommée, la désignation doit distinguer notamment théorème direct et réciproque. [X] : nom adéquat ; [ ] : désignation inexacte ou incomplète ; [?] : appellation englobante admise par usage ; — : aucune nomination examinée. Dans R04, retirer seulement « réciproque » est codé [ ] selon cette convention stricte, sans invalider l’inférence géométrique. Ce code sépare cette cible de l’unicité globale [[#NAME][NAME]].
+
+** Appuis bibliographiques
+
+- [[file:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf][Moore, 2016, Mathematics Professors’ Evaluation of Students’ Proofs]], [[docview:../bib/Moore_2016_Mathematics_Professors_Evaluation_of_Students_Proofs.pdf::23][PDF p. 23 ; p. 268]]. Correction, clarté, notation et ponctuation interviennent dans des jugements dont les pondérations diffèrent.
+- [[file:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf][Duval, 1993, Argumenter, démontrer, expliquer]], [[docview:../bib/Duval_1993_Argumenter_demontrer_expliquer.pdf::8][PDF p. 8 ; p. 44]]. Organisation d’un pas de déduction : prémisses, énoncé tiers et conclusion ; distinction des statuts.
+
+Appui à la distinction étudiée ; la formulation opérationnelle ci-dessus appartient à notre dispositif.
+
+** Rédactions liées
+
+#+begin_generated references-TERM
+| Rédaction | Respect | Rôle |
+|---+---+---|
+| [[file:questions.org::#R04-1][R04-1]] | [X] | comparaison |
+| [[file:questions.org::#R04-2][R04-2]] | [ ] | cible |
+#+end_generated
+

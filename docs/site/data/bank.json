@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "questions": [
     {
       "id": "R01",
@@ -215,6 +215,14 @@
         {
           "id": "R09-5",
           "content": "Le premier discriminant vaut $\\Delta=1$. Les racines du premier facteur sont $2$ et $3$. Pour le second facteur, on garde ce même discriminant : ses racines sont $(1-\\sqrt\\Delta)/4=0$ et $(1+\\sqrt\\Delta)/4=1/2$. Donc $S=\\{0;1/2;2;3\\}$."
+        },
+        {
+          "id": "R09-6",
+          "content": "Le produit est nul si et seulement si l’un des deux facteurs est nul.\n\nPour $x^2-5x+6=0$ :\nLe discriminant vaut $\\Delta=25-24=1$.\nLes solutions sont $x=2$ ou $x=3$.\n\nPour $2x^2-x-1=0$ :\nLe discriminant vaut $\\Delta=1+8=9$.\nLes solutions sont $x=-1/2$ ou $x=1$.\n\nDonc $S=\\{-1/2;1;2;3\\}$."
+        },
+        {
+          "id": "R09-7",
+          "content": "Le produit est nul si et seulement si l’un des deux facteurs est nul.\n\nPour $x^2-5x+6=0$ :\n    Le discriminant vaut $\\Delta=25-24=1$.\n    Les solutions sont $x=2$ ou $x=3$.\n\nPour $2x^2-x-1=0$ :\n    Le discriminant vaut $\\Delta=1+8=9$.\n    Les solutions sont $x=-1/2$ ou $x=1$.\n\nDonc $S=\\{-1/2;1;2;3\\}$."
         }
       ]
     },
@@ -319,6 +327,14 @@
         {
           "id": "R13-4",
           "content": "$u_0=0$, $u_1\\approx1{,}414$, $u_2\\approx1{,}848$, $u_3\\approx1{,}962$. Les termes existent et restent entre $0$ et $2$. Ils continuent donc à vérifier $0\\le u_n<2$."
+        },
+        {
+          "id": "R13-5",
+          "content": "Au rang $0$, $u_0=0$ est défini et $0\\le u_0<2$.\n\nSoit $n\\in\\mathbb N$. Supposons $u_n$ défini et $0\\le u_n<2$.\nAlors $2\\le2+u_n<4$.\nLa racine existe et $0\\le u_{n+1}=\\sqrt{2+u_n}<2$.\n\nPar récurrence, pour tout $n\\in\\mathbb N$, $u_n$ existe et $0\\le u_n<2$."
+        },
+        {
+          "id": "R13-6",
+          "content": "Au rang $0$, $u_0=0$ est défini et $0\\le u_0<2$.\n\nSoit $n\\in\\mathbb N$. Supposons $u_n$ défini et $0\\le u_n<2$.\n    Alors $2\\le2+u_n<4$.\n    La racine existe et $0\\le u_{n+1}=\\sqrt{2+u_n}<2$.\n\nPar récurrence, pour tout $n\\in\\mathbb N$, $u_n$ existe et $0\\le u_n<2$."
         }
       ]
     },
@@ -394,6 +410,14 @@
         {
           "id": "R16-4",
           "content": "$a+b=2(3a/6+5b/10)$, donc la somme est paire. La divisibilité par $4$ est fausse pour $a=6,b=0$."
+        },
+        {
+          "id": "R16-5",
+          "content": "Pour $a$ :\nÉcrivons $a=6k$ avec $k\\in\\mathbb Z$.\nAlors $a=2(3k)$ est pair.\n\nPour $b$ :\nÉcrivons $b=10k$ avec $k\\in\\mathbb Z$.\nAlors $b=2(5k)$ est pair.\n\nLa somme de deux entiers pairs est paire, donc $2\\mid(a+b)$.\nAvec $a=6$ et $b=0$, on a $a+b=6$, qui n’est pas divisible par $4$.\nLa divisibilité par $4$ n’est donc pas nécessaire."
+        },
+        {
+          "id": "R16-6",
+          "content": "Pour $a$ :\n    Écrivons $a=6k$ avec $k\\in\\mathbb Z$.\n    Alors $a=2(3k)$ est pair.\n\nPour $b$ :\n    Écrivons $b=10k$ avec $k\\in\\mathbb Z$.\n    Alors $b=2(5k)$ est pair.\n\nLa somme de deux entiers pairs est paire, donc $2\\mid(a+b)$.\nAvec $a=6$ et $b=0$, on a $a+b=6$, qui n’est pas divisible par $4$.\nLa divisibilité par $4$ n’est donc pas nécessaire."
         }
       ]
     },
@@ -423,6 +447,14 @@
         {
           "id": "R17-5",
           "content": "Soit $\\varepsilon>0$. Prenons un entier $n>3/\\varepsilon$. Pour tout entier $n$ supérieur ou égal à ce $n$, on a $|u_n-2|=3/(n+2)<\\varepsilon$. Donc $u_n\\to2$."
+        },
+        {
+          "id": "R17-6",
+          "content": "Soit $\\varepsilon>0$.\nPosons $N=\\lceil3/\\varepsilon\\rceil$.\nSoit $n\\in\\mathbb N$ tel que $n\\ge N$.\nOn a $|u_n-2|=3/(n+2)$ et $n+2>3/\\varepsilon$.\nDonc $|u_n-2|<\\varepsilon$.\nAinsi, pour tout $n\\ge N$, $|u_n-2|<\\varepsilon$.\nPour tout $\\varepsilon>0$, il existe donc un rang $N$ tel que, pour tout $n\\ge N$, $|u_n-2|<\\varepsilon$.\nPar définition, $u_n\\to2$."
+        },
+        {
+          "id": "R17-7",
+          "content": "Soit $\\varepsilon>0$.\n    Posons $N=\\lceil3/\\varepsilon\\rceil$.\n    Soit $n\\in\\mathbb N$ tel que $n\\ge N$.\n        On a $|u_n-2|=3/(n+2)$ et $n+2>3/\\varepsilon$.\n        Donc $|u_n-2|<\\varepsilon$.\n    Ainsi, pour tout $n\\ge N$, $|u_n-2|<\\varepsilon$.\nPour tout $\\varepsilon>0$, il existe donc un rang $N$ tel que, pour tout $n\\ge N$, $|u_n-2|<\\varepsilon$.\nPar définition, $u_n\\to2$."
         }
       ]
     },

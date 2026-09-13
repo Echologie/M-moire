@@ -122,6 +122,15 @@ jobs:
       - name: Install dependencies
         run: npm --prefix docs ci
 
+      - name: Install PDF link checker
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
+      - name: Check Org sources before regenerating anything
+        run: npm --prefix docs run check:data
+
+      - name: Test Org compiler failure cases
+        run: npm --prefix docs run test:data
+
       - name: Test publication checks
         run: python3 -m unittest discover -s docs/tests -p 'test_published_site.py'
 

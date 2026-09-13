@@ -1,14 +1,20 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
+  "source": {
+    "questions": "research/questions.org",
+    "contracts": "research/contrats.org",
+    "sha256": "3bb40ba77ca6ec1d0e7a2b627e5cb89b73d0bda6193e15f4d3847908000f2349"
+  },
   "questions": 20,
-  "productions": 80,
+  "productions": 88,
   "variantsPerQuestion": {
     "3": 5,
-    "4": 11,
-    "5": 3,
-    "6": 1
+    "4": 9,
+    "5": 1,
+    "6": 3,
+    "7": 2
   },
-  "formulas": 542,
+  "formulas": 638,
   "levels": {
     "5e": 2,
     "4e": 2,
@@ -25,12 +31,13 @@
     "EQ": 2,
     "MODEL": 2,
     "EXH": 10,
-    "NAME": 12,
-    "QUANT": 6,
+    "NAME": 14,
+    "QUANT": 12,
     "GEN": 5,
-    "SCOPE": 7,
+    "SCOPE": 15,
     "REGISTER": 11,
     "EMP": 3,
+    "TERM": 1,
     "DOMAIN": 7,
     "CONNECT": 1,
     "LOG": 9,
@@ -38,15 +45,162 @@
     "REC": 3,
     "CALC": 1,
     "TYPE": 3,
-    "INIT": 1,
+    "INIT": 3,
     "CIRC": 3,
     "EXIST": 3,
     "TASK": 1
   },
+  "contractStates": {
+    "EQ": {
+      "respected": 5,
+      "violated": 2,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "EXPL": {
+      "respected": 21,
+      "violated": 1,
+      "discussable": 12,
+      "notApplicable": 0
+    },
+    "EXH": {
+      "respected": 16,
+      "violated": 9,
+      "discussable": 4,
+      "notApplicable": 0
+    },
+    "MODEL": {
+      "respected": 5,
+      "violated": 2,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "NAME": {
+      "respected": 14,
+      "violated": 15,
+      "discussable": 0,
+      "notApplicable": 3
+    },
+    "SCOPE": {
+      "respected": 20,
+      "violated": 3,
+      "discussable": 2,
+      "notApplicable": 9
+    },
+    "QUANT": {
+      "respected": 18,
+      "violated": 5,
+      "discussable": 1,
+      "notApplicable": 5
+    },
+    "GEN": {
+      "respected": 8,
+      "violated": 6,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "EMP": {
+      "respected": 9,
+      "violated": 3,
+      "discussable": 0,
+      "notApplicable": 2
+    },
+    "TERM": {
+      "respected": 1,
+      "violated": 1,
+      "discussable": 0,
+      "notApplicable": 1
+    },
+    "DOMAIN": {
+      "respected": 20,
+      "violated": 5,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "CONNECT": {
+      "respected": 4,
+      "violated": 1,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "LOG": {
+      "respected": 26,
+      "violated": 14,
+      "discussable": 2,
+      "notApplicable": 0
+    },
+    "BOUND": {
+      "respected": 2,
+      "violated": 2,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "REC": {
+      "respected": 6,
+      "violated": 4,
+      "discussable": 1,
+      "notApplicable": 0
+    },
+    "CALC": {
+      "respected": 6,
+      "violated": 1,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "TYPE": {
+      "respected": 8,
+      "violated": 3,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "CIRC": {
+      "respected": 11,
+      "violated": 3,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "INIT": {
+      "respected": 4,
+      "violated": 2,
+      "discussable": 0,
+      "notApplicable": 0
+    },
+    "EXIST": {
+      "respected": 4,
+      "violated": 2,
+      "discussable": 2,
+      "notApplicable": 0
+    },
+    "TASK": {
+      "respected": 5,
+      "violated": 2,
+      "discussable": 0,
+      "notApplicable": 0
+    }
+  },
+  "indentationPairs": [
+    [
+      "R09-6",
+      "R09-7"
+    ],
+    [
+      "R13-5",
+      "R13-6"
+    ],
+    [
+      "R16-5",
+      "R16-6"
+    ],
+    [
+      "R17-6",
+      "R17-7"
+    ]
+  ],
   "checks": [
     "Unique stable identifiers",
     "Variable production counts",
     "Strict public allowlist",
+    "Explicit contract states",
     "Valid mathematical markup",
     "Identical entrypoints",
     "Local assets present"

@@ -1,0 +1,2226 @@
+#+title: Questions et rédactions — source éditoriale de Regards
+#+language: fr
+#+startup: overview
+#+BANK_VERSION: 0.3.0
+#+BANK_STATUS: Banque exploratoire : relecture didactique et prétest requis
+
+* Mode d’emploi
+
+Ce fichier est la source de vérité des énoncés, des textes et des annotations. Il remplace l’ancienne notice produite depuis le JSON. Modifier ici, puis exécuter ~npm --prefix docs run build:data~. Le [[file:contrats.org][référentiel des contrats]] est la source de leurs définitions. Les JSON et les renvois inverses sont générés et ne s’éditent pas.
+
+Chaque question porte un identifiant stable, un niveau, un domaine et une famille dans son tiroir de propriétés. Les tags permettent de filtrer par niveau et domaine. Chaque rédaction a une ancre, des cibles cliquables et une analyse. Les blocs ~verse~ contiennent le texte effectivement affiché, avec son LaTeX, ses paragraphes et ses espaces initiaux ; ils ne contiennent pas du JSON échappé.
+
+Les tableaux sont éditables et constituent la source du codage : une ligne par rédaction, une colonne par contrat examiné dans cette question. ~[X]~ = respecté selon la définition du référentiel ; ~[ ]~ = non respecté ; ~[?]~ = interprétation ou niveau d’explicitation discutable ; ~—~ = non pertinent dans ce contraste. Une colonne absente n’est pas un contrat automatiquement respecté. ~CIBLES~ indique la manipulation ou le contrôle de conception, jamais son résultat : un contrat ciblé peut être respecté. Les marqueurs [[file:contrats.org::#REF][REF]], [[file:contrats.org::#ECO][ECO]] et [[file:contrats.org::#REGISTER][REGISTER]] ne sont pas des contrats à cocher.
+
+Les cellules sont des hypothèses éditoriales à discuter et non les réponses attendues des enseignants. La validité, la lisibilité, la précision et la note restent quatre jugements recueillis indépendamment. Un retrait peut aider à lire une portée sans rendre valide un argument fautif. Le contrat [[file:contrats.org::#NAME][NAME]] teste expressément une convention globale plus stricte que la portée logique locale de [[file:contrats.org::#SCOPE][SCOPE]].
+
+~INDENTATION_DE~ relie une rédaction à son témoin sans retrait. Le compilateur exige les mêmes mots, signes et retours à la ligne, et une différence limitée aux espaces initiaux. Les variantes conservent des identifiants propres. Voir le [[file:protocole.org][protocole]] pour les limites du tirage et du prétest.
+
+* R01 — Angles et bissectrice :5e:geometrie:
+:PROPERTIES:
+:CUSTOM_ID: R01
+:NIVEAU: 5e
+:DOMAINE: Géométrie
+:FAMILLE: R01
+:END:
+
+** Énoncé
+
+#+begin_verse
+Dans un triangle $ABC$, l’angle extérieur adjacent à $\widehat{ACB}$ mesure $120^\circ$, et $\widehat{BAC}$ est le double de $\widehat{ABC}$. La bissectrice de $\widehat{BAC}$ coupe $[BC]$ en $D$. Calculer $\widehat{ADB}$ en justifiant.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$100^\circ$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R01
+| Rédaction | [[file:contrats.org::#EQ][EQ]] | [[file:contrats.org::#EXPL][EXPL]] |
+|---+---+---|
+| [[#R01-1][R01-1]] | [X] | [X] |
+| [[#R01-2][R01-2]] | [X] | [?] |
+| [[#R01-3][R01-3]] | [ ] | [X] |
+
+** Rédactions
+
+*** R01-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R01-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+L’angle en $C$ vaut $180^\circ-120^\circ=60^\circ$. Les angles en $A$ et $B$ totalisent donc $120^\circ$. Comme celui en $A$ est double, ils valent respectivement $80^\circ$ et $40^\circ$.
+
+La bissectrice donne $\widehat{BAD}=40^\circ$. Dans $ABD$, $\widehat{ABD}=40^\circ$, donc $\widehat{ADB}=180^\circ-40^\circ-40^\circ=100^\circ$.
+#+end_verse
+
+**** Analyse
+
+Trois étapes : angle supplémentaire, partage d’une somme, triangle ABD.
+
+*** R01-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R01-2
+:CIBLES: [[file:contrats.org::#ECO][ECO]] [[file:contrats.org::#EXPL][EXPL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+En $C$ : $60^\circ$. Il reste $120^\circ$, partagé en trois parts égales : $80^\circ$ en $A$, $40^\circ$ en $B$. La moitié de $80^\circ$ vaut $40^\circ$. Dans $ABD$, il reste donc $180^\circ-80^\circ=100^\circ$.
+#+end_verse
+
+**** Analyse
+
+Même calcul et même enchaînement ; règles et désignations plus implicites, sans invalider les inférences.
+
+*** R01-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R01-3
+:CIBLES: [[file:contrats.org::#EQ][EQ]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$\widehat C=180-120=60^\circ$. Puis $\widehat A=180-60=120\times2/3=80^\circ$, et $\widehat B=40^\circ$. La bissectrice donne $\widehat{BAD}=40^\circ$. Donc $\widehat{ADB}=180-40=140-40=100^\circ$.
+#+end_verse
+
+**** Analyse
+
+Les résultats sont corrects, mais les chaînes séquentielles affirment des égalités fausses. Les unités ne constituent pas la manipulation principale.
+
+* R02 — Une réserve en deux prélèvements :5e:fractions:
+:PROPERTIES:
+:CUSTOM_ID: R02
+:NIVEAU: 5e
+:DOMAINE: Fractions
+:FAMILLE: R02
+:END:
+
+** Énoncé
+
+#+begin_verse
+On utilise les $\frac25$ du contenu d’une réserve d’eau, puis le tiers de ce qui reste. Il reste alors $18$ litres. Quelle quantité d’eau y avait-il au départ ? Expliquer le calcul.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$45$ litres.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R02
+| Rédaction | [[file:contrats.org::#EXH][EXH]] | [[file:contrats.org::#EXPL][EXPL]] | [[file:contrats.org::#MODEL][MODEL]] |
+|---+---+---+---|
+| [[#R02-1][R02-1]] | [X] | [X] | [X] |
+| [[#R02-2][R02-2]] | [X] | [X] | [ ] |
+| [[#R02-3][R02-3]] | [ ] | [?] | [X] |
+
+** Rédactions
+
+*** R02-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R02-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Après le premier prélèvement, il reste $1-\frac25=\frac35$ du contenu initial. Après le second, il reste les $\frac23$ de ces $\frac35$, soit $\frac23\times\frac35=\frac25$ du contenu initial.
+
+Deux cinquièmes représentent $18$ litres : un cinquième représente $9$ litres, et la réserve contenait $45$ litres.
+#+end_verse
+
+**** Analyse
+
+Identification de la base de chaque fraction puis raisonnement inverse.
+
+*** R02-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R02-2
+:CIBLES: [[file:contrats.org::#MODEL][MODEL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Après le premier prélèvement, il reste $\frac35$. Après le second : $\frac35-\frac13=\frac4{15}$. Cette fraction représente $18$ litres, donc la réserve contenait $18\times15/4=67{,}5$ litres.
+#+end_verse
+
+**** Analyse
+
+Le tiers du reste devient indûment un tiers du contenu initial ; calculs exacts pour le mauvais modèle.
+
+*** R02-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R02-3
+:CIBLES: [[file:contrats.org::#EXH][EXH]] [[file:contrats.org::#EXPL][EXPL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+La réserve contenait $45$ litres. On en prend $18$, il reste $27$. Puis on prend $9$, il reste bien $18$ litres.
+#+end_verse
+
+**** Analyse
+
+Vérifie la valeur candidate ; ne dit pas comment elle est trouvée ni pourquoi elle est seule possible. Ne pas assimiler automatiquement cette économie à une erreur.
+
+* R03 — Carrés de deux impairs :4e:arithmetique:
+:PROPERTIES:
+:CUSTOM_ID: R03
+:NIVEAU: 4e
+:DOMAINE: Arithmétique
+:FAMILLE: R03
+:END:
+
+** Énoncé
+
+#+begin_verse
+Démontrer que la différence des carrés de deux entiers impairs est divisible par $8$.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$(2p+1)^2-(2q+1)^2=4[p(p+1)-q(q+1)]$, multiple de $8$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R03
+| Rédaction | [[file:contrats.org::#NAME][NAME]] | [[file:contrats.org::#SCOPE][SCOPE]] | [[file:contrats.org::#QUANT][QUANT]] | [[file:contrats.org::#GEN][GEN]] | [[file:contrats.org::#EMP][EMP]] |
+|---+---+---+---+---+---|
+| [[#R03-1][R03-1]] | [X] | [X] | [X] | [X] | [X] |
+| [[#R03-2][R03-2]] | [ ] | — | [ ] | [ ] | — |
+| [[#R03-3][R03-3]] | [ ] | [X] | [X] | [X] | [X] |
+| [[#R03-4][R03-4]] | — | — | — | [ ] | [ ] |
+
+** Rédactions
+
+*** R03-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R03-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Écrivons les deux impairs $2p+1$ et $2q+1$, avec $p,q\in\mathbb Z$. La différence de leurs carrés est $4[p(p+1)-q(q+1)]$.
+
+Chacun des produits de deux entiers consécutifs $p(p+1)$ et $q(q+1)$ est pair. Leur différence est paire ; multipliée par $4$, elle est divisible par $8$.
+#+end_verse
+
+**** Analyse
+
+Témoins indépendants et lemme de parité explicite.
+
+*** R03-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R03-2
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#QUANT][QUANT]] [[file:contrats.org::#GEN][GEN]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Écrivons les deux impairs $2n+1$ et $2n+1$, avec $n\in\mathbb Z$. La différence de leurs carrés vaut $0$, qui est divisible par $8$.
+#+end_verse
+
+**** Analyse
+
+Un même témoin impose l’égalité des entiers. Rupture de désignation avec perte effective de généralité.
+
+*** R03-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R03-3
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#REGISTER][REGISTER]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Pour le premier impair, écrivons $2n+1$, avec $n\in\mathbb Z$. Son carré vaut $4n(n+1)+1$, donc un multiple de $8$ plus $1$, puisque $n(n+1)$ est pair.
+
+Pour le second impair, reprenons la lettre $n$ pour un autre entier. Le même calcul donne aussi un multiple de $8$ plus $1$. La différence est donc un multiple de $8$.
+#+end_verse
+
+**** Analyse
+
+Réemploi explicitement local du nom n ; preuve valide. Contraste avec témoin commun, sans postuler une interdiction universelle de réaffectation.
+
+*** R03-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R03-4
+:CIBLES: [[file:contrats.org::#EMP][EMP]] [[file:contrats.org::#GEN][GEN]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$9^2-7^2=32$, $11^2-3^2=112$ et $15^2-5^2=200$. Ces différences sont divisibles par $8$, donc la différence des carrés de deux impairs est toujours divisible par $8$.
+#+end_verse
+
+**** Analyse
+
+Généralisation empirique à partir de trois cas, tous numériquement exacts.
+
+* R04 — Une hauteur sans dessin :4e:geometrie:
+:PROPERTIES:
+:CUSTOM_ID: R04
+:NIVEAU: 4e
+:DOMAINE: Géométrie
+:FAMILLE: R04
+:END:
+
+** Énoncé
+
+#+begin_verse
+Un triangle $ABC$ vérifie $AB=5$ cm, $BC=12$ cm et $AC=13$ cm. On note $H$ le pied de la hauteur issue de $B$ sur $(AC)$. Calculer $BH$ en justifiant.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$BH=60/13$ cm.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R04
+| Rédaction | [[file:contrats.org::#EXPL][EXPL]] | [[file:contrats.org::#TERM][TERM]] |
+|---+---+---|
+| [[#R04-1][R04-1]] | [X] | [X] |
+| [[#R04-2][R04-2]] | [X] | [ ] |
+| [[#R04-3][R04-3]] | [?] | — |
+
+** Rédactions
+
+*** R04-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R04-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$AB^2+BC^2=25+144=169=AC^2$. Par la réciproque du théorème de Pythagore, $ABC$ est rectangle en $B$. Son aire vaut donc $5\times12/2=30$ cm².
+
+Cette aire vaut aussi $AC\times BH/2$. Ainsi $13BH/2=30$, d’où $BH=60/13$ cm.
+#+end_verse
+
+**** Analyse
+
+Identification de la structure puis double calcul d’aire.
+
+*** R04-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R04-2
+:CIBLES: [[file:contrats.org::#TERM][TERM]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$AB^2+BC^2=25+144=169=AC^2$. Par le théorème de Pythagore, $ABC$ est rectangle en $B$. Son aire vaut donc $5\times12/2=30$ cm².
+
+Cette aire vaut aussi $AC\times BH/2$. Ainsi $13BH/2=30$, d’où $BH=60/13$ cm.
+#+end_verse
+
+**** Analyse
+
+Seul le mot « réciproque » est retiré ; inférence géométrique identique et valide. Norme de nomination à distinguer de validité.
+
+*** R04-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R04-3
+:CIBLES: [[file:contrats.org::#ECO][ECO]] [[file:contrats.org::#EXPL][EXPL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$5^2+12^2=13^2$. Donc $\frac{5\times12}{2}=\frac{13\times BH}{2}$, ce qui donne $BH=60/13$ cm.
+#+end_verse
+
+**** Analyse
+
+Rectangle et aire récupérables, non verbalisés ; résultat et calcul exacts.
+
+* R05 — Une équation factorisée :3e:algebre:
+:PROPERTIES:
+:CUSTOM_ID: R05
+:NIVEAU: 3e
+:DOMAINE: Algèbre
+:FAMILLE: R05
+:END:
+
+** Énoncé
+
+#+begin_verse
+Résoudre dans $\mathbb R$ l’équation $(2x-1)^2=(2x-1)(x+3)$. Justifier l’ensemble des solutions.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$S=\{1/2;4\}$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R05
+| Rédaction | [[file:contrats.org::#DOMAIN][DOMAIN]] | [[file:contrats.org::#EXH][EXH]] | [[file:contrats.org::#CONNECT][CONNECT]] |
+|---+---+---+---|
+| [[#R05-1][R05-1]] | [X] | [X] | [X] |
+| [[#R05-2][R05-2]] | [ ] | [ ] | [X] |
+| [[#R05-3][R05-3]] | [X] | [X] | [X] |
+| [[#R05-4][R05-4]] | [X] | [?] | [ ] |
+| [[#R05-5][R05-5]] | [X] | [ ] | [X] |
+
+** Rédactions
+
+*** R05-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R05-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$(2x-1)^2-(2x-1)(x+3)=0\iff(2x-1)(x-4)=0$.
+
+Un produit est nul si et seulement si l’un de ses facteurs est nul. Donc $S=\{1/2;4\}$.
+#+end_verse
+
+**** Analyse
+
+Factorisation et équivalence complètes.
+
+*** R05-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R05-2
+:CIBLES: [[file:contrats.org::#DOMAIN][DOMAIN]] [[file:contrats.org::#EXH][EXH]]
+:END:
+
+**** Texte
+
+#+begin_verse
+On divise par $2x-1$ : $2x-1=x+3$, donc $x=4$. Ainsi $S=\{4\}$.
+#+end_verse
+
+**** Analyse
+
+Division sans traiter son annulation ; perte de la solution 1/2.
+
+*** R05-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R05-3
+:CIBLES: [[file:contrats.org::#REGISTER][REGISTER]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Si $2x-1=0$, alors $x=1/2$ convient. Sinon, on peut diviser par $2x-1$ : l’équation équivaut à $2x-1=x+3$, soit $x=4$, qui convient. Donc $S=\{1/2;4\}$.
+#+end_verse
+
+**** Analyse
+
+Disjonction de cas valide ; contrôle de méthode alternative.
+
+*** R05-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R05-4
+:CIBLES: [[file:contrats.org::#CONNECT][CONNECT]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$(2x-1)(x-4)=0$, donc $2x-1=0$ et $x-4=0$. Donc $S=\{1/2;4\}$.
+#+end_verse
+
+**** Analyse
+
+Connecteur « et » contredit les alternatives de l’ensemble annoncé.
+
+*** R05-5 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R05-5
+:CIBLES: [[file:contrats.org::#EXH][EXH]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Pour $x=1/2$, les deux membres valent $0$. Pour $x=4$, ils valent $49$. L’ensemble des solutions est donc $\{1/2;4\}$.
+#+end_verse
+
+**** Analyse
+
+Existence vérifiée, exhaustivité non établie dans le texte.
+
+* R06 — Un produit divisible par six :3e:arithmetique:
+:PROPERTIES:
+:CUSTOM_ID: R06
+:NIVEAU: 3e
+:DOMAINE: Arithmétique
+:FAMILLE: R06
+:END:
+
+** Énoncé
+
+#+begin_verse
+Démontrer que, pour tout entier naturel $n$, le nombre $n^3-n$ est divisible par $6$.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$n^3-n=(n-1)n(n+1)$ est divisible par $2$ et $3$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R06
+| Rédaction | [[file:contrats.org::#GEN][GEN]] | [[file:contrats.org::#EMP][EMP]] | [[file:contrats.org::#EXPL][EXPL]] | [[file:contrats.org::#LOG][LOG]] |
+|---+---+---+---+---|
+| [[#R06-1][R06-1]] | [X] | [X] | [X] | [X] |
+| [[#R06-2][R06-2]] | [X] | [X] | [?] | [X] |
+| [[#R06-3][R06-3]] | [ ] | — | [X] | [ ] |
+| [[#R06-4][R06-4]] | [ ] | [ ] | [X] | [ ] |
+
+** Rédactions
+
+*** R06-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R06-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$n^3-n=(n-1)n(n+1)$. Parmi trois entiers consécutifs, l’un est divisible par $3$ et au moins l’un est pair. Le produit est donc divisible par $2$ et par $3$, donc par $6$ puisque $2$ et $3$ sont premiers entre eux.
+#+end_verse
+
+**** Analyse
+
+Factorisation et deux propriétés de divisibilité.
+
+*** R06-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R06-2
+:CIBLES: [[file:contrats.org::#ECO][ECO]] [[file:contrats.org::#EXPL][EXPL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$n^3-n=(n-1)n(n+1)$. Trois entiers consécutifs donnent toujours un facteur $2$ et un facteur $3$ ; leur produit est donc un multiple de $6$.
+#+end_verse
+
+**** Analyse
+
+Argument correct, propriétés condensées.
+
+*** R06-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R06-3
+:CIBLES: [[file:contrats.org::#GEN][GEN]] [[file:contrats.org::#LOG][LOG]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$n^3-n=(n-1)n(n+1)$. Comme $n$ est pair et divisible par $3$, le produit est divisible par $6$.
+#+end_verse
+
+**** Analyse
+
+Hypothèses indûment imposées à n, conclusion universelle non prouvée.
+
+*** R06-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R06-4
+:CIBLES: [[file:contrats.org::#EMP][EMP]] [[file:contrats.org::#GEN][GEN]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Pour $n=0,1,2,3,4,5$, on trouve $0,0,6,24,60,120$, tous multiples de $6$. Donc $n^3-n$ est toujours divisible par $6$.
+#+end_verse
+
+**** Analyse
+
+Cas exacts mais extrapolation non justifiée.
+
+* R07 — Inéquation rationnelle :2de:algebre:
+:PROPERTIES:
+:CUSTOM_ID: R07
+:NIVEAU: 2de
+:DOMAINE: Algèbre
+:FAMILLE: R07
+:END:
+
+** Énoncé
+
+#+begin_verse
+Résoudre dans $\mathbb R$ l’inéquation $\frac{(x-1)(x+2)}{x-3}\geq0$. Justifier et donner l’ensemble des solutions.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$[-2;1]\cup]3;+\infty[$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R07
+| Rédaction | [[file:contrats.org::#DOMAIN][DOMAIN]] | [[file:contrats.org::#EXH][EXH]] | [[file:contrats.org::#BOUND][BOUND]] | [[file:contrats.org::#EXPL][EXPL]] | [[file:contrats.org::#LOG][LOG]] |
+|---+---+---+---+---+---|
+| [[#R07-1][R07-1]] | [X] | [X] | [X] | [X] | [X] |
+| [[#R07-2][R07-2]] | [ ] | [X] | [ ] | [X] | [X] |
+| [[#R07-3][R07-3]] | [ ] | [X] | [ ] | [X] | [ ] |
+| [[#R07-4][R07-4]] | [X] | [?] | [X] | [?] | [?] |
+
+** Rédactions
+
+*** R07-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R07-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+L’expression est définie pour $x\ne3$. Les facteurs changent de signe en $-2$, $1$ et $3$. Le quotient est successivement négatif, positif, négatif et positif sur les quatre intervalles ainsi délimités.
+
+Il s’annule en $-2$ et $1$, tandis que $3$ est exclu. Donc $S=[-2;1]\cup]3;+\infty[$.
+#+end_verse
+
+**** Analyse
+
+Domaine, signe et bornes contrôlés.
+
+*** R07-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R07-2
+:CIBLES: [[file:contrats.org::#BOUND][BOUND]] [[file:contrats.org::#DOMAIN][DOMAIN]]
+:END:
+
+**** Texte
+
+#+begin_verse
+L’expression est définie pour $x\ne3$. Les facteurs changent de signe en $-2$, $1$ et $3$. Le quotient est successivement négatif, positif, négatif et positif sur les quatre intervalles ainsi délimités.
+
+Il s’annule en $-2$ et $1$. Donc $S=[-2;1]\cup[3;+\infty[$.
+#+end_verse
+
+**** Analyse
+
+Borne 3 incluse malgré domaine initial correct ; variante appariée au contrôle.
+
+*** R07-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R07-3
+:CIBLES: [[file:contrats.org::#DOMAIN][DOMAIN]] [[file:contrats.org::#LOG][LOG]]
+:END:
+
+**** Texte
+
+#+begin_verse
+On multiplie par $x-3$ : $(x-1)(x+2)\geq0$. Le produit est positif à l’extérieur des racines, donc $S=]-\infty;-2]\cup[1;+\infty[$.
+#+end_verse
+
+**** Analyse
+
+Multiplication d’inégalité sans signe du dénominateur et oubli de sa nullité.
+
+*** R07-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R07-4
+:CIBLES: [[file:contrats.org::#EXPL][EXPL]] [[file:contrats.org::#EXH][EXH]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Les signes aux points $-3$, $0$, $2$, $4$ sont respectivement $-$, $+$, $-$, $+$. Donc $S=[-2;1]\cup]3;+\infty[$.
+#+end_verse
+
+**** Analyse
+
+Échantillon des intervalles ; invariance du signe implicite mais récupérable par facteurs. Ne pas coder comme simple expérience aléatoire.
+
+* R08 — Racine et vérification :2de:algebre:
+:PROPERTIES:
+:CUSTOM_ID: R08
+:NIVEAU: 2de
+:DOMAINE: Algèbre
+:FAMILLE: R08
+:END:
+
+** Énoncé
+
+#+begin_verse
+Résoudre dans $\mathbb R$ l’équation $\sqrt{x+6}=x$. Justifier l’ensemble des solutions.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$S=\{3\}$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R08
+| Rédaction | [[file:contrats.org::#REC][REC]] |
+|---+---|
+| [[#R08-1][R08-1]] | [X] |
+| [[#R08-2][R08-2]] | [X] |
+| [[#R08-3][R08-3]] | [ ] |
+
+** Rédactions
+
+*** R08-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R08-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Une solution vérifie $x\geq0$. Sur ce domaine, $\sqrt{x+6}=x\iff x+6=x^2\iff(x-3)(x+2)=0$. Seule la racine $3$ est positive ou nulle, donc $S=\{3\}$.
+#+end_verse
+
+**** Analyse
+
+Signe préalable rend l’élévation au carré réversible.
+
+*** R08-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R08-2
+:CIBLES: [[file:contrats.org::#REGISTER][REGISTER]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Une solution vérifie $x+6=x^2$, donc $x=3$ ou $x=-2$. Or $\sqrt{9}=3$, tandis que $\sqrt4\ne-2$. Donc $S=\{3\}$.
+#+end_verse
+
+**** Analyse
+
+Analyse-synthèse valide sans annonce du domaine avant calcul.
+
+*** R08-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R08-3
+:CIBLES: [[file:contrats.org::#REC][REC]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$\sqrt{x+6}=x\iff x+6=x^2\iff x=3\text{ ou }x=-2$. Après vérification, $-2$ ne convient pas et $3$ convient. Donc $S=\{3\}$.
+#+end_verse
+
+**** Analyse
+
+Ensemble final et élimination corrects ; symbole d’équivalence localement faux. Le texte se répare en remplaçant la première équivalence par une implication.
+
+* R09 — Deux discriminants :1re_spe:algebre:
+:PROPERTIES:
+:CUSTOM_ID: R09
+:NIVEAU: 1re spé
+:DOMAINE: Algèbre
+:FAMILLE: R09
+:END:
+
+** Énoncé
+
+#+begin_verse
+Résoudre dans $\mathbb R$ l’équation $(x^2-5x+6)(2x^2-x-1)=0$ en justifiant.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$S=\{-1/2;1;2;3\}$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R09
+| Rédaction | [[file:contrats.org::#NAME][NAME]] | [[file:contrats.org::#SCOPE][SCOPE]] | [[file:contrats.org::#CALC][CALC]] | [[file:contrats.org::#LOG][LOG]] |
+|---+---+---+---+---|
+| [[#R09-1][R09-1]] | [X] | [X] | [X] | [X] |
+| [[#R09-2][R09-2]] | [ ] | [X] | [X] | [X] |
+| [[#R09-3][R09-3]] | [ ] | [X] | [X] | [X] |
+| [[#R09-4][R09-4]] | [X] | — | [X] | [X] |
+| [[#R09-5][R09-5]] | [ ] | [ ] | [ ] | [ ] |
+| [[#R09-6][R09-6]] | [ ] | [X] | [X] | [X] |
+| [[#R09-7][R09-7]] | [ ] | [X] | [X] | [X] |
+
+** Rédactions
+
+*** R09-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R09-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Le produit est nul si et seulement si l’un des deux facteurs est nul.
+
+Pour $x^2-5x+6=0$, le discriminant $\Delta_1=25-24=1$ donne $x=2$ ou $x=3$. Pour $2x^2-x-1=0$, le discriminant $\Delta_2=1+8=9$ donne $x=-1/2$ ou $x=1$.
+
+Donc $S=\{-1/2;1;2;3\}$.
+#+end_verse
+
+**** Analyse
+
+Deux objets explicitement nommés différemment.
+
+*** R09-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R09-2
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#SCOPE][SCOPE]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Le produit est nul si et seulement si l’un des deux facteurs est nul.
+
+Pour $x^2-5x+6=0$, le discriminant $\Delta=25-24=1$ donne $x=2$ ou $x=3$. Pour $2x^2-x-1=0$, le discriminant $\Delta=1+8=9$ donne $x=-1/2$ ou $x=1$.
+
+Donc $S=\{-1/2;1;2;3\}$.
+#+end_verse
+
+**** Analyse
+
+Différence appariée : seuls les indices des deux delta sont retirés. Contexte local lisible ; ne pas confondre réemploi séquentiel et identification simultanée.
+
+*** R09-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R09-3
+:CIBLES: [[file:contrats.org::#NAME][NAME]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Le produit est nul si et seulement si l’un des deux facteurs est nul.
+
+Pour $x^2-5x+6=0$, le discriminant $\Delta=25-24=1$ donne $x=2$ ou $x=3$. Pour $2x^2-x-1=0$, on réutilise la lettre $\Delta$ : $\Delta=1+8=9$ donne $x=-1/2$ ou $x=1$.
+
+Donc $S=\{-1/2;1;2;3\}$.
+#+end_verse
+
+**** Analyse
+
+Réaffectation explicitement signalée ; contrôle de la portée pragmatique du nom.
+
+*** R09-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R09-4
+:CIBLES: [[file:contrats.org::#REGISTER][REGISTER]] [[file:contrats.org::#ECO][ECO]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$x^2-5x+6=(x-2)(x-3)$ et $2x^2-x-1=(2x+1)(x-1)$. Le produit initial est donc nul exactement pour $x\in\{-1/2;1;2;3\}$.
+#+end_verse
+
+**** Analyse
+
+Méthode alternative valide par factorisation ; n’isole pas l’effet de longueur.
+
+*** R09-5 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R09-5
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#LOG][LOG]] [[file:contrats.org::#CALC][CALC]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Le premier discriminant vaut $\Delta=1$. Les racines du premier facteur sont $2$ et $3$. Pour le second facteur, on garde ce même discriminant : ses racines sont $(1-\sqrt\Delta)/4=0$ et $(1+\sqrt\Delta)/4=1/2$. Donc $S=\{0;1/2;2;3\}$.
+#+end_verse
+
+**** Analyse
+
+Conserve indûment la valeur d’un discriminant pour un autre polynôme ; contrôle d’une identification réellement invalide.
+
+*** R09-6 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R09-6
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#SCOPE][SCOPE]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Le produit est nul si et seulement si l’un des deux facteurs est nul.
+
+Pour $x^2-5x+6=0$ :
+Le discriminant vaut $\Delta=25-24=1$.
+Les solutions sont $x=2$ ou $x=3$.
+
+Pour $2x^2-x-1=0$ :
+Le discriminant vaut $\Delta=1+8=9$.
+Les solutions sont $x=-1/2$ ou $x=1$.
+
+Donc $S=\{-1/2;1;2;3\}$.
+#+end_verse
+
+**** Analyse
+
+Les deux discriminants ont le même nom dans des traitements locaux séparés. La convention stricte d’un nom unique sur toute la rédaction est transgressée ; les calculs et les portées locales restent interprétables. Le retrait doit rendre visible chaque contexte et le retour à la conclusion commune, sans changer les mots. Version sans retrait ; les retours à la ligne sont identiques dans la variante indentée.
+
+*** R09-7 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R09-7
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#SCOPE][SCOPE]]
+:INDENTATION_DE: [[#R09-6][R09-6]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Le produit est nul si et seulement si l’un des deux facteurs est nul.
+
+Pour $x^2-5x+6=0$ :
+    Le discriminant vaut $\Delta=25-24=1$.
+    Les solutions sont $x=2$ ou $x=3$.
+
+Pour $2x^2-x-1=0$ :
+    Le discriminant vaut $\Delta=1+8=9$.
+    Les solutions sont $x=-1/2$ ou $x=1$.
+
+Donc $S=\{-1/2;1;2;3\}$.
+#+end_verse
+
+**** Analyse
+
+Les deux discriminants ont le même nom dans des traitements locaux séparés. La convention stricte d’un nom unique sur toute la rédaction est transgressée ; les calculs et les portées locales restent interprétables. Le retrait doit rendre visible chaque contexte et le retour à la conclusion commune, sans changer les mots. Seuls les espaces de début de ligne diffèrent de la rédaction appariée.
+
+* R10 — Conditionnement :1re_spe:probabilites:
+:PROPERTIES:
+:CUSTOM_ID: R10
+:NIVEAU: 1re spé
+:DOMAINE: Probabilités
+:FAMILLE: R10
+:END:
+
+** Énoncé
+
+#+begin_verse
+Une urne contient $4$ boules rouges et $3$ bleues, indiscernables au toucher. On tire successivement deux boules sans remise. Sachant que la seconde est rouge, calculer la probabilité que la première soit bleue. Justifier.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$1/2$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R10
+| Rédaction | [[file:contrats.org::#NAME][NAME]] | [[file:contrats.org::#TYPE][TYPE]] | [[file:contrats.org::#MODEL][MODEL]] |
+|---+---+---+---|
+| [[#R10-1][R10-1]] | [X] | [X] | [X] |
+| [[#R10-2][R10-2]] | [ ] | [ ] | [X] |
+| [[#R10-3][R10-3]] | [X] | [X] | [X] |
+| [[#R10-4][R10-4]] | [X] | [X] | [ ] |
+
+** Rédactions
+
+*** R10-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R10-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Notons $B_1$ l’événement « la première boule est bleue » et $R_2$ l’événement « la seconde est rouge ».
+
+$P(B_1\cap R_2)=\frac37\times\frac46=\frac27$. Par ailleurs $P(R_2)=\frac47\times\frac36+\frac37\times\frac46=\frac47$.
+
+Donc $P(B_1\mid R_2)=\frac{2/7}{4/7}=\frac12$.
+#+end_verse
+
+**** Analyse
+
+Événements, total et quotient correctement distingués.
+
+*** R10-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R10-2
+:CIBLES: [[file:contrats.org::#TYPE][TYPE]] [[file:contrats.org::#NAME][NAME]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$B_1=\frac37\times\frac46=\frac27$ et $R_2=\frac47\times\frac36+\frac37\times\frac46=\frac47$. Donc $P(B_1\mid R_2)=\frac{2/7}{4/7}=\frac12$.
+#+end_verse
+
+**** Analyse
+
+Les noms d’événements portent directement des probabilités, et B1 désigne numériquement une intersection. Le calcul voulu est récupérable ; plusieurs ambiguïtés délibérées sont signalées.
+
+*** R10-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R10-3
+:CIBLES: [[file:contrats.org::#REGISTER][REGISTER]]
+:END:
+
+**** Texte
+
+#+begin_verse
+La seconde boule étant rouge, il reste parmi les six autres boules trois rouges et trois bleues. Par symétrie des positions du tirage, la première boule est uniformément choisie parmi ces six boules. La probabilité cherchée est donc $3/6=1/2$.
+#+end_verse
+
+**** Analyse
+
+Argument combinatoire conditionnel valide ; pas de formule de Bayes obligatoire.
+
+*** R10-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R10-4
+:CIBLES: [[file:contrats.org::#MODEL][MODEL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Les deux tirages sont indépendants. Sachant que la seconde boule est rouge, la probabilité que la première soit bleue reste $3/7$.
+#+end_verse
+
+**** Analyse
+
+Indépendance incorrecte sans remise.
+
+* R11 — Tangentes horizontales :1re_spe:analyse:
+:PROPERTIES:
+:CUSTOM_ID: R11
+:NIVEAU: 1re spé
+:DOMAINE: Analyse
+:FAMILLE: R11
+:END:
+
+** Énoncé
+
+#+begin_verse
+On considère $f(x)=x^3-3x^2-9x+4$ sur $\mathbb R$. Déterminer les équations de ses tangentes horizontales, en justifiant.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$y=9$ et $y=-23$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R11
+| Rédaction | [[file:contrats.org::#EXH][EXH]] | [[file:contrats.org::#TYPE][TYPE]] | [[file:contrats.org::#EXPL][EXPL]] |
+|---+---+---+---|
+| [[#R11-1][R11-1]] | [X] | [X] | [X] |
+| [[#R11-2][R11-2]] | [?] | [ ] | [?] |
+| [[#R11-3][R11-3]] | [?] | [X] | [?] |
+
+** Rédactions
+
+*** R11-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R11-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Une tangente est horizontale si et seulement si son coefficient directeur est nul. Or $f^{\prime}(x)=3x^2-6x-9=3(x-3)(x+1)$.
+
+Ainsi les abscisses sont $-1$ et $3$. Comme $f(-1)=9$ et $f(3)=-23$, les tangentes cherchées ont pour équations $y=9$ et $y=-23$.
+#+end_verse
+
+**** Analyse
+
+Lien dérivée pente, exhaustivité des abscisses, équations de droites.
+
+*** R11-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R11-2
+:CIBLES: [[file:contrats.org::#TYPE][TYPE]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$f^{\prime}(x)=3x^2-6x-9=3(x-3)(x+1)$. La fonction est donc $x=-1$ ou $x=3$. Les tangentes sont $9$ et $-23$.
+#+end_verse
+
+**** Analyse
+
+Résultats numériques corrects ; fonction, abscisses, droites et nombres confondus dans la formulation.
+
+*** R11-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R11-3
+:CIBLES: [[file:contrats.org::#ECO][ECO]] [[file:contrats.org::#EXH][EXH]] [[file:contrats.org::#EXPL][EXPL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$f^{\prime}(x)=3(x-3)(x+1)$ ; $f^{\prime}(-1)=f^{\prime}(3)=0$. Donc les tangentes sont $y=f(-1)=9$ et $y=f(3)=-23$.
+#+end_verse
+
+**** Analyse
+
+Exhaustivité visible dans la factorisation mais non dite. À distinguer d’une seule vérification sans structure factorisée.
+
+* R12 — Une équation sur un grand intervalle :tle_spe:trigonometrie:
+:PROPERTIES:
+:CUSTOM_ID: R12
+:NIVEAU: Tle spé
+:DOMAINE: Trigonométrie
+:FAMILLE: R12
+:END:
+
+** Énoncé
+
+#+begin_verse
+Résoudre $\cos(2x)=\sin(3x)$ pour $x\in[-2\pi;3\pi]$, en justifiant l’ensemble des solutions.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$S=\{\pi/10+2k\pi/5:k\in\mathbb Z,-5\le k\le7\}$. La seconde famille est incluse dans la première.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R12
+| Rédaction | [[file:contrats.org::#QUANT][QUANT]] | [[file:contrats.org::#DOMAIN][DOMAIN]] | [[file:contrats.org::#EXH][EXH]] | [[file:contrats.org::#EXPL][EXPL]] | [[file:contrats.org::#LOG][LOG]] |
+|---+---+---+---+---+---|
+| [[#R12-1][R12-1]] | [X] | [X] | [X] | [X] | [X] |
+| [[#R12-2][R12-2]] | [X] | [X] | [X] | [?] | [X] |
+| [[#R12-3][R12-3]] | [X] | [X] | [X] | [?] | [X] |
+| [[#R12-4][R12-4]] | — | [X] | [ ] | [X] | [ ] |
+| [[#R12-5][R12-5]] | [X] | [X] | [X] | [?] | [X] |
+| [[#R12-6][R12-6]] | — | [ ] | [ ] | [X] | [ ] |
+
+** Rédactions
+
+*** R12-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R12-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$\sin(3x)=\cos(\pi/2-3x)$. Ainsi l’équation équivaut à $2x=\pi/2-3x+2k\pi$ ou $2x=-\pi/2+3x+2k\pi$, pour un entier $k$.
+
+On obtient $x=\pi/10+2k\pi/5$ ou $x=\pi/2-2k\pi$. La seconde famille est incluse dans la première : $\pi/2-2k\pi=\pi/10+2(1-5k)\pi/5$.
+
+Enfin $-2\pi\le\pi/10+2k\pi/5\le3\pi$ équivaut à $-21/4\le k\le29/4$. Donc $S=\{\pi/10+2k\pi/5:k\in\mathbb Z,\ -5\le k\le7\}$.
+#+end_verse
+
+**** Analyse
+
+Deux branches puis inclusion et restriction entières contrôlées.
+
+*** R12-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R12-2
+:CIBLES: [[file:contrats.org::#REGISTER][REGISTER]] [[file:contrats.org::#ECO][ECO]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$\cos(2x)=\sin(3x)\iff2x\equiv\pi/2-3x\pmod{2\pi}$ ou $2x\equiv-\pi/2+3x\pmod{2\pi}$.
+
+Donc $x\equiv\pi/10\pmod{2\pi/5}$ ou $x\equiv\pi/2\pmod{2\pi}$. La seconde classe est incluse dans la première.
+
+Sur $[-2\pi;3\pi]$, on a donc $S=\{\pi/10+2k\pi/5:k=-5,-4,\ldots,7\}$.
+#+end_verse
+
+**** Analyse
+
+Congruences réelles modulo un réel positif au sens de différence multiple entier ; variante valide. Sens du modulo à expliciter dans la notice interne, pas au répondant.
+
+*** R12-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R12-3
+:CIBLES: [[file:contrats.org::#QUANT][QUANT]] [[file:contrats.org::#REGISTER][REGISTER]] [[file:contrats.org::#EXPL][EXPL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Pour $x\in[-2\pi;3\pi]$, $\cos(2x)=\sin(3x)$ équivaut à l’existence d’un entier $k$ tel que $x=\pi/10+2k\pi/5$ ou $x=\pi/2+2k\pi$.
+
+Dans la première branche, $k\in\{-5,\ldots,7\}$ ; dans la seconde, $k\in\{-1,0,1\}$. La seconde branche donne déjà des valeurs de la première. Donc $S=\{\pi/10+2k\pi/5:k\in\mathbb Z,-5\le k\le7\}$.
+#+end_verse
+
+**** Analyse
+
+Même nom k licite sous la disjonction existentielle ; témoins de branches non simultanés. Contrôle d’une norme trop forte sur l’unicité des noms.
+
+*** R12-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R12-4
+:CIBLES: [[file:contrats.org::#EXH][EXH]] [[file:contrats.org::#LOG][LOG]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$\cos(2x)=\sin(3x)\iff\cos(2x)=\cos(\pi/2-3x)\iff2x=\pi/2-3x$.
+
+Donc $x=\pi/10$, qui appartient à l’intervalle demandé. Ainsi $S=\{\pi/10\}$.
+#+end_verse
+
+**** Analyse
+
+Injectivité globale indue du cosinus ; omission de la périodicité et de l’autre branche.
+
+*** R12-5 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R12-5
+:CIBLES: [[file:contrats.org::#DOMAIN][DOMAIN]] [[file:contrats.org::#EXPL][EXPL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Les solutions réelles sont $x=\pi/10+2k\pi/5$ ou $x=\pi/2+2k\pi$, avec $k\in\mathbb Z$. La seconde famille est incluse dans la première.
+
+Sur l’intervalle demandé, $-5\le k\le7$, donc $S=\{\pi/10+2k\pi/5:-5\le k\le7\}$.
+#+end_verse
+
+**** Analyse
+
+Intégralité indiquée en amont, omise dans l’ensemble final : lecture contextuelle récupérable. Comparaison avec un vrai paramètre réel ci-dessous.
+
+*** R12-6 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R12-6
+:CIBLES: [[file:contrats.org::#DOMAIN][DOMAIN]] [[file:contrats.org::#LOG][LOG]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Les solutions réelles sont $x=\pi/10+2k\pi/5$, avec $k\in\mathbb R$. Sur l’intervalle demandé, cela donne toutes les valeurs de $[-2\pi;3\pi]$.
+#+end_verse
+
+**** Analyse
+
+Paramètre réel rend la famille continue ; ensemble faux. Ne pas confondre avec omission seulement locale de l’intégralité.
+
+* R13 — Une récurrence à deux objectifs :tle_spe:suites:
+:PROPERTIES:
+:CUSTOM_ID: R13
+:NIVEAU: Tle spé
+:DOMAINE: Suites
+:FAMILLE: R13
+:END:
+
+** Énoncé
+
+#+begin_verse
+On définit $u_0=0$ et $u_{n+1}=\sqrt{2+u_n}$. Démontrer que la suite est bien définie et que $0\leq u_n<2$ pour tout $n\in\mathbb N$.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+Initialisation puis récurrence : $0\le u_n<2$ implique $2\le2+u_n<4$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R13
+| Rédaction | [[file:contrats.org::#SCOPE][SCOPE]] | [[file:contrats.org::#QUANT][QUANT]] | [[file:contrats.org::#CIRC][CIRC]] | [[file:contrats.org::#INIT][INIT]] | [[file:contrats.org::#GEN][GEN]] | [[file:contrats.org::#EMP][EMP]] |
+|---+---+---+---+---+---+---|
+| [[#R13-1][R13-1]] | [X] | [X] | [X] | [X] | [X] | [X] |
+| [[#R13-2][R13-2]] | [X] | [X] | [X] | [ ] | [X] | [X] |
+| [[#R13-3][R13-3]] | [ ] | [ ] | [ ] | [ ] | [ ] | [X] |
+| [[#R13-4][R13-4]] | — | — | [X] | [X] | [ ] | [ ] |
+| [[#R13-5][R13-5]] | [X] | [X] | [X] | [X] | [X] | [X] |
+| [[#R13-6][R13-6]] | [X] | [X] | [X] | [X] | [X] | [X] |
+
+** Rédactions
+
+*** R13-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R13-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Au rang $0$, $u_0=0$ existe et $0\le u_0<2$.
+
+Supposons $u_n$ défini et $0\le u_n<2$. Alors $2\le2+u_n<4$, donc la racine existe et $0\le u_{n+1}=\sqrt{2+u_n}<2$.
+
+Par récurrence, tous les termes existent et vérifient l’encadrement demandé.
+#+end_verse
+
+**** Analyse
+
+Hypothèse locale, existence et borne stricte établies.
+
+*** R13-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R13-2
+:CIBLES: [[file:contrats.org::#INIT][INIT]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Supposons $u_n$ défini et $0\le u_n<2$. Alors $2\le2+u_n<4$, donc la racine existe et $0\le u_{n+1}=\sqrt{2+u_n}<2$.
+
+Par récurrence, tous les termes existent et vérifient l’encadrement demandé.
+#+end_verse
+
+**** Analyse
+
+Suppression appariée de l’initialisation ; hérédité identique. Le cas initial est immédiatement contrôlable par le lecteur.
+
+*** R13-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R13-3
+:CIBLES: [[file:contrats.org::#QUANT][QUANT]] [[file:contrats.org::#CIRC][CIRC]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Supposons que, pour tout $n\in\mathbb N$, $u_n$ existe et $0\le u_n<2$. Alors $2\le2+u_n<4$, d’où $0\le u_{n+1}<2$. La propriété est donc vraie pour tout $n$.
+#+end_verse
+
+**** Analyse
+
+Conclusion universelle posée comme hypothèse globale ; absence d’initialisation également signalée comme facteur associé.
+
+*** R13-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R13-4
+:CIBLES: [[file:contrats.org::#EMP][EMP]] [[file:contrats.org::#GEN][GEN]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$u_0=0$, $u_1\approx1{,}414$, $u_2\approx1{,}848$, $u_3\approx1{,}962$. Les termes existent et restent entre $0$ et $2$. Ils continuent donc à vérifier $0\le u_n<2$.
+#+end_verse
+
+**** Analyse
+
+Calculs approchés exacts aux précisions annoncées, extrapolation non prouvée.
+
+*** R13-5 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R13-5
+:CIBLES: [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#QUANT][QUANT]] [[file:contrats.org::#INIT][INIT]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Au rang $0$, $u_0=0$ est défini et $0\le u_0<2$.
+
+Soit $n\in\mathbb N$. Supposons $u_n$ défini et $0\le u_n<2$.
+Alors $2\le2+u_n<4$.
+La racine existe et $0\le u_{n+1}=\sqrt{2+u_n}<2$.
+
+Par récurrence, pour tout $n\in\mathbb N$, $u_n$ existe et $0\le u_n<2$.
+#+end_verse
+
+**** Analyse
+
+L’initialisation et l’hérédité sont complètes dans les deux versions. Le retrait porte uniquement sur les conséquences de l’hypothèse locale ; la conclusion universelle revient au niveau initial. Il ne s’agit pas de réparer une circularité par la mise en page. Version sans retrait ; les retours à la ligne sont identiques dans la variante indentée.
+
+*** R13-6 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R13-6
+:CIBLES: [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#QUANT][QUANT]] [[file:contrats.org::#INIT][INIT]]
+:INDENTATION_DE: [[#R13-5][R13-5]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Au rang $0$, $u_0=0$ est défini et $0\le u_0<2$.
+
+Soit $n\in\mathbb N$. Supposons $u_n$ défini et $0\le u_n<2$.
+    Alors $2\le2+u_n<4$.
+    La racine existe et $0\le u_{n+1}=\sqrt{2+u_n}<2$.
+
+Par récurrence, pour tout $n\in\mathbb N$, $u_n$ existe et $0\le u_n<2$.
+#+end_verse
+
+**** Analyse
+
+L’initialisation et l’hérédité sont complètes dans les deux versions. Le retrait porte uniquement sur les conséquences de l’hypothèse locale ; la conclusion universelle revient au niveau initial. Il ne s’agit pas de réparer une circularité par la mise en page. Seuls les espaces de début de ligne diffèrent de la rédaction appariée.
+
+* R14 — Existence et unicité :tle_spe:analyse:
+:PROPERTIES:
+:CUSTOM_ID: R14
+:NIVEAU: Tle spé
+:DOMAINE: Analyse
+:FAMILLE: R14
+:END:
+
+** Énoncé
+
+#+begin_verse
+Démontrer que l’équation $x^3+x-1=0$ admet une unique solution réelle $\alpha$ et que $0{,}68<\alpha<0{,}69$.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+Continuité, stricte croissance, signes $f(0.68)=-0.005568$ et $f(0.69)=0.018509$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R14
+| Rédaction | [[file:contrats.org::#CIRC][CIRC]] | [[file:contrats.org::#EXH][EXH]] | [[file:contrats.org::#EXIST][EXIST]] | [[file:contrats.org::#EXPL][EXPL]] | [[file:contrats.org::#LOG][LOG]] |
+|---+---+---+---+---+---|
+| [[#R14-1][R14-1]] | [X] | [X] | [X] | [X] | [X] |
+| [[#R14-2][R14-2]] | [X] | [ ] | [X] | [X] | [ ] |
+| [[#R14-3][R14-3]] | [X] | [X] | [?] | [?] | [ ] |
+| [[#R14-4][R14-4]] | [ ] | [ ] | [ ] | [ ] | [ ] |
+
+** Rédactions
+
+*** R14-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R14-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Posons $f(x)=x^3+x-1$. Elle est continue sur $\mathbb R$ et $f^{\prime}(x)=3x^2+1>0$, donc elle y est strictement croissante.
+
+De plus, $f(0{,}68)=-0{,}005568<0$ et $f(0{,}69)=0{,}018509>0$. Par continuité, il existe une racine entre ces deux nombres ; par stricte croissance, elle est la seule racine réelle.
+#+end_verse
+
+**** Analyse
+
+Existence sur intervalle et unicité globale.
+
+*** R14-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R14-2
+:CIBLES: [[file:contrats.org::#EXH][EXH]] [[file:contrats.org::#LOG][LOG]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Posons $f(x)=x^3+x-1$. Elle est continue sur $\mathbb R$. On calcule $f(0{,}68)<0$ et $f(0{,}69)>0$. Le théorème des valeurs intermédiaires donne donc une unique solution réelle entre $0{,}68$ et $0{,}69$.
+#+end_verse
+
+**** Analyse
+
+TVI ne donne pas l’unicité ; monotonie absente.
+
+*** R14-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R14-3
+:CIBLES: [[file:contrats.org::#EXIST][EXIST]] [[file:contrats.org::#EXPL][EXPL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$f^{\prime}(x)=3x^2+1>0$. La fonction est strictement croissante, donc l’équation possède une unique solution réelle. Comme $f(0{,}68)<0<f(0{,}69)$, cette solution est entre les deux bornes.
+#+end_verse
+
+**** Analyse
+
+Existence annoncée sur la seule croissance ; signes et continuité polynomiale récupérables ensuite. Réorganisation potentiellement suffisante, à distinguer d’une conclusion fausse.
+
+*** R14-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R14-4
+:CIBLES: [[file:contrats.org::#CIRC][CIRC]] [[file:contrats.org::#EXIST][EXIST]] [[file:contrats.org::#EXH][EXH]]
+:END:
+
+**** Texte
+
+#+begin_verse
+La solution unique est notée $\alpha$. Puisque $f$ est strictement croissante et $f(0{,}68)<0<f(0{,}69)$, on a $0{,}68<\alpha<0{,}69$. Cela démontre l’existence et l’unicité de la solution.
+#+end_verse
+
+**** Analyse
+
+Existence et unicité présupposées, seul encadrement argumenté ; croissance également non justifiée.
+
+* R15 — Point de raccord :tle_spe:analyse:
+:PROPERTIES:
+:CUSTOM_ID: R15
+:NIVEAU: Tle spé
+:DOMAINE: Analyse
+:FAMILLE: R15
+:END:
+
+** Énoncé
+
+#+begin_verse
+On définit $f(x)=x^2$ pour $x\le1$ et $f(x)=ax+b$ pour $x>1$. Déterminer les réels $a,b$ pour que $f$ soit dérivable en $1$. Justifier.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$a=2,b=-1$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R15
+| Rédaction | [[file:contrats.org::#DOMAIN][DOMAIN]] | [[file:contrats.org::#REC][REC]] | [[file:contrats.org::#EXIST][EXIST]] | [[file:contrats.org::#LOG][LOG]] |
+|---+---+---+---+---|
+| [[#R15-1][R15-1]] | [X] | [X] | [X] | [X] |
+| [[#R15-2][R15-2]] | [ ] | [ ] | [ ] | [ ] |
+| [[#R15-3][R15-3]] | [X] | [X] | [X] | [X] |
+| [[#R15-4][R15-4]] | [X] | [ ] | [?] | [ ] |
+
+** Rédactions
+
+*** R15-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R15-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+La dérivabilité impose la continuité : $a+b=f(1)=1$.
+
+Sous cette condition, le taux d’accroissement en $1$ vaut $x+1$ à gauche, donc tend vers $2$, et vaut $a$ à droite. Les deux limites coïncident si et seulement si $a=2$. Alors $b=-1$.
+
+Réciproquement, ces valeurs donnent les deux taux de limite $2$ ; elles conviennent.
+#+end_verse
+
+**** Analyse
+
+Nécessité continuité, taux et réciproque.
+
+*** R15-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R15-2
+:CIBLES: [[file:contrats.org::#DOMAIN][DOMAIN]] [[file:contrats.org::#EXIST][EXIST]] [[file:contrats.org::#LOG][LOG]]
+:END:
+
+**** Texte
+
+#+begin_verse
+À gauche, $f^{\prime}(x)=2x$ ; à droite, $f^{\prime}(x)=a$. Les dérivées se raccordent si $a=2$. Donc $a=2$ et $b$ est quelconque.
+#+end_verse
+
+**** Analyse
+
+Continuité omise ; dérivées des morceaux ne suffisent pas.
+
+*** R15-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R15-3
+:CIBLES: [[file:contrats.org::#ECO][ECO]]
+:END:
+
+**** Texte
+
+#+begin_verse
+La continuité exige $a+b=1$. Les taux d’accroissement ont alors les limites $2$ et $a$. Ils ont une limite commune exactement lorsque $a=2$. Donc $(a,b)=(2,-1)$.
+#+end_verse
+
+**** Analyse
+
+Réciproque portée par « exactement lorsque », sans paragraphe séparé.
+
+*** R15-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R15-4
+:CIBLES: [[file:contrats.org::#REC][REC]]
+:END:
+
+**** Texte
+
+#+begin_verse
+La dérivabilité implique $a+b=1$ et $a=2$, donc $b=-1$. Pour ces valeurs, $f$ est continue en $1$ ; elle est donc dérivable en $1$.
+#+end_verse
+
+**** Analyse
+
+Paramètres corrects et conditions nécessaires exactes, mais réciproque finale fausse en général.
+
+* R16 — Divisibilité et témoins :sup_1:logique:
+:PROPERTIES:
+:CUSTOM_ID: R16
+:NIVEAU: Sup 1
+:DOMAINE: Logique
+:FAMILLE: R16
+:END:
+
+** Énoncé
+
+#+begin_verse
+Soient $a,b\in\mathbb Z$ tels que $6\mid a$ et $10\mid b$. Démontrer que $2\mid(a+b)$, puis déterminer si $4\mid(a+b)$ est nécessairement vrai.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$a+b=2(3p+5q)$ ; non pour $a=6,b=0$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R16
+| Rédaction | [[file:contrats.org::#NAME][NAME]] | [[file:contrats.org::#SCOPE][SCOPE]] | [[file:contrats.org::#QUANT][QUANT]] | [[file:contrats.org::#DOMAIN][DOMAIN]] | [[file:contrats.org::#LOG][LOG]] |
+|---+---+---+---+---+---|
+| [[#R16-1][R16-1]] | [X] | [X] | [X] | [X] | [X] |
+| [[#R16-2][R16-2]] | [ ] | — | [ ] | [X] | [ ] |
+| [[#R16-3][R16-3]] | [ ] | [X] | [X] | [X] | [X] |
+| [[#R16-4][R16-4]] | — | — | [X] | [X] | [X] |
+| [[#R16-5][R16-5]] | [ ] | [X] | [X] | [X] | [X] |
+| [[#R16-6][R16-6]] | [ ] | [X] | [X] | [X] | [X] |
+
+** Rédactions
+
+*** R16-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R16-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Il existe $p,q\in\mathbb Z$ tels que $a=6p$ et $b=10q$. Alors $a+b=2(3p+5q)$ est pair.
+
+En revanche, $a=6$ et $b=0$ vérifient les hypothèses et leur somme $6$ n’est pas divisible par $4$. La seconde assertion est donc fausse.
+#+end_verse
+
+**** Analyse
+
+Témoins indépendants et contre-exemple admissible.
+
+*** R16-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R16-2
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#QUANT][QUANT]] [[file:contrats.org::#LOG][LOG]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Il existe $k\in\mathbb Z$ tel que $a=6k$ et $b=10k$. Alors $a+b=16k$, donc est pair et même divisible par $4$.
+#+end_verse
+
+**** Analyse
+
+Fusion de deux existentiels ; témoin commun illégitime et conclusion renforcée fausse.
+
+*** R16-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R16-3
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#SCOPE][SCOPE]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Écrivons $a=6k$ pour un entier $k$. Pour $b$, réutilisons $k$ pour un autre entier : $b=10k$. Chacun des deux nombres est pair, donc leur somme est paire.
+
+Avec $a=6$ et $b=0$, la somme n’est pas divisible par $4$. La seconde assertion est donc fausse.
+#+end_verse
+
+**** Analyse
+
+Réemploi séquentiel explicite, pas d’addition symbolique de témoins identifiés ; argument correct.
+
+*** R16-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R16-4
+:CIBLES: [[file:contrats.org::#DOMAIN][DOMAIN]] [[file:contrats.org::#ECO][ECO]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$a+b=2(3a/6+5b/10)$, donc la somme est paire. La divisibilité par $4$ est fausse pour $a=6,b=0$.
+#+end_verse
+
+**** Analyse
+
+Intégralité des quotients implicite mais donnée par les hypothèses. Réécriture exacte.
+
+*** R16-5 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R16-5
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#QUANT][QUANT]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Pour $a$ :
+Écrivons $a=6k$ avec $k\in\mathbb Z$.
+Alors $a=2(3k)$ est pair.
+
+Pour $b$ :
+Écrivons $b=10k$ avec $k\in\mathbb Z$.
+Alors $b=2(5k)$ est pair.
+
+La somme de deux entiers pairs est paire, donc $2\mid(a+b)$.
+Avec $a=6$ et $b=0$, on a $a+b=6$, qui n’est pas divisible par $4$.
+La divisibilité par $4$ n’est donc pas nécessaire.
+#+end_verse
+
+**** Analyse
+
+Deux témoins locaux portent le même nom, mais aucune formule ne les additionne comme s’ils étaient identiques. La convention globale [[file:contrats.org::#NAME][NAME]] est transgressée ; la preuve est valide selon les portées locales. Le retrait matérialise deux sous-raisonnements puis leur sortie commune. Version sans retrait ; les retours à la ligne sont identiques dans la variante indentée.
+
+*** R16-6 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R16-6
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#QUANT][QUANT]]
+:INDENTATION_DE: [[#R16-5][R16-5]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Pour $a$ :
+    Écrivons $a=6k$ avec $k\in\mathbb Z$.
+    Alors $a=2(3k)$ est pair.
+
+Pour $b$ :
+    Écrivons $b=10k$ avec $k\in\mathbb Z$.
+    Alors $b=2(5k)$ est pair.
+
+La somme de deux entiers pairs est paire, donc $2\mid(a+b)$.
+Avec $a=6$ et $b=0$, on a $a+b=6$, qui n’est pas divisible par $4$.
+La divisibilité par $4$ n’est donc pas nécessaire.
+#+end_verse
+
+**** Analyse
+
+Deux témoins locaux portent le même nom, mais aucune formule ne les additionne comme s’ils étaient identiques. La convention globale [[file:contrats.org::#NAME][NAME]] est transgressée ; la preuve est valide selon les portées locales. Le retrait matérialise deux sous-raisonnements puis leur sortie commune. Seuls les espaces de début de ligne diffèrent de la rédaction appariée.
+
+* R17 — Quantificateurs et limite :sup_1:analyse:
+:PROPERTIES:
+:CUSTOM_ID: R17
+:NIVEAU: Sup 1
+:DOMAINE: Analyse
+:FAMILLE: R17
+:END:
+
+** Énoncé
+
+#+begin_verse
+À l’aide de la définition quantifiée, démontrer que $u_n=\frac{2n+1}{n+2}$ converge vers $2$. Donner un rang qui convient à chaque $\varepsilon>0$.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$|u_n-2|=3/(n+2)$ ; $N=\lceil3/\varepsilon\rceil$ convient.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R17
+| Rédaction | [[file:contrats.org::#NAME][NAME]] | [[file:contrats.org::#SCOPE][SCOPE]] | [[file:contrats.org::#QUANT][QUANT]] | [[file:contrats.org::#TASK][TASK]] | [[file:contrats.org::#LOG][LOG]] |
+|---+---+---+---+---+---|
+| [[#R17-1][R17-1]] | [X] | [X] | [X] | [X] | [X] |
+| [[#R17-2][R17-2]] | [X] | — | [ ] | [X] | [ ] |
+| [[#R17-3][R17-3]] | [X] | — | [ ] | [ ] | [ ] |
+| [[#R17-4][R17-4]] | — | — | — | [ ] | [X] |
+| [[#R17-5][R17-5]] | [ ] | [?] | [?] | [X] | [?] |
+| [[#R17-6][R17-6]] | [X] | [X] | [X] | [X] | [X] |
+| [[#R17-7][R17-7]] | [X] | [X] | [X] | [X] | [X] |
+
+** Rédactions
+
+*** R17-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R17-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Soit $\varepsilon>0$. Pour tout $n\in\mathbb N$, $|u_n-2|=3/(n+2)$. Prenons $N=\lceil3/\varepsilon\rceil$. Si $n\ge N$, alors $n+2>3/\varepsilon$ et $|u_n-2|<\varepsilon$.
+
+Ainsi, pour tout $\varepsilon>0$, il existe un rang $N$ à partir duquel l’écart est inférieur à $\varepsilon$ : $u_n\to2$.
+#+end_verse
+
+**** Analyse
+
+Seuil entier dépendant d’epsilon et inégalité stricte.
+
+*** R17-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R17-2
+:CIBLES: [[file:contrats.org::#QUANT][QUANT]] [[file:contrats.org::#LOG][LOG]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Il existe $N=1000$ tel que, pour tout $\varepsilon>0$ et tout $n\ge N$, $|u_n-2|=3/(n+2)<\varepsilon$. Donc $u_n\to2$.
+#+end_verse
+
+**** Analyse
+
+Seuil universel impossible, ordre des quantificateurs modifié.
+
+*** R17-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R17-3
+:CIBLES: [[file:contrats.org::#QUANT][QUANT]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Pour tout $n$, posons $\varepsilon=4/(n+2)$. Alors $|u_n-2|=3/(n+2)<\varepsilon$. Donc $u_n\to2$.
+#+end_verse
+
+**** Analyse
+
+Epsilon choisi après n ; ne satisfait pas le défi de la définition.
+
+*** R17-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R17-4
+:CIBLES: [[file:contrats.org::#TASK][TASK]] [[file:contrats.org::#REGISTER][REGISTER]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$u_n=2-3/(n+2)$. Puisque $3/(n+2)\to0$, on a $u_n\to2$.
+#+end_verse
+
+**** Analyse
+
+Preuve correcte par règles de limites, sans la définition ni le rang demandés.
+
+*** R17-5 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R17-5
+:CIBLES: [[file:contrats.org::#NAME][NAME]] [[file:contrats.org::#SCOPE][SCOPE]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Soit $\varepsilon>0$. Prenons un entier $n>3/\varepsilon$. Pour tout entier $n$ supérieur ou égal à ce $n$, on a $|u_n-2|=3/(n+2)<\varepsilon$. Donc $u_n\to2$.
+#+end_verse
+
+**** Analyse
+
+Collision entre nom du seuil fixé et indice quantifié. Sens récupérable par renommage, formulation littérale à analyser.
+
+*** R17-6 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R17-6
+:CIBLES: [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#QUANT][QUANT]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Soit $\varepsilon>0$.
+Posons $N=\lceil3/\varepsilon\rceil$.
+Soit $n\in\mathbb N$ tel que $n\ge N$.
+On a $|u_n-2|=3/(n+2)$ et $n+2>3/\varepsilon$.
+Donc $|u_n-2|<\varepsilon$.
+Ainsi, pour tout $n\ge N$, $|u_n-2|<\varepsilon$.
+Pour tout $\varepsilon>0$, il existe donc un rang $N$ tel que, pour tout $n\ge N$, $|u_n-2|<\varepsilon$.
+Par définition, $u_n\to2$.
+#+end_verse
+
+**** Analyse
+
+Le témoin N dépend d’epsilon ; l’indice n est arbitraire au-delà de N. Les retraits à deux profondeurs matérialisent l’imbrication et les sorties successives. Le contenu et les quantificateurs sont valides dans les deux versions ; l’effet attendu porte sur la lecture de leur structure, sans note prescrite. Version sans retrait ; les retours à la ligne sont identiques dans la variante indentée.
+
+*** R17-7 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R17-7
+:CIBLES: [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#QUANT][QUANT]]
+:INDENTATION_DE: [[#R17-6][R17-6]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Soit $\varepsilon>0$.
+    Posons $N=\lceil3/\varepsilon\rceil$.
+    Soit $n\in\mathbb N$ tel que $n\ge N$.
+        On a $|u_n-2|=3/(n+2)$ et $n+2>3/\varepsilon$.
+        Donc $|u_n-2|<\varepsilon$.
+    Ainsi, pour tout $n\ge N$, $|u_n-2|<\varepsilon$.
+Pour tout $\varepsilon>0$, il existe donc un rang $N$ tel que, pour tout $n\ge N$, $|u_n-2|<\varepsilon$.
+Par définition, $u_n\to2$.
+#+end_verse
+
+**** Analyse
+
+Le témoin N dépend d’epsilon ; l’indice n est arbitraire au-delà de N. Les retraits à deux profondeurs matérialisent l’imbrication et les sorties successives. Le contenu et les quantificateurs sont valides dans les deux versions ; l’effet attendu porte sur la lecture de leur structure, sans note prescrite. Seuls les espaces de début de ligne diffèrent de la rédaction appariée.
+
+* R18 — Unicité d’une limite :sup_1:analyse:
+:PROPERTIES:
+:CUSTOM_ID: R18
+:NIVEAU: Sup 1
+:DOMAINE: Analyse
+:FAMILLE: R18
+:END:
+
+** Énoncé
+
+#+begin_verse
+Démontrer, à partir de la définition de la convergence, qu’une suite réelle ne peut pas avoir deux limites distinctes.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+Contradiction par epsilon égal au tiers de la distance entre deux limites.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R18
+| Rédaction | [[file:contrats.org::#CIRC][CIRC]] | [[file:contrats.org::#EXPL][EXPL]] |
+|---+---+---|
+| [[#R18-1][R18-1]] | [X] | [X] |
+| [[#R18-2][R18-2]] | [X] | [?] |
+| [[#R18-3][R18-3]] | [ ] | [X] |
+| [[#R18-4][R18-4]] | [X] | [X] |
+
+** Rédactions
+
+*** R18-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R18-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Supposons que $u_n\to a$ et $u_n\to b$, avec $a\ne b$. Posons $\varepsilon=|a-b|/3$. Il existe des rangs $N_a,N_b$ tels que $n\ge N_a$ implique $|u_n-a|<\varepsilon$, et $n\ge N_b$ implique $|u_n-b|<\varepsilon$.
+
+Pour $n\ge\max(N_a,N_b)$, l’inégalité triangulaire donne $|a-b|\le|a-u_n|+|u_n-b|<2|a-b|/3$, impossible. Donc $a=b$.
+#+end_verse
+
+**** Analyse
+
+Deux seuils et seuil commun explicités.
+
+*** R18-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R18-2
+:CIBLES: [[file:contrats.org::#ECO][ECO]] [[file:contrats.org::#EXPL][EXPL]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Supposons que $u_n\to a$ et $u_n\to b$, avec $a\ne b$. Posons $\varepsilon=|a-b|/3$. Pour $n$ assez grand, $|u_n-a|<\varepsilon$ et $|u_n-b|<\varepsilon$.
+
+Ainsi $|a-b|\le|a-u_n|+|u_n-b|<2|a-b|/3$, impossible. Donc $a=b$.
+#+end_verse
+
+**** Analyse
+
+Seul développement des deux rangs remplacé par « assez grand » ; seuil commun récupérable.
+
+*** R18-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R18-3
+:CIBLES: [[file:contrats.org::#CIRC][CIRC]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Si la suite converge vers $a$ et vers $b$, alors $a=\lim_{n\to\infty}u_n=b$. Donc $a=b$.
+#+end_verse
+
+**** Analyse
+
+La notation de limite unique présuppose ce qui doit être démontré.
+
+*** R18-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R18-4
+:CIBLES: [[file:contrats.org::#REGISTER][REGISTER]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Si deux limites étaient distinctes, on choisirait autour de chacune un intervalle ouvert de rayon égal au tiers de leur distance. Ces intervalles sont disjoints. La convergence impose que tous les termes, à partir d’un rang commun, appartiennent aux deux intervalles. C’est impossible.
+#+end_verse
+
+**** Analyse
+
+Argument verbal complet issu de la définition ; contrôle de registre sans symbolisme.
+
+* R19 — Intégrales et variables liées :sup_1:analyse:
+:PROPERTIES:
+:CUSTOM_ID: R19
+:NIVEAU: Sup 1
+:DOMAINE: Analyse
+:FAMILLE: R19
+:END:
+
+** Énoncé
+
+#+begin_verse
+Pour $x\in[0;1]$, on pose $F(x)=\int_0^x t\,dt+\int_x^1(1-t)\,dt$. Déterminer le minimum de $F$ sur $[0;1]$ et les points où il est atteint.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+$F(x)=x^2-x+1/2=(x-1/2)^2+1/4$, minimum $1/4$ en $x=1/2$.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R19
+| Rédaction | [[file:contrats.org::#NAME][NAME]] | [[file:contrats.org::#SCOPE][SCOPE]] | [[file:contrats.org::#EQ][EQ]] | [[file:contrats.org::#TYPE][TYPE]] |
+|---+---+---+---+---|
+| [[#R19-1][R19-1]] | [X] | [X] | [X] | [X] |
+| [[#R19-2][R19-2]] | [ ] | [X] | [X] | [X] |
+| [[#R19-3][R19-3]] | [ ] | [?] | [X] | [X] |
+| [[#R19-4][R19-4]] | [X] | [ ] | [ ] | [ ] |
+
+** Rédactions
+
+*** R19-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R19-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$F(x)=x^2/2+(1/2-x+x^2/2)=x^2-x+1/2$. Ainsi $F(x)=(x-1/2)^2+1/4$.
+
+Le carré est positif ou nul et s’annule seulement pour $x=1/2\in[0;1]$. Le minimum vaut $1/4$, atteint uniquement en $1/2$.
+#+end_verse
+
+**** Analyse
+
+Calcul de primitives, forme canonique et domaine.
+
+*** R19-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R19-2
+:CIBLES: [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#REGISTER][REGISTER]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$F(x)=\int_0^x u\,du+\int_x^1(1-u)\,du=x^2/2+(1/2-x+x^2/2)=(x-1/2)^2+1/4$.
+
+Le minimum vaut $1/4$, atteint uniquement pour $x=1/2$.
+#+end_verse
+
+**** Analyse
+
+Renommage licite des deux variables muettes, réemploi du même nom dans portées séparées.
+
+*** R19-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R19-3
+:CIBLES: [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#NAME][NAME]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$F(x)=\int_0^x x\,dx+\int_x^1(1-x)\,dx=x^2/2+(1/2-x+x^2/2)=(x-1/2)^2+1/4$.
+
+Le minimum vaut $1/4$, atteint uniquement pour $x=1/2$.
+#+end_verse
+
+**** Analyse
+
+Même symbole libre dans bornes et lié dans intégrandes ; notation d’usage parfois admise, à lire avec convention de portée explicite. Pas une faute mathématique automatique.
+
+*** R19-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R19-4
+:CIBLES: [[file:contrats.org::#SCOPE][SCOPE]] [[file:contrats.org::#EQ][EQ]] [[file:contrats.org::#TYPE][TYPE]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$F(x)=t^2/2+t-t^2/2=t$. Sur $[0;1]$, le minimum est donc $0$.
+#+end_verse
+
+**** Analyse
+
+Primitives confondues avec intégrales définies ; bornes ignorées et variable liée devenue libre.
+
+* R20 — Égalité d’ensembles :sup_1:algebre:
+:PROPERTIES:
+:CUSTOM_ID: R20
+:NIVEAU: Sup 1
+:DOMAINE: Algèbre
+:FAMILLE: R20
+:END:
+
+** Énoncé
+
+#+begin_verse
+Soient $A,B$ deux parties d’un ensemble $E$ et $A\triangle B=(A\setminus B)\cup(B\setminus A)$. Démontrer que $A\triangle B=\varnothing$ si et seulement si $A=B$.
+#+end_verse
+
+** Réponse de référence
+
+#+begin_verse
+Deux inclusions puis réciproque.
+#+end_verse
+
+** Contrats examinés
+
+#+name: contrats-R20
+| Rédaction | [[file:contrats.org::#REC][REC]] | [[file:contrats.org::#EXH][EXH]] |
+|---+---+---|
+| [[#R20-1][R20-1]] | [X] | [X] |
+| [[#R20-2][R20-2]] | [?] | [ ] |
+| [[#R20-3][R20-3]] | [ ] | [ ] |
+| [[#R20-4][R20-4]] | [X] | [X] |
+
+** Rédactions
+
+*** R20-1 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R20-1
+:CIBLES: [[file:contrats.org::#REF][REF]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Si $A\triangle B=\varnothing$, alors $A\setminus B=B\setminus A=\varnothing$. Tout élément de $A$ appartient donc à $B$, et tout élément de $B$ appartient à $A$ : $A=B$.
+
+Réciproquement, si $A=B$, les deux différences sont vides, donc $A\triangle B=\varnothing$.
+#+end_verse
+
+**** Analyse
+
+Équivalence et double inclusion établies.
+
+*** R20-2 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R20-2
+:CIBLES: [[file:contrats.org::#EXH][EXH]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Si $A\triangle B=\varnothing$, alors $A\setminus B=\varnothing$. Tout élément de $A$ appartient donc à $B$, d’où $A=B$.
+
+Réciproquement, si $A=B$, les deux différences sont vides, donc $A\triangle B=\varnothing$.
+#+end_verse
+
+**** Analyse
+
+Une inclusion manque dans la première implication, le reste est identique au contrôle.
+
+*** R20-3 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R20-3
+:CIBLES: [[file:contrats.org::#REC][REC]] [[file:contrats.org::#EXH][EXH]]
+:END:
+
+**** Texte
+
+#+begin_verse
+Si $A=B$, alors $A\setminus B=B\setminus A=\varnothing$, donc $A\triangle B=\varnothing$. L’équivalence est démontrée.
+#+end_verse
+
+**** Analyse
+
+Une seule direction de l’équivalence.
+
+*** R20-4 :redaction:
+:PROPERTIES:
+:CUSTOM_ID: R20-4
+:CIBLES: [[file:contrats.org::#REGISTER][REGISTER]] [[file:contrats.org::#ECO][ECO]]
+:END:
+
+**** Texte
+
+#+begin_verse
+$A\triangle B=\varnothing\iff(A\setminus B=\varnothing\text{ et }B\setminus A=\varnothing)\iff(A\subseteq B\text{ et }B\subseteq A)\iff A=B$.
+#+end_verse
+
+**** Analyse
+
+Chaîne d’équivalences complète sans paragraphes ni éléments génériques.
+

@@ -14,7 +14,7 @@ function versionModule(name) {
   fs.writeFileSync(file, source); const version = hash(source); visited.set(name, version); return version;
 }
 versionModule('enquete.js');
-const assets = new Set(['survey.js', 'enquete.js', 'enquete.css', 'sliders.css']);
+const assets = new Set(['survey.js', 'enquete.js', 'enquete.css', 'sliders.css', 'rich-text.js']);
 let html = fs.readFileSync(path.join(site, 'index.html'), 'utf8');
 html = html.replace(/((?:src|href)=")([^"]+)(")/g, (whole, prefix, ref, suffix) => {
   const clean = ref.split('?')[0];

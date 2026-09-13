@@ -1,5 +1,12 @@
 # Règles de travail de l'agent
 
+## Source éditoriale des questions et des contrats
+
+- Modifier les questions, les textes et les tableaux de codage dans `research/questions.org`, et les définitions dans `research/contrats.org`.
+- Ne pas éditer les JSON générés ni les blocs Org `generated`. Lancer `npm --prefix docs run build:data`, puis `npm --prefix docs run check:data` et `npm --prefix docs run test:data` après une modification du corpus ou du compilateur.
+- Conserver les espaces initiaux des blocs `verse` : ils portent les variantes d’indentation. Les paires `INDENTATION_DE` ne doivent différer que par ces espaces.
+- Les tests navigateur restent requis pour les changements des données ou de leur affichage, comme indiqué dans `docs/tests/e2e/README.org`.
+
 ## Validation adaptée aux changements
 
 - Compiler localement les applications Elm uniquement lorsque les changements affectent les sources Elm, les dépendances ou la configuration Elm, ou les commandes de compilation. Utiliser `npm --prefix docs run build:main` (`docs/src/Main.elm` vers `docs/site/main.js` et `docs/src/Survey.elm` vers `docs/site/survey.js`).
