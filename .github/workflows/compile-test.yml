@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 permissions:
@@ -14,6 +17,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    outputs:
+      manifest: ${{ steps.release.outputs.manifest }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -109,15 +114,16 @@ jobs:
           cp docs/data/*.json docs/site/data/
 
       - uses: actions/setup-node@v4
-        if: steps.scope.outputs.content_only != 'true'
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: docs/package-lock.json
 
       - name: Install dependencies
-        if: steps.scope.outputs.content_only != 'true'
         run: npm --prefix docs ci
+
+      - name: Test publication checks
+        run: python3 -m unittest discover -s docs/tests -p 'test_published_site.py'
 
       - name: Validate survey bank and session logic
         if: steps.scope.outputs.content_only != 'true'
@@ -134,22 +140,54 @@ jobs:
         if: steps.scope.outputs.content_only != 'true'
         run: npm --prefix docs run build:main
 
-      - name: Install Playwright Firefox
-        if: steps.scope.outputs.content_only != 'true'
+      - name: Install Playwright browsers
         run: npm --prefix docs run test:e2e:install:ci
 
       - name: Run browser interaction tests
-        if: steps.scope.outputs.content_only != 'true'
         run: npm --prefix docs run test:e2e
 
+      - name: Save browser checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-checks
+          path: docs/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Fingerprint tested site
+        id: release
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          release_manifest="$(python3 docs/scripts/check-published-site.py manifest docs/site)"
+          printf 'manifest=%s\n' "$release_manifest" >> "$GITHUB_OUTPUT"
+
       - name: Configure Pages
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
 
       - name: Upload site
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/site
 
+  deploy:
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    needs: publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify published files
+        timeout-minutes: 5
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_SITE: ${{ needs.publish.outputs.manifest }}
+        run: python3 docs/scripts/check-published-site.py verify

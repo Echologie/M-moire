@@ -3,12 +3,13 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "build:main": "npx elm make src/Main.elm --output=site/main.js && mkdir -p site/data && cp data/*.json site/data/",
+    "dev": "vite",
+    "build:main": "elm make src/Main.elm --output=site/main.js && elm make src/Survey.elm --optimize --output=site/survey.js && python3 scripts/build-bank.py && node scripts/version-assets.cjs && cp data/exercise-001.json site/data/",
     "test:logic": "npx elm-test",
     "test:e2e": "npx playwright test",
     "test:e2e:guix": "bash scripts/patch-playwright-firefox.sh && PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 npx playwright test",
-    "test:e2e:install": "npx playwright install firefox",
-    "test:e2e:install:ci": "npx playwright install --with-deps firefox",
+    "test:e2e:install": "npx playwright install firefox chromium",
+    "test:e2e:install:ci": "npx playwright install --with-deps firefox chromium",
     "test:all": "npm run test:logic && npm run test:e2e",
     "build:data": "python3 scripts/build-bank.py && node scripts/validate-bank.cjs"
   },
@@ -16,6 +17,7 @@
     "@playwright/test": "^1.52.0",
     "elm": "^0.19.1-6",
     "elm-format": "^0.8.8",
-    "elm-test": "^0.19.1-revision16"
+    "elm-test": "^0.19.1-revision16",
+    "vite": "^8.3.0"
   }
 }

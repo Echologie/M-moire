@@ -21,10 +21,21 @@ module.exports = defineConfig({
   projects: [
     {
       name: 'firefox',
+      testIgnore: '**/*.touch.spec.js',
       use: {
         ...devices['Desktop Firefox'],
         browserName: 'firefox'
       }
+    },
+    {
+      name: 'chromium',
+      testMatch: '**/survey-gestures.spec.js',
+      use: { ...devices['Desktop Chrome'], browserName: 'chromium' }
+    },
+    {
+      name: 'chromium-touch',
+      testMatch: '**/*.touch.spec.js',
+      use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }
     }
   ]
 });

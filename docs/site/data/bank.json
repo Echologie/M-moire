@@ -1,1043 +1,503 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "questions": [
     {
-      "id": "Q01",
-      "level": "3e",
-      "domain": "Géométrie",
-      "title": "Longueur et justification",
-      "statement": "Le triangle $ABC$ est rectangle en $B$, avec $AC=5$ cm et $BC=3$ cm. Calculer $AB$ en justifiant.",
-      "family": "pythagore",
-      "productions": [
-        {
-          "id": "Q01-1",
-          "content": "$AC^2=AB^2+BC^2$ par le théorème de Pythagore. Donc $AB^2=25-9=16$. Comme $AB$ est une longueur, $AB=4$ cm."
-        },
-        {
-          "id": "Q01-2",
-          "content": "$AB=\\sqrt{5^2-3^2}=4$ cm."
-        },
-        {
-          "id": "Q01-3",
-          "content": "$AB^2=25-9=16$, donc $AB=4$."
-        },
-        {
-          "id": "Q01-4",
-          "content": "$AB=4$ cm car $4^2+3^2=5^2$."
-        }
-      ]
-    },
-    {
-      "id": "Q02",
-      "level": "4e",
-      "domain": "Géométrie",
-      "title": "Réciproque ou théorème",
-      "statement": "$AB=3$, $BC=4$, $AC=5$ (en cm). Démontrer que $ABC$ est rectangle.",
-      "family": "Q02",
-      "productions": [
-        {
-          "id": "Q02-1",
-          "content": "$AC^2=25=9+16=AB^2+BC^2$. Par la réciproque du théorème de Pythagore, le triangle est rectangle en $B$."
-        },
-        {
-          "id": "Q02-2",
-          "content": "$3^2+4^2=5^2$. Donc le triangle est rectangle en $B$, par le théorème de Pythagore."
-        },
-        {
-          "id": "Q02-3",
-          "content": "Le triangle est rectangle en $B$, donc $AB^2+BC^2=AC^2$. Les valeurs donnent bien $9+16=25$. Il est donc rectangle."
-        },
-        {
-          "id": "Q02-4",
-          "content": "$9+16=25$. Rectangle."
-        }
-      ]
-    },
-    {
-      "id": "Q03",
+      "id": "R01",
       "level": "5e",
       "domain": "Géométrie",
-      "title": "Angles d’un triangle",
-      "statement": "Dans un triangle $ABC$, $\\widehat A=50^\\circ$ et $\\widehat B=60^\\circ$. Calculer $\\widehat C$ en justifiant.",
-      "family": "Q03",
+      "statement": "Dans un triangle $ABC$, l’angle extérieur adjacent à $\\widehat{ACB}$ mesure $120^\\circ$, et $\\widehat{BAC}$ est le double de $\\widehat{ABC}$. La bissectrice de $\\widehat{BAC}$ coupe $[BC]$ en $D$. Calculer $\\widehat{ADB}$ en justifiant.",
+      "family": "R01",
       "productions": [
         {
-          "id": "Q03-1",
-          "content": "La somme des angles d’un triangle vaut $180^\\circ$. Ainsi $\\widehat C=180^\\circ-50^\\circ-60^\\circ=70^\\circ$."
+          "id": "R01-1",
+          "content": "L’angle en $C$ vaut $180^\\circ-120^\\circ=60^\\circ$. Les angles en $A$ et $B$ totalisent donc $120^\\circ$. Comme celui en $A$ est double, ils valent respectivement $80^\\circ$ et $40^\\circ$.\n\nLa bissectrice donne $\\widehat{BAD}=40^\\circ$. Dans $ABD$, $\\widehat{ABD}=40^\\circ$, donc $\\widehat{ADB}=180^\\circ-40^\\circ-40^\\circ=100^\\circ$."
         },
         {
-          "id": "Q03-2",
-          "content": "$180-50-60=70$. Donc $\\widehat C=70^\\circ$."
+          "id": "R01-2",
+          "content": "En $C$ : $60^\\circ$. Il reste $120^\\circ$, partagé en trois parts égales : $80^\\circ$ en $A$, $40^\\circ$ en $B$. La moitié de $80^\\circ$ vaut $40^\\circ$. Dans $ABD$, il reste donc $180^\\circ-80^\\circ=100^\\circ$."
         },
         {
-          "id": "Q03-3",
-          "content": "$\\widehat C=180-50=130-60=70^\\circ$."
-        },
-        {
-          "id": "Q03-4",
-          "content": "La somme des angles vaut $180^\\circ$. Donc $\\widehat C=180^\\circ-50^\\circ-60^\\circ=80^\\circ$."
+          "id": "R01-3",
+          "content": "$\\widehat C=180-120=60^\\circ$. Puis $\\widehat A=180-60=120\\times2/3=80^\\circ$, et $\\widehat B=40^\\circ$. La bissectrice donne $\\widehat{BAD}=40^\\circ$. Donc $\\widehat{ADB}=180-40=140-40=100^\\circ$."
         }
       ]
     },
     {
-      "id": "Q04",
-      "level": "3e",
-      "domain": "Algèbre",
-      "title": "Équation linéaire",
-      "statement": "Résoudre $3x+2=14$ dans $\\mathbb R$ et justifier.",
-      "family": "lineaire",
-      "productions": [
-        {
-          "id": "Q04-1",
-          "content": "$3x+2=14\\iff3x=12\\iff x=4$. L’ensemble des solutions est $\\{4\\}$."
-        },
-        {
-          "id": "Q04-2",
-          "content": "Pour $x=4$, $3\\times4+2=14$. Donc la solution est $4$."
-        },
-        {
-          "id": "Q04-3",
-          "content": "$3x+2=14$, donc $3x=12$, donc $x=4$."
-        },
-        {
-          "id": "Q04-4",
-          "content": "$3x=14-2=12/3=4$. Donc $x=4$."
-        }
-      ]
-    },
-    {
-      "id": "Q05",
-      "level": "3e",
-      "domain": "Algèbre",
-      "title": "Produit nul",
-      "statement": "Résoudre $(x-2)(x+3)=0$ dans $\\mathbb R$. Justifier.",
-      "family": "produit",
-      "productions": [
-        {
-          "id": "Q05-1",
-          "content": "Un produit est nul si et seulement si l’un des facteurs est nul. Ainsi $x=2$ ou $x=-3$ ; $S=\\{-3;2\\}$."
-        },
-        {
-          "id": "Q05-2",
-          "content": "Il faut $x-2=0$ et $x+3=0$. Donc $S=\\{-3;2\\}$."
-        },
-        {
-          "id": "Q05-3",
-          "content": "Pour $x=2$ ou $x=-3$, le produit vaut zéro. Ce sont les solutions."
-        },
-        {
-          "id": "Q05-4",
-          "content": "$(x-2)(x+3)=0\\iff x=2$."
-        }
-      ]
-    },
-    {
-      "id": "Q06",
-      "level": "4e",
-      "domain": "Arithmétique",
-      "title": "Somme de deux impairs",
-      "statement": "Démontrer que la somme de deux entiers impairs est paire.",
-      "family": "Q06",
-      "productions": [
-        {
-          "id": "Q06-1",
-          "content": "Écrivons les deux entiers $2p+1$ et $2q+1$, avec $p,q\\in\\mathbb Z$. Leur somme vaut $2(p+q+1)$ et $p+q+1$ est entier : elle est paire."
-        },
-        {
-          "id": "Q06-2",
-          "content": "Les deux nombres sont $2n+1$ et $2n+1$. Leur somme vaut $4n+2=2(2n+1)$, donc elle est paire."
-        },
-        {
-          "id": "Q06-3",
-          "content": "$3+5=8$, $7+9=16$ et $11+13=24$. La somme de deux impairs est donc toujours paire."
-        },
-        {
-          "id": "Q06-4",
-          "content": "Chaque nombre impair laisse une unité après regroupement par paires. Les deux unités restantes forment une paire supplémentaire ; la somme se regroupe donc entièrement par paires."
-        }
-      ]
-    },
-    {
-      "id": "Q07",
-      "level": "3e",
-      "domain": "Arithmétique",
-      "title": "Divisibilité",
-      "statement": "Démontrer que le produit de deux entiers pairs est divisible par $4$.",
-      "family": "Q07",
-      "productions": [
-        {
-          "id": "Q07-1",
-          "content": "Soient $a=2p$ et $b=2q$ avec $p,q\\in\\mathbb Z$. Alors $ab=4pq$ ; comme $pq$ est entier, $4$ divise $ab$."
-        },
-        {
-          "id": "Q07-2",
-          "content": "$a=2p$, $b=2q$, donc $ab=4pq$, d’où le résultat."
-        },
-        {
-          "id": "Q07-3",
-          "content": "Les deux nombres sont pairs, donc leur produit est pair, donc divisible par $4$."
-        },
-        {
-          "id": "Q07-4",
-          "content": "$2\\times4=8$ et $6\\times8=48$. C’est donc vrai."
-        }
-      ]
-    },
-    {
-      "id": "Q08",
+      "id": "R02",
       "level": "5e",
-      "domain": "Calcul",
-      "title": "Fractions",
-      "statement": "Calculer exactement $\\frac12+\\frac13$, en montrant le calcul.",
-      "family": "Q08",
+      "domain": "Fractions",
+      "statement": "On utilise les $\\frac25$ du contenu d’une réserve d’eau, puis le tiers de ce qui reste. Il reste alors $18$ litres. Quelle quantité d’eau y avait-il au départ ? Expliquer le calcul.",
+      "family": "R02",
       "productions": [
         {
-          "id": "Q08-1",
-          "content": "$\\frac12+\\frac13=\\frac36+\\frac26=\\frac55=1$."
+          "id": "R02-1",
+          "content": "Après le premier prélèvement, il reste $1-\\frac25=\\frac35$ du contenu initial. Après le second, il reste les $\\frac23$ de ces $\\frac35$, soit $\\frac23\\times\\frac35=\\frac25$ du contenu initial.\n\nDeux cinquièmes représentent $18$ litres : un cinquième représente $9$ litres, et la réserve contenait $45$ litres."
         },
         {
-          "id": "Q08-2",
-          "content": "$\\frac12+\\frac13=0{,}833$."
+          "id": "R02-2",
+          "content": "Après le premier prélèvement, il reste $\\frac35$. Après le second : $\\frac35-\\frac13=\\frac4{15}$. Cette fraction représente $18$ litres, donc la réserve contenait $18\\times15/4=67{,}5$ litres."
         },
         {
-          "id": "Q08-3",
-          "content": "$\\frac12+\\frac13=\\frac{1+1}{2+3}=\\frac25$."
-        },
-        {
-          "id": "Q08-4",
-          "content": "$\\frac56$."
+          "id": "R02-3",
+          "content": "La réserve contenait $45$ litres. On en prend $18$, il reste $27$. Puis on prend $9$, il reste bien $18$ litres."
         }
       ]
     },
     {
-      "id": "Q09",
+      "id": "R03",
+      "level": "4e",
+      "domain": "Arithmétique",
+      "statement": "Démontrer que la différence des carrés de deux entiers impairs est divisible par $8$.",
+      "family": "R03",
+      "productions": [
+        {
+          "id": "R03-1",
+          "content": "Écrivons les deux impairs $2p+1$ et $2q+1$, avec $p,q\\in\\mathbb Z$. La différence de leurs carrés est $4[p(p+1)-q(q+1)]$.\n\nChacun des produits de deux entiers consécutifs $p(p+1)$ et $q(q+1)$ est pair. Leur différence est paire ; multipliée par $4$, elle est divisible par $8$."
+        },
+        {
+          "id": "R03-2",
+          "content": "Écrivons les deux impairs $2n+1$ et $2n+1$, avec $n\\in\\mathbb Z$. La différence de leurs carrés vaut $0$, qui est divisible par $8$."
+        },
+        {
+          "id": "R03-3",
+          "content": "Pour le premier impair, écrivons $2n+1$, avec $n\\in\\mathbb Z$. Son carré vaut $4n(n+1)+1$, donc un multiple de $8$ plus $1$, puisque $n(n+1)$ est pair.\n\nPour le second impair, reprenons la lettre $n$ pour un autre entier. Le même calcul donne aussi un multiple de $8$ plus $1$. La différence est donc un multiple de $8$."
+        },
+        {
+          "id": "R03-4",
+          "content": "$9^2-7^2=32$, $11^2-3^2=112$ et $15^2-5^2=200$. Ces différences sont divisibles par $8$, donc la différence des carrés de deux impairs est toujours divisible par $8$."
+        }
+      ]
+    },
+    {
+      "id": "R04",
       "level": "4e",
       "domain": "Géométrie",
-      "title": "Parallélisme",
-      "statement": "Les droites $d$ et $e$ sont perpendiculaires à une même droite $f$ dans le plan. Démontrer que $d$ et $e$ sont parallèles.",
-      "family": "Q09",
+      "statement": "Un triangle $ABC$ vérifie $AB=5$ cm, $BC=12$ cm et $AC=13$ cm. On note $H$ le pied de la hauteur issue de $B$ sur $(AC)$. Calculer $BH$ en justifiant.",
+      "family": "R04",
       "productions": [
         {
-          "id": "Q09-1",
-          "content": "Deux droites d’un plan perpendiculaires à une même droite sont parallèles. Comme $d\\perp f$ et $e\\perp f$, on a $d\\parallel e$."
+          "id": "R04-1",
+          "content": "$AB^2+BC^2=25+144=169=AC^2$. Par la réciproque du théorème de Pythagore, $ABC$ est rectangle en $B$. Son aire vaut donc $5\\times12/2=30$ cm².\n\nCette aire vaut aussi $AC\\times BH/2$. Ainsi $13BH/2=30$, d’où $BH=60/13$ cm."
         },
         {
-          "id": "Q09-2",
-          "content": "$d\\perp f$ et $e\\perp f$, donc $d\\parallel e$."
+          "id": "R04-2",
+          "content": "$AB^2+BC^2=25+144=169=AC^2$. Par le théorème de Pythagore, $ABC$ est rectangle en $B$. Son aire vaut donc $5\\times12/2=30$ cm².\n\nCette aire vaut aussi $AC\\times BH/2$. Ainsi $13BH/2=30$, d’où $BH=60/13$ cm."
         },
         {
-          "id": "Q09-3",
-          "content": "Sur mon dessin, $d$ et $e$ ne se coupent pas. Elles sont donc parallèles."
-        },
-        {
-          "id": "Q09-4",
-          "content": "$d\\parallel e$, donc elles font le même angle avec $f$. Elles sont donc parallèles."
+          "id": "R04-3",
+          "content": "$5^2+12^2=13^2$. Donc $\\frac{5\\times12}{2}=\\frac{13\\times BH}{2}$, ce qui donne $BH=60/13$ cm."
         }
       ]
     },
     {
-      "id": "Q10",
-      "level": "3e",
-      "domain": "Statistiques",
-      "title": "Moyenne pondérée",
-      "statement": "Une série comprend deux valeurs égales à $10$ et trois valeurs égales à $20$. Calculer sa moyenne et justifier.",
-      "family": "Q10",
-      "productions": [
-        {
-          "id": "Q10-1",
-          "content": "La somme est $2\\times10+3\\times20=80$ pour $5$ valeurs. La moyenne est $80/5=16$."
-        },
-        {
-          "id": "Q10-2",
-          "content": "$\\frac{2\\times10+3\\times20}{5}=16$."
-        },
-        {
-          "id": "Q10-3",
-          "content": "La moyenne est $(10+20)/2=15$."
-        },
-        {
-          "id": "Q10-4",
-          "content": "$2\\times10=20+3\\times20=80/5=16$."
-        }
-      ]
-    },
-    {
-      "id": "Q11",
-      "level": "3e",
-      "domain": "Probabilités",
-      "title": "Dé équilibré",
-      "statement": "On lance un dé équilibré à six faces numérotées de $1$ à $6$. Calculer la probabilité d’obtenir un nombre pair et justifier.",
-      "family": "Q11",
-      "productions": [
-        {
-          "id": "Q11-1",
-          "content": "Les six issues sont équiprobables et trois sont paires : $2,4,6$. La probabilité est $3/6=1/2$."
-        },
-        {
-          "id": "Q11-2",
-          "content": "$P(\\text{pair})=3/6=1/2$."
-        },
-        {
-          "id": "Q11-3",
-          "content": "Il y a deux possibilités : pair ou impair. Donc la probabilité est $1/2$."
-        },
-        {
-          "id": "Q11-4",
-          "content": "J’ai obtenu $50$ nombres pairs en $100$ lancers, donc la probabilité exacte est $1/2$."
-        }
-      ]
-    },
-    {
-      "id": "Q12",
+      "id": "R05",
       "level": "3e",
       "domain": "Algèbre",
-      "title": "Carré et signe",
-      "statement": "Résoudre $x^2=9$ dans $\\mathbb R$ en justifiant.",
-      "family": "carre",
+      "statement": "Résoudre dans $\\mathbb R$ l’équation $(2x-1)^2=(2x-1)(x+3)$. Justifier l’ensemble des solutions.",
+      "family": "R05",
       "productions": [
         {
-          "id": "Q12-1",
-          "content": "$x^2=9\\iff(x-3)(x+3)=0\\iff x=3\\text{ ou }x=-3$."
+          "id": "R05-1",
+          "content": "$(2x-1)^2-(2x-1)(x+3)=0\\iff(2x-1)(x-4)=0$.\n\nUn produit est nul si et seulement si l’un de ses facteurs est nul. Donc $S=\\{1/2;4\\}$."
         },
         {
-          "id": "Q12-2",
-          "content": "$x^2=9\\iff x=\\sqrt9=3$."
+          "id": "R05-2",
+          "content": "On divise par $2x-1$ : $2x-1=x+3$, donc $x=4$. Ainsi $S=\\{4\\}$."
         },
         {
-          "id": "Q12-3",
-          "content": "$3^2=9$ et $(-3)^2=9$, donc $S=\\{-3;3\\}$."
+          "id": "R05-3",
+          "content": "Si $2x-1=0$, alors $x=1/2$ convient. Sinon, on peut diviser par $2x-1$ : l’équation équivaut à $2x-1=x+3$, soit $x=4$, qui convient. Donc $S=\\{1/2;4\\}$."
         },
         {
-          "id": "Q12-4",
-          "content": "$x=\\pm3$."
+          "id": "R05-4",
+          "content": "$(2x-1)(x-4)=0$, donc $2x-1=0$ et $x-4=0$. Donc $S=\\{1/2;4\\}$."
+        },
+        {
+          "id": "R05-5",
+          "content": "Pour $x=1/2$, les deux membres valent $0$. Pour $x=4$, ils valent $49$. L’ensemble des solutions est donc $\\{1/2;4\\}$."
         }
       ]
     },
     {
-      "id": "Q13",
+      "id": "R06",
+      "level": "3e",
+      "domain": "Arithmétique",
+      "statement": "Démontrer que, pour tout entier naturel $n$, le nombre $n^3-n$ est divisible par $6$.",
+      "family": "R06",
+      "productions": [
+        {
+          "id": "R06-1",
+          "content": "$n^3-n=(n-1)n(n+1)$. Parmi trois entiers consécutifs, l’un est divisible par $3$ et au moins l’un est pair. Le produit est donc divisible par $2$ et par $3$, donc par $6$ puisque $2$ et $3$ sont premiers entre eux."
+        },
+        {
+          "id": "R06-2",
+          "content": "$n^3-n=(n-1)n(n+1)$. Trois entiers consécutifs donnent toujours un facteur $2$ et un facteur $3$ ; leur produit est donc un multiple de $6$."
+        },
+        {
+          "id": "R06-3",
+          "content": "$n^3-n=(n-1)n(n+1)$. Comme $n$ est pair et divisible par $3$, le produit est divisible par $6$."
+        },
+        {
+          "id": "R06-4",
+          "content": "Pour $n=0,1,2,3,4,5$, on trouve $0,0,6,24,60,120$, tous multiples de $6$. Donc $n^3-n$ est toujours divisible par $6$."
+        }
+      ]
+    },
+    {
+      "id": "R07",
       "level": "2de",
       "domain": "Algèbre",
-      "title": "Équation linéaire",
-      "statement": "Résoudre $3x+2=14$ dans $\\mathbb R$ et justifier.",
-      "family": "lineaire",
+      "statement": "Résoudre dans $\\mathbb R$ l’inéquation $\\frac{(x-1)(x+2)}{x-3}\\geq0$. Justifier et donner l’ensemble des solutions.",
+      "family": "R07",
       "productions": [
         {
-          "id": "Q13-1",
-          "content": "$3x+2=14\\iff3x=12\\iff x=4$. L’ensemble des solutions est $\\{4\\}$."
+          "id": "R07-1",
+          "content": "L’expression est définie pour $x\\ne3$. Les facteurs changent de signe en $-2$, $1$ et $3$. Le quotient est successivement négatif, positif, négatif et positif sur les quatre intervalles ainsi délimités.\n\nIl s’annule en $-2$ et $1$, tandis que $3$ est exclu. Donc $S=[-2;1]\\cup]3;+\\infty[$."
         },
         {
-          "id": "Q13-2",
-          "content": "Pour $x=4$, $3\\times4+2=14$. Donc la solution est $4$."
+          "id": "R07-2",
+          "content": "L’expression est définie pour $x\\ne3$. Les facteurs changent de signe en $-2$, $1$ et $3$. Le quotient est successivement négatif, positif, négatif et positif sur les quatre intervalles ainsi délimités.\n\nIl s’annule en $-2$ et $1$. Donc $S=[-2;1]\\cup[3;+\\infty[$."
         },
         {
-          "id": "Q13-3",
-          "content": "$3x+2=14$, donc $3x=12$, donc $x=4$."
+          "id": "R07-3",
+          "content": "On multiplie par $x-3$ : $(x-1)(x+2)\\geq0$. Le produit est positif à l’extérieur des racines, donc $S=]-\\infty;-2]\\cup[1;+\\infty[$."
         },
         {
-          "id": "Q13-4",
-          "content": "$3x=14-2=12/3=4$. Donc $x=4$."
+          "id": "R07-4",
+          "content": "Les signes aux points $-3$, $0$, $2$, $4$ sont respectivement $-$, $+$, $-$, $+$. Donc $S=[-2;1]\\cup]3;+\\infty[$."
         }
       ]
     },
     {
-      "id": "Q14",
+      "id": "R08",
       "level": "2de",
       "domain": "Algèbre",
-      "title": "Division par l’inconnue",
-      "statement": "Résoudre $x^2=2x$ dans $\\mathbb R$.",
-      "family": "Q14",
+      "statement": "Résoudre dans $\\mathbb R$ l’équation $\\sqrt{x+6}=x$. Justifier l’ensemble des solutions.",
+      "family": "R08",
       "productions": [
         {
-          "id": "Q14-1",
-          "content": "$x^2=2x\\iff x(x-2)=0\\iff x=0\\text{ ou }x=2$."
+          "id": "R08-1",
+          "content": "Une solution vérifie $x\\geq0$. Sur ce domaine, $\\sqrt{x+6}=x\\iff x+6=x^2\\iff(x-3)(x+2)=0$. Seule la racine $3$ est positive ou nulle, donc $S=\\{3\\}$."
         },
         {
-          "id": "Q14-2",
-          "content": "On divise par $x$ : $x=2$. Donc $S=\\{2\\}$."
+          "id": "R08-2",
+          "content": "Une solution vérifie $x+6=x^2$, donc $x=3$ ou $x=-2$. Or $\\sqrt{9}=3$, tandis que $\\sqrt4\\ne-2$. Donc $S=\\{3\\}$."
         },
         {
-          "id": "Q14-3",
-          "content": "Si $x=0$, l’égalité est vraie. Sinon on divise par $x$ et on obtient $x=2$, qui convient aussi. Donc $S=\\{0;2\\}$."
-        },
-        {
-          "id": "Q14-4",
-          "content": "En divisant par $x$, on obtient $x=2$. On ajoute aussi $0$, qui convient. Donc $S=\\{0;2\\}$."
+          "id": "R08-3",
+          "content": "$\\sqrt{x+6}=x\\iff x+6=x^2\\iff x=3\\text{ ou }x=-2$. Après vérification, $-2$ ne convient pas et $3$ convient. Donc $S=\\{3\\}$."
         }
       ]
     },
     {
-      "id": "Q15",
-      "level": "2de",
-      "domain": "Algèbre",
-      "title": "Racine carrée",
-      "statement": "Résoudre $\\sqrt{x+2}=x$ dans $\\mathbb R$.",
-      "family": "Q15",
-      "productions": [
-        {
-          "id": "Q15-1",
-          "content": "Il faut $x\\ge0$. Sur ce domaine, $\\sqrt{x+2}=x\\iff x+2=x^2\\iff(x-2)(x+1)=0$. Seul $2$ est positif ou nul, donc $S=\\{2\\}$."
-        },
-        {
-          "id": "Q15-2",
-          "content": "$\\sqrt{x+2}=x\\iff x+2=x^2\\iff x=2\\text{ ou }x=-1$. Donc $S=\\{-1;2\\}$."
-        },
-        {
-          "id": "Q15-3",
-          "content": "Une solution vérifie $x^2-x-2=0$, donc vaut $2$ ou $-1$. Vérification : $2$ convient ; $-1$ ne convient pas. Donc $S=\\{2\\}$."
-        },
-        {
-          "id": "Q15-4",
-          "content": "$x+2=x^2$, donc $x=2$. Vérification : $\\sqrt4=2$."
-        }
-      ]
-    },
-    {
-      "id": "Q16",
-      "level": "2de",
-      "domain": "Analyse",
-      "title": "Quotient simplifié",
-      "statement": "Simplifier $f(x)=\\frac{x^2-1}{x-1}$ et préciser son domaine de définition.",
-      "family": "Q16",
-      "productions": [
-        {
-          "id": "Q16-1",
-          "content": "$D_f=\\mathbb R\\setminus\\{1\\}$. Pour $x\\ne1$, $f(x)=\\frac{(x-1)(x+1)}{x-1}=x+1$."
-        },
-        {
-          "id": "Q16-2",
-          "content": "$f(x)=x+1$, donc $D_f=\\mathbb R$."
-        },
-        {
-          "id": "Q16-3",
-          "content": "$f(x)=x+1$ pour $x\\ne1$."
-        },
-        {
-          "id": "Q16-4",
-          "content": "$f(x)=x+1$."
-        }
-      ]
-    },
-    {
-      "id": "Q17",
-      "level": "2de",
-      "domain": "Algèbre",
-      "title": "Inéquation",
-      "statement": "Résoudre $-2x<6$ dans $\\mathbb R$. Justifier.",
-      "family": "Q17",
-      "productions": [
-        {
-          "id": "Q17-1",
-          "content": "En divisant par $-2$, on inverse le sens de l’inégalité : $x>-3$. Donc $S=]-3;+\\infty[$."
-        },
-        {
-          "id": "Q17-2",
-          "content": "$-2x<6\\iff x>-3$."
-        },
-        {
-          "id": "Q17-3",
-          "content": "$-2x<6\\iff x<-3$."
-        },
-        {
-          "id": "Q17-4",
-          "content": "$x>-3$, donc $S=[-3;+\\infty[$."
-        }
-      ]
-    },
-    {
-      "id": "Q18",
+      "id": "R09",
       "level": "1re spé",
       "domain": "Algèbre",
-      "title": "Second degré",
-      "statement": "Résoudre $3x^2-5x+2=0$ dans $\\mathbb R$ en justifiant.",
-      "family": "Q18",
+      "statement": "Résoudre dans $\\mathbb R$ l’équation $(x^2-5x+6)(2x^2-x-1)=0$ en justifiant.",
+      "family": "R09",
       "productions": [
         {
-          "id": "Q18-1",
-          "content": "$3x^2-5x+2=(3x-2)(x-1)$. Le produit est nul exactement pour $x=2/3$ ou $x=1$. Donc $S=\\{2/3;1\\}$."
+          "id": "R09-1",
+          "content": "Le produit est nul si et seulement si l’un des deux facteurs est nul.\n\nPour $x^2-5x+6=0$, le discriminant $\\Delta_1=25-24=1$ donne $x=2$ ou $x=3$. Pour $2x^2-x-1=0$, le discriminant $\\Delta_2=1+8=9$ donne $x=-1/2$ ou $x=1$.\n\nDonc $S=\\{-1/2;1;2;3\\}$."
         },
         {
-          "id": "Q18-2",
-          "content": "$\\Delta=25-24=1$. Donc $x=\\frac{5\\pm1}{6}$, soit $S=\\{2/3;1\\}$."
+          "id": "R09-2",
+          "content": "Le produit est nul si et seulement si l’un des deux facteurs est nul.\n\nPour $x^2-5x+6=0$, le discriminant $\\Delta=25-24=1$ donne $x=2$ ou $x=3$. Pour $2x^2-x-1=0$, le discriminant $\\Delta=1+8=9$ donne $x=-1/2$ ou $x=1$.\n\nDonc $S=\\{-1/2;1;2;3\\}$."
         },
         {
-          "id": "Q18-3",
-          "content": "$\\Delta=1$. Puis $\\Delta=\\frac{5-1}{6}=2/3$ et l’autre solution est $1$. Donc $S=\\{2/3;1\\}$."
+          "id": "R09-3",
+          "content": "Le produit est nul si et seulement si l’un des deux facteurs est nul.\n\nPour $x^2-5x+6=0$, le discriminant $\\Delta=25-24=1$ donne $x=2$ ou $x=3$. Pour $2x^2-x-1=0$, on réutilise la lettre $\\Delta$ : $\\Delta=1+8=9$ donne $x=-1/2$ ou $x=1$.\n\nDonc $S=\\{-1/2;1;2;3\\}$."
         },
         {
-          "id": "Q18-4",
-          "content": "$\\Delta=25-24=1$. Donc $x=\\frac{5\\pm1}{3}$, soit $S=\\{4/3;2\\}$."
+          "id": "R09-4",
+          "content": "$x^2-5x+6=(x-2)(x-3)$ et $2x^2-x-1=(2x+1)(x-1)$. Le produit initial est donc nul exactement pour $x\\in\\{-1/2;1;2;3\\}$."
+        },
+        {
+          "id": "R09-5",
+          "content": "Le premier discriminant vaut $\\Delta=1$. Les racines du premier facteur sont $2$ et $3$. Pour le second facteur, on garde ce même discriminant : ses racines sont $(1-\\sqrt\\Delta)/4=0$ et $(1+\\sqrt\\Delta)/4=1/2$. Donc $S=\\{0;1/2;2;3\\}$."
         }
       ]
     },
     {
-      "id": "Q19",
-      "level": "1re spé",
-      "domain": "Analyse",
-      "title": "Dérivée et variation",
-      "statement": "Pour $f(x)=x^2-4x+1$ sur $\\mathbb R$, déterminer les intervalles de monotonie en justifiant.",
-      "family": "Q19",
-      "productions": [
-        {
-          "id": "Q19-1",
-          "content": "$f’(x)=2x-4$, négatif pour $x<2$ et positif pour $x>2$. Donc $f$ décroît sur $]-\\infty;2]$ et croît sur $[2;+\\infty[$."
-        },
-        {
-          "id": "Q19-2",
-          "content": "$2x-4<0\\iff x<2$ ; $2x-4>0\\iff x>2$. Décroissante puis croissante, changement en $2$."
-        },
-        {
-          "id": "Q19-3",
-          "content": "$f’(x)=2x-4$ est croissante ; donc $f$ est croissante sur $\\mathbb R$."
-        },
-        {
-          "id": "Q19-4",
-          "content": "$f(0)=1$, $f(2)=-3$, $f(4)=1$. Donc $f$ décroît jusqu’à $2$, puis croît."
-        }
-      ]
-    },
-    {
-      "id": "Q20",
+      "id": "R10",
       "level": "1re spé",
       "domain": "Probabilités",
-      "title": "Probabilité conditionnelle",
-      "statement": "$P(A)=0{,}4$, $P(B\\mid A)=0{,}5$ et $P(B\\mid\\overline A)=0{,}2$. Calculer $P(B)$ et justifier.",
-      "family": "Q20",
+      "statement": "Une urne contient $4$ boules rouges et $3$ bleues, indiscernables au toucher. On tire successivement deux boules sans remise. Sachant que la seconde est rouge, calculer la probabilité que la première soit bleue. Justifier.",
+      "family": "R10",
       "productions": [
         {
-          "id": "Q20-1",
-          "content": "$A$ et $\\overline A$ forment une partition. Donc $P(B)=0{,}4\\times0{,}5+0{,}6\\times0{,}2=0{,}32$."
+          "id": "R10-1",
+          "content": "Notons $B_1$ l’événement « la première boule est bleue » et $R_2$ l’événement « la seconde est rouge ».\n\n$P(B_1\\cap R_2)=\\frac37\\times\\frac46=\\frac27$. Par ailleurs $P(R_2)=\\frac47\\times\\frac36+\\frac37\\times\\frac46=\\frac47$.\n\nDonc $P(B_1\\mid R_2)=\\frac{2/7}{4/7}=\\frac12$."
         },
         {
-          "id": "Q20-2",
-          "content": "$P(B)=0{,}4\\times0{,}5+0{,}6\\times0{,}2=0{,}32$."
+          "id": "R10-2",
+          "content": "$B_1=\\frac37\\times\\frac46=\\frac27$ et $R_2=\\frac47\\times\\frac36+\\frac37\\times\\frac46=\\frac47$. Donc $P(B_1\\mid R_2)=\\frac{2/7}{4/7}=\\frac12$."
         },
         {
-          "id": "Q20-3",
-          "content": "$P(B)=(0{,}5+0{,}2)/2=0{,}35$."
+          "id": "R10-3",
+          "content": "La seconde boule étant rouge, il reste parmi les six autres boules trois rouges et trois bleues. Par symétrie des positions du tirage, la première boule est uniformément choisie parmi ces six boules. La probabilité cherchée est donc $3/6=1/2$."
         },
         {
-          "id": "Q20-4",
-          "content": "$P(A\\mid B)=0{,}4\\times0{,}5+0{,}6\\times0{,}2=0{,}32$. Donc $P(B)=0{,}32$."
+          "id": "R10-4",
+          "content": "Les deux tirages sont indépendants. Sachant que la seconde boule est rouge, la probabilité que la première soit bleue reste $3/7$."
         }
       ]
     },
     {
-      "id": "Q21",
-      "level": "Tle spé",
-      "domain": "Analyse",
-      "title": "Limite d’un quotient",
-      "statement": "Calculer $\\lim_{x\\to+\\infty}\\frac{2x+1}{x+3}$ en justifiant.",
-      "family": "Q21",
-      "productions": [
-        {
-          "id": "Q21-1",
-          "content": "Pour $x>0$, $\\frac{2x+1}{x+3}=\\frac{2+1/x}{1+3/x}$. Le numérateur tend vers $2$ et le dénominateur vers $1\\ne0$. La limite vaut $2$."
-        },
-        {
-          "id": "Q21-2",
-          "content": "$\\frac{2x+1}{x+3}\\sim\\frac{2x}{x}=2$, donc la limite vaut $2$."
-        },
-        {
-          "id": "Q21-3",
-          "content": "$\\frac{2x+1}{x+3}=\\frac{2x}{x}=2$ à l’infini."
-        },
-        {
-          "id": "Q21-4",
-          "content": "Le quotient est de la forme $\\infty/\\infty$, donc sa limite est $1$."
-        }
-      ]
-    },
-    {
-      "id": "Q22",
-      "level": "Tle spé",
-      "domain": "Analyse",
-      "title": "Récurrence",
-      "statement": "$u_0=1$ et $u_{n+1}=2u_n$ pour $n\\in\\mathbb N$. Démontrer que $u_n=2^n$ pour tout $n\\in\\mathbb N$.",
-      "family": "Q22",
-      "productions": [
-        {
-          "id": "Q22-1",
-          "content": "$u_0=1=2^0$. Si $u_n=2^n$ pour un entier $n\\ge0$, alors $u_{n+1}=2\\times2^n=2^{n+1}$. La propriété est donc vraie pour tout $n\\ge0$ par récurrence."
-        },
-        {
-          "id": "Q22-2",
-          "content": "Si $u_n=2^n$, alors $u_{n+1}=2u_n=2^{n+1}$. Donc la propriété est vraie pour tout $n$."
-        },
-        {
-          "id": "Q22-3",
-          "content": "On suppose que pour tout $n$, $u_n=2^n$. Alors $u_{n+1}=2^{n+1}$. La propriété est démontrée."
-        },
-        {
-          "id": "Q22-4",
-          "content": "$u_0=1$, $u_1=2$, $u_2=4$, $u_3=8$. On voit que $u_n=2^n$."
-        }
-      ]
-    },
-    {
-      "id": "Q23",
-      "level": "Tle spé",
-      "domain": "Analyse",
-      "title": "Intégrale",
-      "statement": "Calculer $\\int_0^1 2x\\,dx$ en justifiant.",
-      "family": "Q23",
-      "productions": [
-        {
-          "id": "Q23-1",
-          "content": "$f(x)=x^3+x-1$. La calculatrice donne $f(0{,}682)\\approx-0{,}001$ et $f(0{,}683)\\approx0{,}002$. Il y a donc une unique solution réelle."
-        },
-        {
-          "id": "Q23-2",
-          "content": "$\\int_0^1 2x\\,dx=[x^2]_0^1=1$."
-        },
-        {
-          "id": "Q23-3",
-          "content": "$\\int_0^1 2x\\,dx=x^2=1$."
-        },
-        {
-          "id": "Q23-4",
-          "content": "$\\int_0^1 2x\\,dx=2$."
-        }
-      ]
-    },
-    {
-      "id": "Q24",
-      "level": "Tle spé",
-      "domain": "Analyse",
-      "title": "Existence et unicité",
-      "statement": "Démontrer que $x^3+x-1=0$ possède une unique solution réelle.",
-      "family": "Q24",
-      "productions": [
-        {
-          "id": "Q24-1",
-          "content": "$f(x)=x^3+x-1$ est continue sur $\\mathbb R$, avec $f(0)=-1$ et $f(1)=1$. Le TVI donne une racine dans $]0;1[$. Comme $f’(x)=3x^2+1>0$, $f$ est strictement croissante sur $\\mathbb R$, donc cette racine est unique."
-        },
-        {
-          "id": "Q24-2",
-          "content": "$f(x)=x^3+x-1$ est continue, $f(0)<0<f(1)$. Par le TVI il y a une unique racine réelle."
-        },
-        {
-          "id": "Q24-3",
-          "content": "$f’(x)=3x^2+1>0$, donc il existe une unique racine."
-        },
-        {
-          "id": "Q24-4",
-          "content": "Le graphe coupe l’axe une seule fois, donc il y a une unique solution."
-        }
-      ]
-    },
-    {
-      "id": "Q25",
-      "level": "2de",
-      "domain": "Géométrie",
-      "title": "Milieu et coordonnées",
-      "statement": "$A(1;2)$ et $B(5;6)$. Déterminer les coordonnées du milieu $M$ de $[AB]$ en montrant le calcul.",
-      "family": "Q25",
-      "productions": [
-        {
-          "id": "Q25-1",
-          "content": "$M\\left(\\frac{1+5}{2};\\frac{2+6}{2}\\right)$, donc $M(3;4)$."
-        },
-        {
-          "id": "Q25-2",
-          "content": "$M=(3;4)$ car $(1+5)/2=3$ et $(2+6)/2=4$."
-        },
-        {
-          "id": "Q25-3",
-          "content": "$x=(1+5)/2=3$, puis $x=(2+6)/2=4$. Donc $M(3;4)$."
-        },
-        {
-          "id": "Q25-4",
-          "content": "$M(3;4)$."
-        }
-      ]
-    },
-    {
-      "id": "Q26",
-      "level": "2de",
-      "domain": "Algèbre",
-      "title": "Identité et exemples",
-      "statement": "L’égalité $(x+1)^2=x^2+1$ est-elle vraie pour tout réel $x$ ? Justifier.",
-      "family": "Q26",
-      "productions": [
-        {
-          "id": "Q26-1",
-          "content": "Non : pour $x=1$, $(x+1)^2=4$ alors que $x^2+1=2$."
-        },
-        {
-          "id": "Q26-2",
-          "content": "Non : $(x+1)^2-(x^2+1)=2x$, non nul lorsque $x\\ne0$."
-        },
-        {
-          "id": "Q26-3",
-          "content": "Pour $x=0$, les deux membres valent $1$, donc oui."
-        },
-        {
-          "id": "Q26-4",
-          "content": "Non, car elle n’est vraie pour aucun réel."
-        }
-      ]
-    },
-    {
-      "id": "Q27",
+      "id": "R11",
       "level": "1re spé",
       "domain": "Analyse",
-      "title": "Tangente",
-      "statement": "Pour $f(x)=x^2$, déterminer une équation de la tangente au point d’abscisse $1$. Justifier.",
-      "family": "Q27",
+      "statement": "On considère $f(x)=x^3-3x^2-9x+4$ sur $\\mathbb R$. Déterminer les équations de ses tangentes horizontales, en justifiant.",
+      "family": "R11",
       "productions": [
         {
-          "id": "Q27-1",
-          "content": "$f(1)=1$ et $f’(1)=2$. La tangente a pour équation $y=f’(1)(x-1)+f(1)=2x-1$."
+          "id": "R11-1",
+          "content": "Une tangente est horizontale si et seulement si son coefficient directeur est nul. Or $f^{\\prime}(x)=3x^2-6x-9=3(x-3)(x+1)$.\n\nAinsi les abscisses sont $-1$ et $3$. Comme $f(-1)=9$ et $f(3)=-23$, les tangentes cherchées ont pour équations $y=9$ et $y=-23$."
         },
         {
-          "id": "Q27-2",
-          "content": "$y=2(x-1)+1=2x-1$."
+          "id": "R11-2",
+          "content": "$f^{\\prime}(x)=3x^2-6x-9=3(x-3)(x+1)$. La fonction est donc $x=-1$ ou $x=3$. Les tangentes sont $9$ et $-23$."
         },
         {
-          "id": "Q27-3",
-          "content": "$f’(x)=2x$, donc la tangente est $y=2x$."
-        },
-        {
-          "id": "Q27-4",
-          "content": "$f(x)=2x-1$ est l’équation de la tangente."
+          "id": "R11-3",
+          "content": "$f^{\\prime}(x)=3(x-3)(x+1)$ ; $f^{\\prime}(-1)=f^{\\prime}(3)=0$. Donc les tangentes sont $y=f(-1)=9$ et $y=f(3)=-23$."
         }
       ]
     },
     {
-      "id": "Q28",
+      "id": "R12",
       "level": "Tle spé",
-      "domain": "Probabilités",
-      "title": "Indépendance",
-      "statement": "$P(A)=0{,}5$, $P(B)=0{,}4$, $P(A\\cap B)=0{,}2$. Les événements sont-ils indépendants ? Justifier.",
-      "family": "Q28",
+      "domain": "Trigonométrie",
+      "statement": "Résoudre $\\cos(2x)=\\sin(3x)$ pour $x\\in[-2\\pi;3\\pi]$, en justifiant l’ensemble des solutions.",
+      "family": "R12",
       "productions": [
         {
-          "id": "Q28-1",
-          "content": "$P(A)P(B)=0{,}5\\times0{,}4=0{,}2=P(A\\cap B)$. Par définition, $A$ et $B$ sont indépendants."
+          "id": "R12-1",
+          "content": "$\\sin(3x)=\\cos(\\pi/2-3x)$. Ainsi l’équation équivaut à $2x=\\pi/2-3x+2k\\pi$ ou $2x=-\\pi/2+3x+2k\\pi$, pour un entier $k$.\n\nOn obtient $x=\\pi/10+2k\\pi/5$ ou $x=\\pi/2-2k\\pi$. La seconde famille est incluse dans la première : $\\pi/2-2k\\pi=\\pi/10+2(1-5k)\\pi/5$.\n\nEnfin $-2\\pi\\le\\pi/10+2k\\pi/5\\le3\\pi$ équivaut à $-21/4\\le k\\le29/4$. Donc $S=\\{\\pi/10+2k\\pi/5:k\\in\\mathbb Z,\\ -5\\le k\\le7\\}$."
         },
         {
-          "id": "Q28-2",
-          "content": "$0{,}5\\times0{,}4=0{,}2$, donc oui."
+          "id": "R12-2",
+          "content": "$\\cos(2x)=\\sin(3x)\\iff2x\\equiv\\pi/2-3x\\pmod{2\\pi}$ ou $2x\\equiv-\\pi/2+3x\\pmod{2\\pi}$.\n\nDonc $x\\equiv\\pi/10\\pmod{2\\pi/5}$ ou $x\\equiv\\pi/2\\pmod{2\\pi}$. La seconde classe est incluse dans la première.\n\nSur $[-2\\pi;3\\pi]$, on a donc $S=\\{\\pi/10+2k\\pi/5:k=-5,-4,\\ldots,7\\}$."
         },
         {
-          "id": "Q28-3",
-          "content": "Ils sont indépendants, donc $P(A\\cap B)=P(A)P(B)=0{,}2$. Donc oui."
+          "id": "R12-3",
+          "content": "Pour $x\\in[-2\\pi;3\\pi]$, $\\cos(2x)=\\sin(3x)$ équivaut à l’existence d’un entier $k$ tel que $x=\\pi/10+2k\\pi/5$ ou $x=\\pi/2+2k\\pi$.\n\nDans la première branche, $k\\in\\{-5,\\ldots,7\\}$ ; dans la seconde, $k\\in\\{-1,0,1\\}$. La seconde branche donne déjà des valeurs de la première. Donc $S=\\{\\pi/10+2k\\pi/5:k\\in\\mathbb Z,-5\\le k\\le7\\}$."
         },
         {
-          "id": "Q28-4",
-          "content": "Oui, car $A\\cap B=0{,}2$."
+          "id": "R12-4",
+          "content": "$\\cos(2x)=\\sin(3x)\\iff\\cos(2x)=\\cos(\\pi/2-3x)\\iff2x=\\pi/2-3x$.\n\nDonc $x=\\pi/10$, qui appartient à l’intervalle demandé. Ainsi $S=\\{\\pi/10\\}$."
+        },
+        {
+          "id": "R12-5",
+          "content": "Les solutions réelles sont $x=\\pi/10+2k\\pi/5$ ou $x=\\pi/2+2k\\pi$, avec $k\\in\\mathbb Z$. La seconde famille est incluse dans la première.\n\nSur l’intervalle demandé, $-5\\le k\\le7$, donc $S=\\{\\pi/10+2k\\pi/5:-5\\le k\\le7\\}$."
+        },
+        {
+          "id": "R12-6",
+          "content": "Les solutions réelles sont $x=\\pi/10+2k\\pi/5$, avec $k\\in\\mathbb R$. Sur l’intervalle demandé, cela donne toutes les valeurs de $[-2\\pi;3\\pi]$."
         }
       ]
     },
     {
-      "id": "Q29",
-      "level": "Sup 1",
+      "id": "R13",
+      "level": "Tle spé",
+      "domain": "Suites",
+      "statement": "On définit $u_0=0$ et $u_{n+1}=\\sqrt{2+u_n}$. Démontrer que la suite est bien définie et que $0\\leq u_n<2$ pour tout $n\\in\\mathbb N$.",
+      "family": "R13",
+      "productions": [
+        {
+          "id": "R13-1",
+          "content": "Au rang $0$, $u_0=0$ existe et $0\\le u_0<2$.\n\nSupposons $u_n$ défini et $0\\le u_n<2$. Alors $2\\le2+u_n<4$, donc la racine existe et $0\\le u_{n+1}=\\sqrt{2+u_n}<2$.\n\nPar récurrence, tous les termes existent et vérifient l’encadrement demandé."
+        },
+        {
+          "id": "R13-2",
+          "content": "Supposons $u_n$ défini et $0\\le u_n<2$. Alors $2\\le2+u_n<4$, donc la racine existe et $0\\le u_{n+1}=\\sqrt{2+u_n}<2$.\n\nPar récurrence, tous les termes existent et vérifient l’encadrement demandé."
+        },
+        {
+          "id": "R13-3",
+          "content": "Supposons que, pour tout $n\\in\\mathbb N$, $u_n$ existe et $0\\le u_n<2$. Alors $2\\le2+u_n<4$, d’où $0\\le u_{n+1}<2$. La propriété est donc vraie pour tout $n$."
+        },
+        {
+          "id": "R13-4",
+          "content": "$u_0=0$, $u_1\\approx1{,}414$, $u_2\\approx1{,}848$, $u_3\\approx1{,}962$. Les termes existent et restent entre $0$ et $2$. Ils continuent donc à vérifier $0\\le u_n<2$."
+        }
+      ]
+    },
+    {
+      "id": "R14",
+      "level": "Tle spé",
       "domain": "Analyse",
-      "title": "Somme de limites",
-      "statement": "$f(x)\\to a$ et $g(x)\\to b$ lorsque $x\\to0$. Démontrer avec $\\varepsilon,\\delta$ que $f(x)+g(x)\\to a+b$.",
-      "family": "Q29",
+      "statement": "Démontrer que l’équation $x^3+x-1=0$ admet une unique solution réelle $\\alpha$ et que $0{,}68<\\alpha<0{,}69$.",
+      "family": "R14",
       "productions": [
         {
-          "id": "Q29-1",
-          "content": "Soit $\\varepsilon>0$. Il existe $\\delta_1,\\delta_2>0$ tels que $0<|x|<\\delta_1$ entraîne $|f(x)-a|<\\varepsilon/2$ et $0<|x|<\\delta_2$ entraîne $|g(x)-b|<\\varepsilon/2$. Posons $\\delta=\\min(\\delta_1,\\delta_2)$. Alors $0<|x|<\\delta$ entraîne $|f(x)+g(x)-a-b|<\\varepsilon$ par inégalité triangulaire."
+          "id": "R14-1",
+          "content": "Posons $f(x)=x^3+x-1$. Elle est continue sur $\\mathbb R$ et $f^{\\prime}(x)=3x^2+1>0$, donc elle y est strictement croissante.\n\nDe plus, $f(0{,}68)=-0{,}005568<0$ et $f(0{,}69)=0{,}018509>0$. Par continuité, il existe une racine entre ces deux nombres ; par stricte croissance, elle est la seule racine réelle."
         },
         {
-          "id": "Q29-2",
-          "content": "Soit $\\varepsilon>0$. Pour $f$, choisissons $\\delta>0$ donnant $|f(x)-a|<\\varepsilon/2$ si $0<|x|<\\delta$. Pour $g$, choisissons $\\delta>0$ donnant $|g(x)-b|<\\varepsilon/2$ si $0<|x|<\\delta$. On prend le plus petit des deux $\\delta$. La somme des écarts est alors inférieure à $\\varepsilon$."
+          "id": "R14-2",
+          "content": "Posons $f(x)=x^3+x-1$. Elle est continue sur $\\mathbb R$. On calcule $f(0{,}68)<0$ et $f(0{,}69)>0$. Le théorème des valeurs intermédiaires donne donc une unique solution réelle entre $0{,}68$ et $0{,}69$."
         },
         {
-          "id": "Q29-3",
-          "content": "Soit $\\varepsilon>0$. Choisissons $\\delta>0$ pour que $|f(x)-a|<\\varepsilon/2$ dès que $0<|x|<\\delta$. Alors aussi $|g(x)-b|<\\varepsilon/2$, donc la somme tend vers $a+b$."
+          "id": "R14-3",
+          "content": "$f^{\\prime}(x)=3x^2+1>0$. La fonction est strictement croissante, donc l’équation possède une unique solution réelle. Comme $f(0{,}68)<0<f(0{,}69)$, cette solution est entre les deux bornes."
         },
         {
-          "id": "Q29-4",
-          "content": "Par le théorème de la limite d’une somme, la limite vaut $a+b$."
+          "id": "R14-4",
+          "content": "La solution unique est notée $\\alpha$. Puisque $f$ est strictement croissante et $f(0{,}68)<0<f(0{,}69)$, on a $0{,}68<\\alpha<0{,}69$. Cela démontre l’existence et l’unicité de la solution."
         }
       ]
     },
     {
-      "id": "Q30",
-      "level": "Sup 1",
+      "id": "R15",
+      "level": "Tle spé",
       "domain": "Analyse",
-      "title": "Dépendance du seuil",
-      "statement": "Démontrer par définition que $1/n\\to0$ quand $n\\to+\\infty$.",
-      "family": "Q30",
+      "statement": "On définit $f(x)=x^2$ pour $x\\le1$ et $f(x)=ax+b$ pour $x>1$. Déterminer les réels $a,b$ pour que $f$ soit dérivable en $1$. Justifier.",
+      "family": "R15",
       "productions": [
         {
-          "id": "Q30-1",
-          "content": "Soit $\\varepsilon>0$. Choisissons un entier $N>1/\\varepsilon$. Pour tout $n\\ge N$, $|1/n|\\le1/N<\\varepsilon$."
+          "id": "R15-1",
+          "content": "La dérivabilité impose la continuité : $a+b=f(1)=1$.\n\nSous cette condition, le taux d’accroissement en $1$ vaut $x+1$ à gauche, donc tend vers $2$, et vaut $a$ à droite. Les deux limites coïncident si et seulement si $a=2$. Alors $b=-1$.\n\nRéciproquement, ces valeurs donnent les deux taux de limite $2$ ; elles conviennent."
         },
         {
-          "id": "Q30-2",
-          "content": "Choisissons $N=1000$. Pour tout $\\varepsilon>0$ et tout $n\\ge N$, $1/n<\\varepsilon$. Donc la limite est $0$."
+          "id": "R15-2",
+          "content": "À gauche, $f^{\\prime}(x)=2x$ ; à droite, $f^{\\prime}(x)=a$. Les dérivées se raccordent si $a=2$. Donc $a=2$ et $b$ est quelconque."
         },
         {
-          "id": "Q30-3",
-          "content": "Pour tout $n\\ge1$, choisissons $\\varepsilon=2/n$. Alors $1/n<\\varepsilon$, donc la limite vaut $0$."
+          "id": "R15-3",
+          "content": "La continuité exige $a+b=1$. Les taux d’accroissement ont alors les limites $2$ et $a$. Ils ont une limite commune exactement lorsque $a=2$. Donc $(a,b)=(2,-1)$."
         },
         {
-          "id": "Q30-4",
-          "content": "$1/n$ devient aussi petit que l’on veut quand $n$ devient assez grand. Donc la limite est $0$."
+          "id": "R15-4",
+          "content": "La dérivabilité implique $a+b=1$ et $a=2$, donc $b=-1$. Pour ces valeurs, $f$ est continue en $1$ ; elle est donc dérivable en $1$."
         }
       ]
     },
     {
-      "id": "Q31",
+      "id": "R16",
       "level": "Sup 1",
       "domain": "Logique",
-      "title": "Témoins existentiels",
-      "statement": "Pour $a,b\\in\\mathbb Z$, on suppose $3\\mid a$ et $3\\mid b$. Démontrer $3\\mid(a+b)$.",
-      "family": "Q31",
+      "statement": "Soient $a,b\\in\\mathbb Z$ tels que $6\\mid a$ et $10\\mid b$. Démontrer que $2\\mid(a+b)$, puis déterminer si $4\\mid(a+b)$ est nécessairement vrai.",
+      "family": "R16",
       "productions": [
         {
-          "id": "Q31-1",
-          "content": "Il existe $p,q\\in\\mathbb Z$ tels que $a=3p$ et $b=3q$. Alors $a+b=3(p+q)$, avec $p+q\\in\\mathbb Z$."
+          "id": "R16-1",
+          "content": "Il existe $p,q\\in\\mathbb Z$ tels que $a=6p$ et $b=10q$. Alors $a+b=2(3p+5q)$ est pair.\n\nEn revanche, $a=6$ et $b=0$ vérifient les hypothèses et leur somme $6$ n’est pas divisible par $4$. La seconde assertion est donc fausse."
         },
         {
-          "id": "Q31-2",
-          "content": "Il existe $k\\in\\mathbb Z$ tel que $a=3k$ et $b=3k$. Alors $a+b=6k$ est divisible par $3$."
+          "id": "R16-2",
+          "content": "Il existe $k\\in\\mathbb Z$ tel que $a=6k$ et $b=10k$. Alors $a+b=16k$, donc est pair et même divisible par $4$."
         },
         {
-          "id": "Q31-3",
-          "content": "$a=3k$ pour un entier $k$. Puis $b=3k$ pour un autre entier $k$. La somme vaut trois fois la somme des deux entiers, donc est divisible par $3$."
+          "id": "R16-3",
+          "content": "Écrivons $a=6k$ pour un entier $k$. Pour $b$, réutilisons $k$ pour un autre entier : $b=10k$. Chacun des deux nombres est pair, donc leur somme est paire.\n\nAvec $a=6$ et $b=0$, la somme n’est pas divisible par $4$. La seconde assertion est donc fausse."
         },
         {
-          "id": "Q31-4",
-          "content": "$a+b=3(a/3+b/3)$, donc $3\\mid(a+b)$."
+          "id": "R16-4",
+          "content": "$a+b=2(3a/6+5b/10)$, donc la somme est paire. La divisibilité par $4$ est fausse pour $a=6,b=0$."
         }
       ]
     },
     {
-      "id": "Q32",
+      "id": "R17",
       "level": "Sup 1",
       "domain": "Analyse",
-      "title": "Variables muettes",
-      "statement": "Calculer $\\int_0^1 t\\,dt+\\int_0^1 x\\,dx$ en justifiant.",
-      "family": "Q32",
+      "statement": "À l’aide de la définition quantifiée, démontrer que $u_n=\\frac{2n+1}{n+2}$ converge vers $2$. Donner un rang qui convient à chaque $\\varepsilon>0$.",
+      "family": "R17",
       "productions": [
         {
-          "id": "Q32-1",
-          "content": "Chaque intégrale vaut $1/2$, donc la somme vaut $1$."
+          "id": "R17-1",
+          "content": "Soit $\\varepsilon>0$. Pour tout $n\\in\\mathbb N$, $|u_n-2|=3/(n+2)$. Prenons $N=\\lceil3/\\varepsilon\\rceil$. Si $n\\ge N$, alors $n+2>3/\\varepsilon$ et $|u_n-2|<\\varepsilon$.\n\nAinsi, pour tout $\\varepsilon>0$, il existe un rang $N$ à partir duquel l’écart est inférieur à $\\varepsilon$ : $u_n\\to2$."
         },
         {
-          "id": "Q32-2",
-          "content": "$\\int_0^1 t\\,dt+\\int_0^1 x\\,dx=\\int_0^1 x\\,dx+\\int_0^1 x\\,dx=2[x^2/2]_0^1=1$."
+          "id": "R17-2",
+          "content": "Il existe $N=1000$ tel que, pour tout $\\varepsilon>0$ et tout $n\\ge N$, $|u_n-2|=3/(n+2)<\\varepsilon$. Donc $u_n\\to2$."
         },
         {
-          "id": "Q32-3",
-          "content": "Les lettres sont différentes, on ne peut pas additionner ces intégrales."
+          "id": "R17-3",
+          "content": "Pour tout $n$, posons $\\varepsilon=4/(n+2)$. Alors $|u_n-2|=3/(n+2)<\\varepsilon$. Donc $u_n\\to2$."
         },
         {
-          "id": "Q32-4",
-          "content": "$\\int_0^1 t\\,dt+\\int_0^1 x\\,dx=t^2/2+x^2/2=1$."
+          "id": "R17-4",
+          "content": "$u_n=2-3/(n+2)$. Puisque $3/(n+2)\\to0$, on a $u_n\\to2$."
+        },
+        {
+          "id": "R17-5",
+          "content": "Soit $\\varepsilon>0$. Prenons un entier $n>3/\\varepsilon$. Pour tout entier $n$ supérieur ou égal à ce $n$, on a $|u_n-2|=3/(n+2)<\\varepsilon$. Donc $u_n\\to2$."
         }
       ]
     },
     {
-      "id": "Q33",
+      "id": "R18",
+      "level": "Sup 1",
+      "domain": "Analyse",
+      "statement": "Démontrer, à partir de la définition de la convergence, qu’une suite réelle ne peut pas avoir deux limites distinctes.",
+      "family": "R18",
+      "productions": [
+        {
+          "id": "R18-1",
+          "content": "Supposons que $u_n\\to a$ et $u_n\\to b$, avec $a\\ne b$. Posons $\\varepsilon=|a-b|/3$. Il existe des rangs $N_a,N_b$ tels que $n\\ge N_a$ implique $|u_n-a|<\\varepsilon$, et $n\\ge N_b$ implique $|u_n-b|<\\varepsilon$.\n\nPour $n\\ge\\max(N_a,N_b)$, l’inégalité triangulaire donne $|a-b|\\le|a-u_n|+|u_n-b|<2|a-b|/3$, impossible. Donc $a=b$."
+        },
+        {
+          "id": "R18-2",
+          "content": "Supposons que $u_n\\to a$ et $u_n\\to b$, avec $a\\ne b$. Posons $\\varepsilon=|a-b|/3$. Pour $n$ assez grand, $|u_n-a|<\\varepsilon$ et $|u_n-b|<\\varepsilon$.\n\nAinsi $|a-b|\\le|a-u_n|+|u_n-b|<2|a-b|/3$, impossible. Donc $a=b$."
+        },
+        {
+          "id": "R18-3",
+          "content": "Si la suite converge vers $a$ et vers $b$, alors $a=\\lim_{n\\to\\infty}u_n=b$. Donc $a=b$."
+        },
+        {
+          "id": "R18-4",
+          "content": "Si deux limites étaient distinctes, on choisirait autour de chacune un intervalle ouvert de rayon égal au tiers de leur distance. Ces intervalles sont disjoints. La convergence impose que tous les termes, à partir d’un rang commun, appartiennent aux deux intervalles. C’est impossible."
+        }
+      ]
+    },
+    {
+      "id": "R19",
+      "level": "Sup 1",
+      "domain": "Analyse",
+      "statement": "Pour $x\\in[0;1]$, on pose $F(x)=\\int_0^x t\\,dt+\\int_x^1(1-t)\\,dt$. Déterminer le minimum de $F$ sur $[0;1]$ et les points où il est atteint.",
+      "family": "R19",
+      "productions": [
+        {
+          "id": "R19-1",
+          "content": "$F(x)=x^2/2+(1/2-x+x^2/2)=x^2-x+1/2$. Ainsi $F(x)=(x-1/2)^2+1/4$.\n\nLe carré est positif ou nul et s’annule seulement pour $x=1/2\\in[0;1]$. Le minimum vaut $1/4$, atteint uniquement en $1/2$."
+        },
+        {
+          "id": "R19-2",
+          "content": "$F(x)=\\int_0^x u\\,du+\\int_x^1(1-u)\\,du=x^2/2+(1/2-x+x^2/2)=(x-1/2)^2+1/4$.\n\nLe minimum vaut $1/4$, atteint uniquement pour $x=1/2$."
+        },
+        {
+          "id": "R19-3",
+          "content": "$F(x)=\\int_0^x x\\,dx+\\int_x^1(1-x)\\,dx=x^2/2+(1/2-x+x^2/2)=(x-1/2)^2+1/4$.\n\nLe minimum vaut $1/4$, atteint uniquement pour $x=1/2$."
+        },
+        {
+          "id": "R19-4",
+          "content": "$F(x)=t^2/2+t-t^2/2=t$. Sur $[0;1]$, le minimum est donc $0$."
+        }
+      ]
+    },
+    {
+      "id": "R20",
       "level": "Sup 1",
       "domain": "Algèbre",
-      "title": "Inclusion d’ensembles",
-      "statement": "Démontrer $A\\cap(B\\cup C)=(A\\cap B)\\cup(A\\cap C)$.",
-      "family": "Q33",
+      "statement": "Soient $A,B$ deux parties d’un ensemble $E$ et $A\\triangle B=(A\\setminus B)\\cup(B\\setminus A)$. Démontrer que $A\\triangle B=\\varnothing$ si et seulement si $A=B$.",
+      "family": "R20",
       "productions": [
         {
-          "id": "Q33-1",
-          "content": "Pour tout $x$, $x\\in A\\cap(B\\cup C)\\iff(x\\in A)\\land(x\\in B\\lor x\\in C)\\iff(x\\in A\\cap B)\\lor(x\\in A\\cap C)$. Les deux ensembles ont donc les mêmes éléments."
+          "id": "R20-1",
+          "content": "Si $A\\triangle B=\\varnothing$, alors $A\\setminus B=B\\setminus A=\\varnothing$. Tout élément de $A$ appartient donc à $B$, et tout élément de $B$ appartient à $A$ : $A=B$.\n\nRéciproquement, si $A=B$, les deux différences sont vides, donc $A\\triangle B=\\varnothing$."
         },
         {
-          "id": "Q33-2",
-          "content": "Si $x\\in A\\cap(B\\cup C)$, alors $x\\in A$ et $x\\in B$ ou $x\\in C$. Ainsi $x\\in(A\\cap B)\\cup(A\\cap C)$. Donc les ensembles sont égaux."
+          "id": "R20-2",
+          "content": "Si $A\\triangle B=\\varnothing$, alors $A\\setminus B=\\varnothing$. Tout élément de $A$ appartient donc à $B$, d’où $A=B$.\n\nRéciproquement, si $A=B$, les deux différences sont vides, donc $A\\triangle B=\\varnothing$."
         },
         {
-          "id": "Q33-3",
-          "content": "Par distributivité de l’intersection sur l’union, les deux ensembles sont égaux."
+          "id": "R20-3",
+          "content": "Si $A=B$, alors $A\\setminus B=B\\setminus A=\\varnothing$, donc $A\\triangle B=\\varnothing$. L’équivalence est démontrée."
         },
         {
-          "id": "Q33-4",
-          "content": "Un élément du premier est dans $A$ et dans au moins l’un de $B,C$ ; c’est exactement être dans au moins l’un de $A\\cap B,A\\cap C$."
-        }
-      ]
-    },
-    {
-      "id": "Q34",
-      "level": "Sup 1",
-      "domain": "Algèbre",
-      "title": "Injectivité",
-      "statement": "Démontrer que $f:\\mathbb R\\to\\mathbb R$, $f(x)=3x+1$, est injective.",
-      "family": "Q34",
-      "productions": [
-        {
-          "id": "Q34-1",
-          "content": "Soient $a,b\\in\\mathbb R$ tels que $f(a)=f(b)$. Alors $3a+1=3b+1$, donc $a=b$. Ainsi $f$ est injective."
-        },
-        {
-          "id": "Q34-2",
-          "content": "Si $a=b$, alors $3a+1=3b+1$, donc $f(a)=f(b)$. Donc $f$ est injective."
-        },
-        {
-          "id": "Q34-3",
-          "content": "$f(a)=f(b)\\iff3a+1=3b+1\\iff a=b$. Donc $f$ est injective."
-        },
-        {
-          "id": "Q34-4",
-          "content": "$f$ est strictement croissante sur $\\mathbb R$, car son coefficient directeur est positif ; elle est donc injective."
-        }
-      ]
-    },
-    {
-      "id": "Q35",
-      "level": "Sup 1",
-      "domain": "Analyse",
-      "title": "Supremum",
-      "statement": "Déterminer et justifier $\\sup\\{1-1/n:n\\ge1\\}$.",
-      "family": "Q35",
-      "productions": [
-        {
-          "id": "Q35-1",
-          "content": "Tous les termes sont inférieurs à $1$. Si $b<1$, choisir $n>1/(1-b)$ donne $1-1/n>b$ ; $b$ n’est pas majorant. Donc le supremum est $1$."
-        },
-        {
-          "id": "Q35-2",
-          "content": "Pour tout $n\\ge1$, $1-1/n<1$. Donc le supremum est $1$."
-        },
-        {
-          "id": "Q35-3",
-          "content": "La suite tend vers $1$, donc le supremum est $1$."
-        },
-        {
-          "id": "Q35-4",
-          "content": "Le maximum est $1$, puisque les termes s’en approchent sans l’atteindre."
-        }
-      ]
-    },
-    {
-      "id": "Q36",
-      "level": "Sup 1",
-      "domain": "Analyse",
-      "title": "Continuité et dérivabilité",
-      "statement": "L’affirmation « toute fonction continue sur $\\mathbb R$ est dérivable sur $\\mathbb R$ » est-elle vraie ? Justifier.",
-      "family": "Q36",
-      "productions": [
-        {
-          "id": "Q36-1",
-          "content": "Non. $f(x)=|x|$ est continue sur $\\mathbb R$. En $0$, son taux d’accroissement vaut $1$ à droite et $-1$ à gauche ; elle n’y est pas dérivable."
-        },
-        {
-          "id": "Q36-2",
-          "content": "Non : $f(x)=|x|$."
-        },
-        {
-          "id": "Q36-3",
-          "content": "Oui, car une fonction dérivable est continue."
-        },
-        {
-          "id": "Q36-4",
-          "content": "Non : $f(x)=1/x$ n’est pas dérivable en $0$."
-        }
-      ]
-    },
-    {
-      "id": "Q37",
-      "level": "Sup 1",
-      "domain": "Algèbre",
-      "title": "Produit de matrices",
-      "statement": "Pour des matrices carrées réelles $A,B$ de même taille, développer $(A+B)^2$ sans supposer $AB=BA$.",
-      "family": "Q37",
-      "productions": [
-        {
-          "id": "Q37-1",
-          "content": "$(A+B)^2=(A+B)(A+B)=A^2+AB+B^2$."
-        },
-        {
-          "id": "Q37-2",
-          "content": "$(A+B)^2=A^2+2AB+B^2$."
-        },
-        {
-          "id": "Q37-3",
-          "content": "$(A+B)^2=A^2+AB+BA+B^2=A^2+2AB+B^2$."
-        },
-        {
-          "id": "Q37-4",
-          "content": "On pose $C=AB$ et $C=BA$. Alors $(A+B)^2=A^2+C+C+B^2$."
-        }
-      ]
-    },
-    {
-      "id": "Q38",
-      "level": "Sup 1",
-      "domain": "Arithmétique",
-      "title": "Parité par contraposition",
-      "statement": "Pour $n\\in\\mathbb Z$, démontrer que si $n^2$ est pair, alors $n$ est pair.",
-      "family": "Q38",
-      "productions": [
-        {
-          "id": "Q38-1",
-          "content": "Par contraposition, si $n$ est impair, $n=2k+1$ avec $k\\in\\mathbb Z$, et $n^2=2(2k^2+2k)+1$ est impair. Donc si $n^2$ est pair, $n$ est pair."
-        },
-        {
-          "id": "Q38-2",
-          "content": "Si $n$ est pair, $n=2k$, donc $n^2=4k^2$ est pair. Cela prouve le résultat."
-        },
-        {
-          "id": "Q38-3",
-          "content": "$n^2$ pair signifie $n^2=2k$. Donc $n=2\\sqrt{k/2}$ et $n$ est pair."
-        },
-        {
-          "id": "Q38-4",
-          "content": "Un impair au carré est impair, donc un entier dont le carré est pair est pair."
-        }
-      ]
-    },
-    {
-      "id": "Q39",
-      "level": "Sup 1",
-      "domain": "Analyse",
-      "title": "Suite bornée",
-      "statement": "La suite $u_n=(-1)^n$ converge-t-elle ? Justifier.",
-      "family": "Q39",
-      "productions": [
-        {
-          "id": "Q39-1",
-          "content": "$u_{2n}=1$ et $u_{2n+1}=-1$. Ces deux sous-suites ont des limites différentes ; la suite ne converge pas."
-        },
-        {
-          "id": "Q39-2",
-          "content": "Elle est bornée entre $-1$ et $1$, donc elle converge."
-        },
-        {
-          "id": "Q39-3",
-          "content": "Elle alterne indéfiniment entre deux valeurs distinctes, $1$ et $-1$, donc elle ne peut s’approcher d’une seule limite."
-        },
-        {
-          "id": "Q39-4",
-          "content": "$u_n=1$ puis $u_n=-1$, donc $1=-1$, impossible : la suite diverge."
-        }
-      ]
-    },
-    {
-      "id": "Q40",
-      "level": "Sup 1",
-      "domain": "Analyse",
-      "title": "Unicité de limite",
-      "statement": "Démontrer qu’une suite réelle convergente possède une seule limite.",
-      "family": "Q40",
-      "productions": [
-        {
-          "id": "Q40-1",
-          "content": "Supposons $u_n\\to a$ et $u_n\\to b$ avec $a\\ne b$. Posons $\\varepsilon=|a-b|/3$. Pour $n$ assez grand, $|u_n-a|<\\varepsilon$ et $|u_n-b|<\\varepsilon$. Alors $|a-b|\\le|a-u_n|+|u_n-b|<2|a-b|/3$, contradiction."
-        },
-        {
-          "id": "Q40-2",
-          "content": "Si $u_n\\to a$ et $u_n\\to b$, alors $a=\\lim u_n=b$."
-        },
-        {
-          "id": "Q40-3",
-          "content": "À partir d’un certain rang, $u_n=a$ et $u_n=b$. Donc $a=b$."
-        },
-        {
-          "id": "Q40-4",
-          "content": "Si deux limites étaient distinctes, des voisinages disjoints autour d’elles devraient tous deux contenir tous les termes à partir d’un certain rang. C’est impossible."
+          "id": "R20-4",
+          "content": "$A\\triangle B=\\varnothing\\iff(A\\setminus B=\\varnothing\\text{ et }B\\setminus A=\\varnothing)\\iff(A\\subseteq B\\text{ et }B\\subseteq A)\\iff A=B$."
         }
       ]
     }
